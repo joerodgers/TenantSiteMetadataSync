@@ -4,7 +4,7 @@
 $moduleRoot = Resolve-Path -Path "$PSScriptRoot\.." | Select-Object -ExpandProperty Path
 
 # local the first .psd1 file in the module root
-$moduleManifestPath = Get-ChildItem -Path $moduleRoot -Filter "*.psd1" | Select-Object -ExpandProperty FullName -First 1 
+$moduleManifestPath = Get-ChildItem -Path $moduleRoot -Filter "*.psd1" -Recurse | Select-Object -ExpandProperty FullName -First 1 
 
 # Automatically add missing dependencies
 $data = Import-PowerShellDataFile -Path $moduleManifestPath
