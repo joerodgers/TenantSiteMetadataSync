@@ -8,6 +8,29 @@
 
         InModuleScope -ModuleName "TenantSiteMetadataSync" {
 
+            BeforeAll {
+
+                function Connect-MgGraph 
+                { 
+                    param($ClientId, $CertificateThumbprint, $TenantId) 
+                }
+                function Disconnect-MgGraph 
+                { 
+                    param() 
+                }
+
+                function Get-MgGroupOwner
+                {
+                    param($GroupId, $Top) 
+                }
+
+
+                Mock -CommandName "Start-SyncJobExecution" -Verifiable
+                Mock -CommandName "Stop-SyncJobExecution"  -Verifiable
+                Mock -CommandName "Disconnect-MgGraph"     -Verifiable
+            }
+
+
             It "should update the group owner" {
 
                 $mockGroup1 = @{ GroupId = "8dca3683-8d6c-4735-878f-49001418f7c4"; AdditionalProperties = @{ userPrincipalName = "john.doe@contoso.com" }}
@@ -19,19 +42,6 @@
                 $mockThumbprint     = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                 $mockTenant         = "contoso"
 
-                function Connect-MgGraph 
-                { 
-                    param($ClientId, $CertificateThumbprint, $TenantId) 
-                }
-                function Get-MgGroupOwner
-                {
-                    param($GroupId, $Top) 
-                }
-
-
-                Mock -CommandName "Start-SyncJobExecution" -Verifiable
-                Mock -CommandName "Stop-SyncJobExecution"  -Verifiable
-                Mock -CommandName "Disconnect-MgGraph"     -Verifiable
 
                 Mock `
                     -CommandName "Get-DataTable" `
@@ -76,7 +86,7 @@
                     -ParameterFilter { $Query -eq "EXEC proc_AddGroupOwnerByGroupId @GroupId = @GroupId, @UserPrincipalName = @UserPrincipalName" -and $Parameters.GroupId -eq  $mockGroup2.GroupId } `
                     -Verifiable
 
-                Import-M365GroupOwnershipData -Tenant $mockTenant -ClientId $mockClientId -Thumbprint $mockThumbprint -DatabaseName $mockDatabaseName -DatabaseServer $mockDatabaseServer -Verbose
+                Import-M365GroupOwnershipData -Tenant $mockTenant -ClientId $mockClientId -Thumbprint $mockThumbprint -DatabaseName $mockDatabaseName -DatabaseServer $mockDatabaseServer
 
                 Should -InvokeVerifiable
             }

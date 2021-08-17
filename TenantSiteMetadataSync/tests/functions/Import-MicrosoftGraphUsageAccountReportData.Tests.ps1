@@ -7,7 +7,47 @@
     Context "Import-MicrosoftGraphUsageAccountReportData function" {
 
         InModuleScope -ModuleName "TenantSiteMetadataSync" {
-        
+            
+            BeforeAll {
+
+                function Connect-PnPOnline
+                {
+                    param($Url, $ClientId, $Thumbprint, $Tenant, $ReturnConnection) 
+                }
+                function Disconnect-PnPOnline 
+                {
+                    param($Connection) 
+                }
+                function Get-PnPGraphAccessToken
+                {
+                    param($Connection) 
+                }
+
+                Mock `
+                    -CommandName "Start-SyncJobExecution" `
+                    -ModuleName "TenantSiteMetadataSync" `
+                    -Verifiable
+
+                Mock `
+                    -CommandName "Stop-SyncJobExecution" `
+                    -ModuleName "TenantSiteMetadataSync" `
+                    -Verifiable
+
+                Mock `
+                    -CommandName "Connect-PnPOnline" `
+                    -MockWith { return 1 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName "Disconnect-PnPOnline" `
+                    -Verifiable
+
+                Mock `
+                    -CommandName "Get-PnPGraphAccessToken" `
+                    -MockWith { return "mock_access_token" } `
+                    -Verifiable
+            }
+
             It "should update the group metadata" {
             
                 $mockM365Group1 = [PSCustomObject] @{
@@ -47,36 +87,6 @@
                     'Exchange Mailbox Storage Used (Byte)' = 1GB
                     'Last Activity Date'                   = [DateTime]::Today.ToString()
                 }
-
-                function Connect-PnPOnline {}
-                function Disconnect-PnPOnline {}
-                function Get-PnPGraphAccessToken {}
-
-                Mock `
-                    -CommandName "Start-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Stop-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Connect-PnPOnline" `
-                    -MockWith { return 1 } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Disconnect-PnPOnline" `
-                    -RemoveParameterType "Connection" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Get-PnPGraphAccessToken" `
-                    -RemoveParameterType "Connection" `
-                    -MockWith { return "mock_access_token" } `
-                    -Verifiable
 
                 Mock `
                     -CommandName "Invoke-RestMethod" `
@@ -159,36 +169,6 @@
                     'Page View Count'          = 102
                 }
 
-                function Connect-PnPOnline {}
-                function Disconnect-PnPOnline {}
-                function Get-PnPGraphAccessToken {}
-
-                Mock `
-                    -CommandName "Start-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Stop-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Connect-PnPOnline" `
-                    -MockWith { return 1 } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Disconnect-PnPOnline" `
-                    -RemoveParameterType "Connection" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Get-PnPGraphAccessToken" `
-                    -RemoveParameterType "Connection" `
-                    -MockWith { return "mock_access_token" } `
-                    -Verifiable
-
                 Mock `
                     -CommandName "Invoke-RestMethod" `
                     -ParameterFilter { $Uri -eq "https://graph.microsoft.com/v1.0/reports/getSharePointSiteUsageDetail(period='D30')" -and $Headers.Authorization -eq "Bearer mock_access_token" } `
@@ -258,36 +238,6 @@
                     'Visited Page Count'       = 101
                     'Page View Count'          = 102
                 }
-
-                function Connect-PnPOnline {}
-                function Disconnect-PnPOnline {}
-                function Get-PnPGraphAccessToken {}
-
-                Mock `
-                    -CommandName "Start-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Stop-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Connect-PnPOnline" `
-                    -MockWith { return 1 } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Disconnect-PnPOnline" `
-                    -RemoveParameterType "Connection" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Get-PnPGraphAccessToken" `
-                    -RemoveParameterType "Connection" `
-                    -MockWith { return "mock_access_token" } `
-                    -Verifiable
 
                 Mock `
                     -CommandName "Invoke-RestMethod" `
@@ -360,36 +310,6 @@
                     'Secure Link For Guest Count'  = 104
                     'Secure Link For Member Count' = 105
                 }
-
-                function Connect-PnPOnline {}
-                function Disconnect-PnPOnline {}
-                function Get-PnPGraphAccessToken {}
-                
-                Mock `
-                    -CommandName "Start-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Stop-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Connect-PnPOnline" `
-                    -MockWith { return 1 } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Disconnect-PnPOnline" `
-                    -RemoveParameterType "Connection" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Get-PnPGraphAccessToken" `
-                    -RemoveParameterType "Connection" `
-                    -MockWith { return "mock_access_token" } `
-                    -Verifiable
 
                 Mock `
                     -CommandName "Invoke-RestMethod" `
@@ -476,37 +396,6 @@
                     'Page View Count'          = 102
                 }
 
-                function Connect-PnPOnline {}
-                function Disconnect-PnPOnline {}
-                function Get-PnPGraphAccessToken {}
-
-                
-                Mock `
-                    -CommandName "Start-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Stop-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Connect-PnPOnline" `
-                    -MockWith { return 1 } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Disconnect-PnPOnline" `
-                    -RemoveParameterType "Connection" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Get-PnPGraphAccessToken" `
-                    -RemoveParameterType "Connection" `
-                    -MockWith { return "mock_access_token" } `
-                    -Verifiable
-
                 Mock `
                     -CommandName "Invoke-RestMethod" `
                     -ParameterFilter { $Uri -eq "https://graph.microsoft.com/v1.0/reports/getSharePointSiteUsageDetail(period='D$Period')" -and $Headers.Authorization -eq "Bearer mock_access_token" } `
@@ -559,37 +448,6 @@
                     'Visited Page Count'       = 101
                     'Page View Count'          = 102
                 }
-
-                function Connect-PnPOnline {}
-                function Disconnect-PnPOnline {}
-                function Get-PnPGraphAccessToken {}
-
-
-                Mock `
-                    -CommandName "Start-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Stop-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Connect-PnPOnline" `
-                    -MockWith { return 1 } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Disconnect-PnPOnline" `
-                    -RemoveParameterType "Connection" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Get-PnPGraphAccessToken" `
-                    -RemoveParameterType "Connection" `
-                    -MockWith { return "mock_access_token" } `
-                    -Verifiable
 
                 Mock `
                     -CommandName "Invoke-RestMethod" `
@@ -645,36 +503,6 @@
                 $csvWithBOM = [char]0xEF + [char]0xBB + [char]0xBF + $csvWithoutBOM
 
                 $csvWithBOM.Length | Should -BeExactly ($csvWithoutBOM.Length + 3)
-
-                function Connect-PnPOnline {}
-                function Disconnect-PnPOnline {}
-                function Get-PnPGraphAccessToken {}
-
-                Mock `
-                    -CommandName "Start-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Stop-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Connect-PnPOnline" `
-                    -MockWith { return 1 } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Disconnect-PnPOnline" `
-                    -RemoveParameterType "Connection" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Get-PnPGraphAccessToken" `
-                    -RemoveParameterType "Connection" `
-                    -MockWith { return "mock_access_token" } `
-                    -Verifiable
 
                 Mock `
                     -CommandName "Invoke-RestMethod" `

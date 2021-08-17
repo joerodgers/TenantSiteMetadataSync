@@ -8,6 +8,49 @@
 
         InModuleScope -ModuleName "TenantSiteMetadataSync" {
 
+            BeforeAll {
+
+                function Connect-PnPOnline
+                {
+                    param($Url, $ClientId, $Thumbprint, $Tenant, $ReturnConnection) 
+                }
+                function Disconnect-PnPOnline 
+                {
+                    param($Includes,$Connection) 
+                }
+
+                function Get-PnPSite 
+                {
+                    param($Includes, $Connection) 
+                }
+
+                function Get-PnPWeb
+                {
+                    param($Includes, $Connection) 
+                }
+
+                Mock `
+                    -CommandName "Start-SyncJobExecution" `
+                    -ModuleName "TenantSiteMetadataSync" `
+                    -Verifiable
+
+                Mock `
+                    -CommandName "Stop-SyncJobExecution" `
+                    -ModuleName "TenantSiteMetadataSync" `
+                    -Verifiable
+
+                Mock `
+                    -CommandName "Connect-PnPOnline" `
+                    -MockWith { return 1 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName "Disconnect-PnPOnline" `
+                    -Verifiable
+            }
+
+
+
             It "should read the basic SPO site info from the API" {
             
                 $mockSite1 = [PSCustomObject] @{ 
@@ -44,32 +87,10 @@
 
                 $mockSites = @( $mockSite1, $mockSite2 )
 
-                function Connect-PnPOnline {}
-                function Disconnect-PnPOnline {}
                 function Get-PnPSite {}
                 function Get-PnPWeb {}
                 function Get-PnPTenantSite {}
                 
-                Mock `
-                    -CommandName "Start-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Stop-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Connect-PnPOnline" `
-                    -MockWith { return 1 } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Disconnect-PnPOnline" `
-                    -RemoveParameterType "Connection" `
-                    -Verifiable
-
                 Mock `
                     -CommandName "Get-PnPTenantSite" `
                     -RemoveParameterType "Connection" `
@@ -162,31 +183,10 @@
 
                 $mockSites = @( $mockSite1, $mockSite2 )
 
-                function Connect-PnPOnline {}
-                function Disconnect-PnPOnline {}
-                function Get-PnPSite {}
-                function Get-PnPWeb {}
-                function Get-PnPTenantSite {}
-
-                Mock `
-                    -CommandName "Start-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Stop-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Connect-PnPOnline" `
-                    -MockWith { return 1 } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Disconnect-PnPOnline" `
-                    -RemoveParameterType "Connection" `
-                    -Verifiable
+                function Get-PnPTenantSite 
+                {
+                    param($IncludeOneDriveSites)
+                }
 
                 Mock `
                     -CommandName "Get-PnPTenantSite" `
@@ -246,32 +246,11 @@
 
                 $mockSites = @( $mockSite1, $mockSite2 )
 
-                function Connect-PnPOnline {}
-                function Disconnect-PnPOnline {}
-                function Get-PnPSite {}
-                function Get-PnPWeb {}
-                function Get-PnPTenantSite {}
+                function Get-PnPTenantSite 
+                {
+                    params($Template)
+                }
                 
-                Mock `
-                    -CommandName "Start-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Stop-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Connect-PnPOnline" `
-                    -MockWith { return 1 } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Disconnect-PnPOnline" `
-                    -RemoveParameterType "Connection" `
-                    -Verifiable
-
                 Mock `
                     -CommandName "Get-PnPTenantSite" `
                     -RemoveParameterType "Connection" `
@@ -296,11 +275,9 @@
 
             It "should read the detailed SPO site info from the API" {
             
-                function Connect-PnPOnline {}
-                function Disconnect-PnPOnline {}
-                function Get-PnPSite {}
-                function Get-PnPWeb {}
-                function Get-PnPTenantSite {}
+                function Get-PnPTenantSite 
+                {
+                }
                 
                 $mockSites = [PSCustomObject] @{ 
                     DenyAddAndCustomizePages = "Disabled"
@@ -331,16 +308,6 @@
                 }
 
                 Mock `
-                    -CommandName "Start-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Stop-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
                     -CommandName "Connect-PnPOnline" `
                     -ParameterFilter { $Url -eq "https://contoso-admin.sharepoint.com" } `
                     -MockWith { return 1 } `
@@ -363,13 +330,7 @@
                     -Verifiable
 
                 Mock `
-                    -CommandName "Disconnect-PnPOnline" `
-                    -RemoveParameterType "Connection" `
-                    -Verifiable
-
-                Mock `
                     -CommandName "Get-PnPTenantSite" `
-                    -RemoveParameterType "Connection" `
                     -MockWith { $mockSites } `
                     -Verifiable
 

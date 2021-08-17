@@ -33,7 +33,7 @@
 
         Write-Verbose "$(Get-Date) - Reading sites from tenant recycle bin"
 
-        if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection )
+        if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection $true )
         {
             if( $tenantSites = Get-PnPTenantRecycleBinItem -Connection $connection )
             {

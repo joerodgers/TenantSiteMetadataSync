@@ -8,18 +8,16 @@
 
         InModuleScope -ModuleName "TenantSiteMetadataSync" {
 
-            It "should update the group metadata" {
-            
-                $mockSource1 = [PSCustomObject] @{ Id = [Guid]::NewGuid().ToString();  DisplayName = "A" }
-                $mockSource2 = [PSCustomObject] @{ Id = [Guid]::NewGuid().ToString();  DisplayName = "B" }
-                $mockSource3 = [PSCustomObject] @{ Id = [Guid]::NewGuid().ToString();  DisplayName = "C" }
+            BeforeAll {
 
-                $mockSiteCreationSources = [PSCustomObject] @{ "value" = @($mockSource1, $mockSource2, $mockSource3 ) }
-
-                function Connect-PnPOnline {}
-                function Disconnect-PnPOnline {}
-                function Invoke-PnPSPRestMethod {}
-
+                function Connect-PnPOnline
+                {
+                    param($Url, $ClientId, $Thumbprint, $Tenant, $ReturnConnection) 
+                }
+                function Disconnect-PnPOnline 
+                {
+                    param($Connection) 
+                }
 
                 Mock `
                     -CommandName "Start-SyncJobExecution" `
@@ -38,8 +36,16 @@
 
                 Mock `
                     -CommandName "Disconnect-PnPOnline" `
-                    -RemoveParameterType "Connection" `
                     -Verifiable
+            }
+
+            It "should update the group metadata" {
+            
+                $mockSource1 = [PSCustomObject] @{ Id = [Guid]::NewGuid().ToString();  DisplayName = "A" }
+                $mockSource2 = [PSCustomObject] @{ Id = [Guid]::NewGuid().ToString();  DisplayName = "B" }
+                $mockSource3 = [PSCustomObject] @{ Id = [Guid]::NewGuid().ToString();  DisplayName = "C" }
+
+                $mockSiteCreationSources = [PSCustomObject] @{ "value" = @($mockSource1, $mockSource2, $mockSource3 ) }
 
                 Mock `
                     -CommandName "Invoke-PnPSPRestMethod" `

@@ -37,7 +37,7 @@
     }
     process
     {
-        if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection )
+        if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection $true )
         {
             $parameters = @{}
             $parameters.Connection = $connection
@@ -89,7 +89,7 @@
                 if( $DetailedImport.IsPresent )
                 {
                     # connect to indvidual site
-                    if( $connection = Connect-PnPOnline -Url $tenantSite.Url -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection )
+                    if( $connection = Connect-PnPOnline -Url $tenantSite.Url -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection $true )
                     {
                         $site = Get-PnPSite -Includes Owner, Id, RelatedGroupId, ConditionalAccessPolicy, SensitivityLabel -Connection $connection
                         $web  = Get-PnPWeb  -Includes Created -Connection $connection

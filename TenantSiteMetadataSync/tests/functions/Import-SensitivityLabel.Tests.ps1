@@ -8,18 +8,20 @@
 
         InModuleScope -ModuleName "TenantSiteMetadataSync" {
 
-            It "should update the group metadata" {
-            
-                $mockLabel1 = [PSCustomObject] @{ Id = [Guid]::NewGuid().ToString();  DisplayName = "Proprietary" }
-                $mockLabel2 = [PSCustomObject] @{ Id = [Guid]::NewGuid().ToString();  DisplayName = "Confidential" }
-                $mockLabel3 = [PSCustomObject] @{ Id = [Guid]::NewGuid().ToString();  DisplayName = "Restricated" }
+            BeforeAll {
 
-                $mockGraphResponse = [PSCustomObject] @{ "value" = @($mockLabel1, $mockLabel2, $mockLabel3 ) }
-
-                function Connect-PnPOnline {}
-                function Disconnect-PnPOnline {}
-                function Get-PnPGraphAccessToken {}
-
+                function Connect-PnPOnline
+                {
+                    param($Url, $ClientId, $Thumbprint, $Tenant, $ReturnConnection) 
+                }
+                function Disconnect-PnPOnline 
+                {
+                    param($Connection) 
+                }
+                function Get-PnPGraphAccessToken
+                {
+                    param($Connection) 
+                }
 
                 Mock `
                     -CommandName "Start-SyncJobExecution" `
@@ -38,14 +40,22 @@
 
                 Mock `
                     -CommandName "Disconnect-PnPOnline" `
-                    -RemoveParameterType "Connection" `
                     -Verifiable
 
                 Mock `
                     -CommandName "Get-PnPGraphAccessToken" `
-                    -RemoveParameterType "Connection" `
                     -MockWith { return "mock_access_token" } `
                     -Verifiable
+            }
+
+
+            It "should update the group metadata" {
+            
+                $mockLabel1 = [PSCustomObject] @{ Id = [Guid]::NewGuid().ToString();  DisplayName = "Proprietary" }
+                $mockLabel2 = [PSCustomObject] @{ Id = [Guid]::NewGuid().ToString();  DisplayName = "Confidential" }
+                $mockLabel3 = [PSCustomObject] @{ Id = [Guid]::NewGuid().ToString();  DisplayName = "Restricated" }
+
+                $mockGraphResponse = [PSCustomObject] @{ "value" = @($mockLabel1, $mockLabel2, $mockLabel3 ) }
 
                 Mock `
                     -CommandName "Invoke-RestMethod" `

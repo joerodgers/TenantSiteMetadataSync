@@ -8,6 +8,37 @@
 
         InModuleScope -ModuleName "TenantSiteMetadataSync" {
 
+            BeforeAll {
+
+                function Connect-PnPOnline
+                {
+                    param($Url, $ClientId, $Thumbprint, $Tenant, $ReturnConnection) 
+                }
+                function Disconnect-PnPOnline 
+                {
+                    param($Connection) 
+                }
+
+                Mock `
+                    -CommandName "Start-SyncJobExecution" `
+                    -ModuleName "TenantSiteMetadataSync" `
+                    -Verifiable
+
+                Mock `
+                    -CommandName "Stop-SyncJobExecution" `
+                    -ModuleName "TenantSiteMetadataSync" `
+                    -Verifiable
+
+                Mock `
+                    -CommandName "Connect-PnPOnline" `
+                    -MockWith { return 1 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName "Disconnect-PnPOnline" `
+                    -Verifiable
+            }
+
             It "should read the AggregatedSiteCollections list and save entries to database" {
             
                 $mockListItem1 = [PSCustomObject] @{ 
@@ -59,30 +90,6 @@
                 }
 
                 $mockListItems = @( $mockListItem1, $mockListItem2 )
-
-                function Connect-PnPOnline {}
-                function Disconnect-PnPOnline {}
-                function Get-PnPListItem {}
-
-                Mock `
-                    -CommandName "Start-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Stop-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Connect-PnPOnline" `
-                    -MockWith { return 1 } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Disconnect-PnPOnline" `
-                    -RemoveParameterType "Connection" `
-                    -Verifiable
 
                 Mock `
                     -CommandName "Get-PnPListItem" `
@@ -181,26 +188,6 @@
                 }
 
                 $mockListItems = @( $mockListItem1, $mockListItem2 )
-
-                Mock `
-                    -CommandName "Start-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Stop-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Connect-PnPOnline" `
-                    -MockWith { return 1 } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Disconnect-PnPOnline" `
-                    -RemoveParameterType "Connection" `
-                    -Verifiable
 
                 Mock `
                     -CommandName "Get-PnPListItem" `

@@ -8,16 +8,20 @@
 
         InModuleScope -ModuleName "TenantSiteMetadataSync" {
 
-            It "should update the group's DisplayName value" {
+            BeforeAll {
 
-                function Get-PnPTenantRecycleBinItem {}
-                function Connect-PnPOnline {}
-                function Disconnect-PnPOnline {}
-                function Get-PnPTenantRecycleBinItem {}
-
-
-                $mockDeletedSites = [PSCustomObject] @{ Url = "https://contoso.sharepoint.com/sites/foo"; SiteId = [Guid]::NewGuid() },
-                                    [PSCustomObject] @{ Url = "https://contoso.sharepoint.com/sites/bar"; SiteId = [Guid]::NewGuid() } 
+                function Connect-PnPOnline
+                {
+                    param($Url, $ClientId, $Thumbprint, $Tenant, $ReturnConnection) 
+                }
+                function Disconnect-PnPOnline 
+                {
+                    param($Connection) 
+                }
+                function Get-PnPTenantRecycleBinItem
+                {
+                    param($Connection) 
+                }
 
                 Mock `
                     -CommandName "Start-SyncJobExecution" `
@@ -37,6 +41,14 @@
                 Mock `
                     -CommandName "Disconnect-PnPOnline" `
                     -Verifiable
+            }
+
+
+            It "should update the group's DisplayName value" {
+
+
+                $mockDeletedSites = [PSCustomObject] @{ Url = "https://contoso.sharepoint.com/sites/foo"; SiteId = [Guid]::NewGuid() },
+                                    [PSCustomObject] @{ Url = "https://contoso.sharepoint.com/sites/bar"; SiteId = [Guid]::NewGuid() } 
 
                 Mock `
                     -CommandName "Get-PnPTenantRecycleBinItem" `
