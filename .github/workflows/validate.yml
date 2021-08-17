@@ -1,7 +1,7 @@
 on: [push]
 
 env:
-  MODULE_NAME: Migration.Core
+  MODULE_NAME: TenantMetadataSync
 
 jobs:
 
