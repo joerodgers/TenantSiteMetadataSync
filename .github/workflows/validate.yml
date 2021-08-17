@@ -14,13 +14,13 @@ jobs:
     - uses: actions/checkout@v1
 
     - name: Install Prerequisites
-      run: .\$MODULE_NAME\build\Install-Prerequisites.ps1
+      run: .\build\Install-Prerequisites.ps1
       shell: pwsh
 
     - name: Validate
-      run: .\$MODULE_NAME\build\Invoke-Validation.ps1
+      run: .\build\Invoke-Validation.ps1
       shell: pwsh
 
     - name: Build
-      run: .\$MODULE_NAME\build\Invoke-Build.ps1
+      run: .\build\Invoke-Build.ps1
       shell: pwsh
