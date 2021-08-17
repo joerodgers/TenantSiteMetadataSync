@@ -33,17 +33,19 @@
     {
         if( $groups = Get-DataTable -Query "SELECT GroupId FROM GroupConnectedSites" -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer )
         {
-            Write-Verbose "$(Get-Date) - Discovered $($groups.Count) Groups"
+            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Discovered $($groups.Count) Groups"
 
             $null = Connect-MgGraph -ClientId $ClientId -CertificateThumbprint $Thumbprint -TenantId "$Tenant.onmicrosoft.com"
 
             foreach( $group in $groups )
             {
-                Write-Verbose "$(Get-Date) - $counter/$($groups.Count) - Processing Group: $($group.GroupId)"
+                Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - $counter/$($groups.Count) - Processing Group: $($group.GroupId)"
                 
                 try
                 {
                     $groupOwners = @(Get-MgGroupOwner -GroupId $group.GroupId -Top 500)
+
+                    Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Owner count: $($groupOwners.Count)"
 
                     if( $groupOwners.Count -gt 0 )
                     {

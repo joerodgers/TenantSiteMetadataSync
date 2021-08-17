@@ -48,6 +48,10 @@
                     'Last Activity Date'                   = [DateTime]::Today.ToString()
                 }
 
+                function Connect-PnPOnline {}
+                function Disconnect-PnPOnline {}
+                function Get-PnPGraphAccessToken {}
+
                 Mock `
                     -CommandName "Start-SyncJobExecution" `
                     -ModuleName "TenantSiteMetadataSync" `
@@ -155,6 +159,10 @@
                     'Page View Count'          = 102
                 }
 
+                function Connect-PnPOnline {}
+                function Disconnect-PnPOnline {}
+                function Get-PnPGraphAccessToken {}
+
                 Mock `
                     -CommandName "Start-SyncJobExecution" `
                     -ModuleName "TenantSiteMetadataSync" `
@@ -250,6 +258,10 @@
                     'Visited Page Count'       = 101
                     'Page View Count'          = 102
                 }
+
+                function Connect-PnPOnline {}
+                function Disconnect-PnPOnline {}
+                function Get-PnPGraphAccessToken {}
 
                 Mock `
                     -CommandName "Start-SyncJobExecution" `
@@ -349,6 +361,10 @@
                     'Secure Link For Member Count' = 105
                 }
 
+                function Connect-PnPOnline {}
+                function Disconnect-PnPOnline {}
+                function Get-PnPGraphAccessToken {}
+                
                 Mock `
                     -CommandName "Start-SyncJobExecution" `
                     -ModuleName "TenantSiteMetadataSync" `
@@ -460,6 +476,11 @@
                     'Page View Count'          = 102
                 }
 
+                function Connect-PnPOnline {}
+                function Disconnect-PnPOnline {}
+                function Get-PnPGraphAccessToken {}
+
+                
                 Mock `
                     -CommandName "Start-SyncJobExecution" `
                     -ModuleName "TenantSiteMetadataSync" `
@@ -538,6 +559,11 @@
                     'Visited Page Count'       = 101
                     'Page View Count'          = 102
                 }
+
+                function Connect-PnPOnline {}
+                function Disconnect-PnPOnline {}
+                function Get-PnPGraphAccessToken {}
+
 
                 Mock `
                     -CommandName "Start-SyncJobExecution" `
@@ -619,6 +645,10 @@
                 $csvWithBOM = [char]0xEF + [char]0xBB + [char]0xBF + $csvWithoutBOM
 
                 $csvWithBOM.Length | Should -BeExactly ($csvWithoutBOM.Length + 3)
+
+                function Connect-PnPOnline {}
+                function Disconnect-PnPOnline {}
+                function Get-PnPGraphAccessToken {}
 
                 Mock `
                     -CommandName "Start-SyncJobExecution" `

@@ -16,6 +16,11 @@
 
                 $mockSiteCreationSources = [PSCustomObject] @{ "value" = @($mockSource1, $mockSource2, $mockSource3 ) }
 
+                function Connect-PnPOnline {}
+                function Disconnect-PnPOnline {}
+                function Invoke-PnPSPRestMethod {}
+
+
                 Mock `
                     -CommandName "Start-SyncJobExecution" `
                     -ModuleName "TenantSiteMetadataSync" `

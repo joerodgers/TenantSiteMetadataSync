@@ -60,6 +60,10 @@
 
                 $mockListItems = @( $mockListItem1, $mockListItem2 )
 
+                function Connect-PnPOnline {}
+                function Disconnect-PnPOnline {}
+                function Get-PnPListItem {}
+
                 Mock `
                     -CommandName "Start-SyncJobExecution" `
                     -ModuleName "TenantSiteMetadataSync" `

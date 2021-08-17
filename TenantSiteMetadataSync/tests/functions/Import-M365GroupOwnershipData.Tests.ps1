@@ -19,8 +19,14 @@
                 $mockThumbprint     = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                 $mockTenant         = "contoso"
 
-                function Connect-MgGraph {}
-                function Get-MgGroupOwner {}
+                function Connect-MgGraph 
+                { 
+                    param($ClientId, $CertificateThumbprint, $TenantId) 
+                }
+                function Get-MgGroupOwner
+                {
+                    param($GroupId, $Top) 
+                }
 
 
                 Mock -CommandName "Start-SyncJobExecution" -Verifiable
@@ -41,13 +47,13 @@
                 Mock `
                     -CommandName "Get-MgGroupOwner" `
                     -ParameterFilter { $GroupId -eq $mockGroup1.GroupId -and $Top -eq 500 } `
-                    -MockWith { $mockGroup1 } `
+                    -MockWith { ,$mockGroup1 } `
                     -Verifiable
 
                 Mock `
                     -CommandName "Get-MgGroupOwner" `
                     -ParameterFilter { $GroupId -eq $mockGroup2.GroupId -and $Top -eq 500 } `
-                    -MockWith { $mockGroup2 } `
+                    -MockWith { ,$mockGroup2 } `
                     -Verifiable
 
                 Mock `
@@ -70,7 +76,7 @@
                     -ParameterFilter { $Query -eq "EXEC proc_AddGroupOwnerByGroupId @GroupId = @GroupId, @UserPrincipalName = @UserPrincipalName" -and $Parameters.GroupId -eq  $mockGroup2.GroupId } `
                     -Verifiable
 
-                Import-M365GroupOwnershipData -Tenant $mockTenant -ClientId $mockClientId -Thumbprint $mockThumbprint -DatabaseName $mockDatabaseName -DatabaseServer $mockDatabaseServer
+                Import-M365GroupOwnershipData -Tenant $mockTenant -ClientId $mockClientId -Thumbprint $mockThumbprint -DatabaseName $mockDatabaseName -DatabaseServer $mockDatabaseServer -Verbose
 
                 Should -InvokeVerifiable
             }

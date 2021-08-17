@@ -16,6 +16,11 @@
 
                 $mockGraphResponse = [PSCustomObject] @{ "value" = @($mockLabel1, $mockLabel2, $mockLabel3 ) }
 
+                function Connect-PnPOnline {}
+                function Disconnect-PnPOnline {}
+                function Get-PnPGraphAccessToken {}
+
+
                 Mock `
                     -CommandName "Start-SyncJobExecution" `
                     -ModuleName "TenantSiteMetadataSync" `
