@@ -20,11 +20,6 @@
         [Parameter(Mandatory=$true,ParameterSetName="ConnectionString")]
         [string]$Query,
 
-        # Command Timeout
-        [Parameter(Mandatory=$false,ParameterSetName="Individual")]
-        [Parameter(Mandatory=$false,ParameterSetName="ConnectionString")]
-        [int]$CommandTimeout=30, # The default is 30 seconds
-
         # Hashtable of parameters to the SQL query.  Do not include the '@' character in the key name.
         [Parameter(Mandatory=$false,ParameterSetName="Individual")]
         [Parameter(Mandatory=$false,ParameterSetName="ConnectionString")]
@@ -44,7 +39,7 @@
         {
             $dataSet     = New-Object System.Data.DataSet     
             $dataAdapter = New-Object System.Data.SqlClient.SqlDataAdapter( $Query, $ConnectionString )
-            
+
             foreach( $Parameter in $Parameters.GetEnumerator() )
             {
                 $null = $dataAdapter.SelectCommand.Parameters.AddWithValue( "@$($Parameter.Key)", $Parameter.Value )

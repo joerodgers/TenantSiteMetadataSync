@@ -13,9 +13,10 @@
     }
     process
     {
-        $databases | Foreach-Object {
-            Write-Verbose "$(Get-Date) - Executing File: $($_.Fullname) "
-            Invoke-Sqlcmd -InputFile $_.FullName -ServerInstance $ServerInstance
+        foreach( $path in $databases )
+        {
+            Write-Verbose "$(Get-Date) - Executing File: $($path.Fullname) "
+            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $ServerInstance
             if( -not $?) { return }
         }
     }

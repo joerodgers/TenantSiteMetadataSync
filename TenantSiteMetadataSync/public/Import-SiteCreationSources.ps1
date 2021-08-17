@@ -16,10 +16,7 @@
         [string]$DatabaseName,
         
         [Parameter(Mandatory=$true)]
-        [string]$DatabaseServer,
-
-        [Parameter(Mandatory=$false)]
-        [DateTime]$StartDate
+        [string]$DatabaseServer
     )
 
 

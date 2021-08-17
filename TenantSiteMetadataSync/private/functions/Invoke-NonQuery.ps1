@@ -60,7 +60,7 @@
  
              foreach( $Parameter in $Parameters.GetEnumerator() )
              {
-                 $param = $command.Parameters.Add( "@$($Parameter.Key)", $Parameter.Value )
+                 $null = $command.Parameters.Add( "@$($Parameter.Key)", $Parameter.Value )
              }
  
              $command.ExecuteNonQuery() | Out-Null

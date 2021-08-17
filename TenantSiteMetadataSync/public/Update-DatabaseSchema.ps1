@@ -18,28 +18,32 @@
         $views     = Get-ChildItem -Path "$PSScriptRoot\..\private\SQL" -Filter "vw_*.sql"
     }
     process
-    {
-        $tables | Foreach-Object {
-            Write-Verbose "$(Get-Date) - Executing File: $($_.Fullname) "
-            Invoke-Sqlcmd -InputFile $_.FullName -ServerInstance $ServerInstance -Database $Database
+    {   
+        foreach( $path in $tables )
+        {
+            Write-Verbose "$(Get-Date) - Executing File: $($path.Fullname)"
+            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $ServerInstance -Database $Database
             if( -not $?) { return }
         }
 
-        $functions | Foreach-Object {
-            Write-Verbose "$(Get-Date) - Executing File: $($_.Fullname) "
-            Invoke-Sqlcmd -InputFile $_.FullName -ServerInstance $ServerInstance -Database $Database
+        foreach( $path in $functions )
+        {
+            Write-Verbose "$(Get-Date) - Executing File: $($path.Fullname)"
+            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $ServerInstance -Database $Database
             if( -not $?) { return }
         }
 
-        $procs | Foreach-Object {
-            Write-Verbose "$(Get-Date) - Executing File: $($_.Fullname) "
-            Invoke-Sqlcmd -InputFile $_.FullName -ServerInstance $ServerInstance -Database $Database
+        foreach( $path in $procs )
+        {
+            Write-Verbose "$(Get-Date) - Executing File: $($path.Fullname)"
+            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $ServerInstance -Database $Database
             if( -not $?) { return }
         }
 
-        $views | Foreach-Object {
-            Write-Verbose "$(Get-Date) - Executing File: $($_.Fullname) "
-            Invoke-Sqlcmd -InputFile $_.FullName -ServerInstance $ServerInstance -Database $Database
+        foreach( $path in $views )
+        {
+            Write-Verbose "$(Get-Date) - Executing File: $($path.Fullname)"
+            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $ServerInstance -Database $Database
             if( -not $?) { return }
         }
     }
