@@ -1,8 +1,5 @@
 on: [push]
 
-env:
-  MODULE_NAME: TenantMetadataSync
-
 jobs:
 
   validate:
