@@ -19,6 +19,10 @@
                 $mockThumbprint     = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                 $mockTenant         = "contoso"
 
+                function Connect-MgGraph {}
+                function Get-MgGroupOwner {}
+
+
                 Mock -CommandName "Start-SyncJobExecution" -Verifiable
                 Mock -CommandName "Stop-SyncJobExecution"  -Verifiable
                 Mock -CommandName "Disconnect-MgGraph"     -Verifiable

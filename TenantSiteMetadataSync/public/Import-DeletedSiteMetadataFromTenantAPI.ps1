@@ -53,6 +53,8 @@
                     $counter++
                 }
             }
+
+            Disconnect-PnPOnline -Connection $connection
         }
     }
     end

@@ -44,6 +44,12 @@
 
                 $mockSites = @( $mockSite1, $mockSite2 )
 
+                function Connect-PnPOnline {}
+                function Disconnect-PnPOnline {}
+                function Get-PnPSite {}
+                function Get-PnPWeb {}
+                function Get-PnPTenantSite {}
+                
                 Mock `
                     -CommandName "Start-SyncJobExecution" `
                     -ModuleName "TenantSiteMetadataSync" `
@@ -156,6 +162,12 @@
 
                 $mockSites = @( $mockSite1, $mockSite2 )
 
+                function Connect-PnPOnline {}
+                function Disconnect-PnPOnline {}
+                function Get-PnPSite {}
+                function Get-PnPWeb {}
+                function Get-PnPTenantSite {}
+
                 Mock `
                     -CommandName "Start-SyncJobExecution" `
                     -ModuleName "TenantSiteMetadataSync" `
@@ -234,6 +246,12 @@
 
                 $mockSites = @( $mockSite1, $mockSite2 )
 
+                function Connect-PnPOnline {}
+                function Disconnect-PnPOnline {}
+                function Get-PnPSite {}
+                function Get-PnPWeb {}
+                function Get-PnPTenantSite {}
+                
                 Mock `
                     -CommandName "Start-SyncJobExecution" `
                     -ModuleName "TenantSiteMetadataSync" `
@@ -278,9 +296,12 @@
 
             It "should read the detailed SPO site info from the API" {
             
+                function Connect-PnPOnline {}
+                function Disconnect-PnPOnline {}
                 function Get-PnPSite {}
                 function Get-PnPWeb {}
-
+                function Get-PnPTenantSite {}
+                
                 $mockSites = [PSCustomObject] @{ 
                     DenyAddAndCustomizePages = "Disabled"
                     GroupId                  = [Guid]::Empty.ToString()

@@ -10,6 +10,12 @@
 
             It "should update the group's DisplayName value" {
 
+                function Get-PnPTenantRecycleBinItem {}
+                function Connect-PnPOnline {}
+                function Disconnect-PnPOnline {}
+                function Get-PnPTenantRecycleBinItem {}
+
+
                 $mockDeletedSites = [PSCustomObject] @{ Url = "https://contoso.sharepoint.com/sites/foo"; SiteId = [Guid]::NewGuid() },
                                     [PSCustomObject] @{ Url = "https://contoso.sharepoint.com/sites/bar"; SiteId = [Guid]::NewGuid() } 
 
@@ -26,6 +32,10 @@
                 Mock `
                     -CommandName "Connect-PnPOnline" `
                     -MockWith { return 1 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName "Disconnect-PnPOnline" `
                     -Verifiable
 
                 Mock `
@@ -47,7 +57,7 @@
                     -Tenant         "contoso"
             
                 Should -InvokeVerifiable
-                Should -Invoke -CommandName "Update-SiteMetadata" -Exactly -Times 3
+                Should -Invoke -CommandName "Update-SiteMetadata" -Exactly -Times 2
             }
         }
     }
