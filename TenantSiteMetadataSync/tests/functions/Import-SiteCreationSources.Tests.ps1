@@ -19,6 +19,11 @@
                     param($Connection) 
                 }
 
+                function Invoke-PnPSPRestMethod 
+                {
+                    param($Method, $Url, $Connection) 
+                }
+
                 Mock `
                     -CommandName "Start-SyncJobExecution" `
                     -ModuleName "TenantSiteMetadataSync" `

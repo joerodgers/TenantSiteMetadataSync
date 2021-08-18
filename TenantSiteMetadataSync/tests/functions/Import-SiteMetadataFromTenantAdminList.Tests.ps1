@@ -19,6 +19,13 @@
                     param($Connection) 
                 }
 
+                function Get-PnPListItem 
+                {
+                    param($List, $PageSize, $Fields, $Connection) 
+                }
+
+                Get-PnPListItem
+
                 Mock `
                     -CommandName "Start-SyncJobExecution" `
                     -ModuleName "TenantSiteMetadataSync" `
