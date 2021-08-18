@@ -51,11 +51,11 @@
 
             It "should update the group metadata" {
             
-                $mockLabel1 = [PSCustomObject] @{ Id = [Guid]::NewGuid().ToString();  DisplayName = "Proprietary" }
-                $mockLabel2 = [PSCustomObject] @{ Id = [Guid]::NewGuid().ToString();  DisplayName = "Confidential" }
-                $mockLabel3 = [PSCustomObject] @{ Id = [Guid]::NewGuid().ToString();  DisplayName = "Restricated" }
+                $mockLabel1 = [PSCustomObject] @{ Id = [Guid]::NewGuid().ToString();  Name = "Proprietary" }
+                $mockLabel2 = [PSCustomObject] @{ Id = [Guid]::NewGuid().ToString();  Name = "Confidential" }
+                $mockLabel3 = [PSCustomObject] @{ Id = [Guid]::NewGuid().ToString();  Name = "Restricted" }
 
-                $mockGraphResponse = [PSCustomObject] @{ "value" = @($mockLabel1, $mockLabel2, $mockLabel3 ) }
+                $mockGraphResponse = [PSCustomObject] @{ "value" = @($mockLabel1, $mockLabel2, $mockLabel3) }
 
                 Mock `
                     -CommandName "Invoke-RestMethod" `
@@ -65,9 +65,18 @@
 
                 Mock `
                     -CommandName "Invoke-NonQuery" `
-                    -ParameterFilter { $query -eq "EXEC proc_AddOrUpdateSiteCreationSource @Id = @Id, @Source = @Source" -and $Parameters.Id -eq $mockLabel3.Id -and $Parameters.Label -eq $mockLabel3.Name } `
+                    -ParameterFilter { $query -eq "EXEC proc_AddOrUpdateSensitivityLabel @Id = @Id, @Label = @Label" -and $Parameters.Id -eq $mockLabel1.Id -and $Parameters.Label -eq $mockLabel1.Name } `
                     -Verifiable    
 
+                Mock `
+                    -CommandName "Invoke-NonQuery" `
+                    -ParameterFilter { $query -eq "EXEC proc_AddOrUpdateSensitivityLabel @Id = @Id, @Label = @Label" -and $Parameters.Id -eq $mockLabel2.Id -and $Parameters.Label -eq $mockLabel2.Name } `
+                    -Verifiable    
+
+                Mock `
+                    -CommandName "Invoke-NonQuery" `
+                    -ParameterFilter { $query -eq "EXEC proc_AddOrUpdateSensitivityLabel @Id = @Id, @Label = @Label" -and $Parameters.Id -eq $mockLabel3.Id -and $Parameters.Label -eq $mockLabel3.Name } `
+                    -Verifiable    
 
                 Import-SensitivityLabel `
                     -DatabaseName   "TenantSiteMetadataSync" `
