@@ -1,16 +1,42 @@
 ﻿function Update-DeletionStatus
 {
+<#
+	.SYNOPSIS
+		Updates the deleted status of sites based on sites being restored from the tenant recycle bin or moved into the recycle bin. 
+	
+	.DESCRIPTION
+		Updates the deleted status of sites based on sites being restored from the tenant recycle bin or moved into the recycle bin. 
+	
+	.PARAMETER ClientId
+		Azure Active Directory Application Principal Client/Application Id
+	
+	.PARAMETER Thumbprint
+		Thumbprint of certificate associated with the Azure Active Directory Application Principal
+	
+	.PARAMETER Tenant
+		Name of the O365 Tenant
+	
+	.PARAMETER DatabaseName
+		The SQL Server database name
+	
+	.PARAMETER DatabaseServer
+		Name of the SQL Server database server, including the instance name (if applicable).
+	
+	.EXAMPLE
+		PS C:\> Update-DeletionStatus -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+	
+#>
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory=$true)]
-        [string]$Tenant,
-
         [Parameter(Mandatory=$true)]
         [string]$ClientId,
 
         [Parameter(Mandatory=$true)]
         [string]$Thumbprint,
+
+        [Parameter(Mandatory=$true)]
+        [string]$Tenant,
 
         [Parameter(Mandatory=$true)]
         [string]$DatabaseName,

@@ -23,7 +23,7 @@
         [string]$DatabaseName,
 
         [Parameter(Mandatory=$true)]
-        [string]$Database
+        [string]$DatabaseServer
     )
 
     begin
@@ -38,14 +38,14 @@
         foreach( $path in $tables )
         {
             Write-Verbose "$(Get-Date) - Executing File: $($path.Fullname)"
-            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseName -Database $Database
+            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseServer -Database $DatabaseName
             if( -not $?) { return }
         }
 
         foreach( $path in $functions )
         {
             Write-Verbose "$(Get-Date) - Executing File: $($path.Fullname)"
-            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseName -Database $Database
+            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseServer -Database $DatabaseName
             if( -not $?) { return }
         }
 

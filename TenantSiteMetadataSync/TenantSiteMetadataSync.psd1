@@ -15,11 +15,12 @@
     PowerShellVersion = '5.1'
 
     # Modules that must be imported into the global environment prior to importing this module
-    RequiredModules = @{ModuleName="Microsoft.PowerShell.SecretStore";      ModuleVersion ="1.0.0" }, 
-                      @{ModuleName="Microsoft.PowerShell.SecretManagement"; ModuleVersion ="1.0.0"},
-                      @{ModuleName="SqlServer";                             ModuleVersion ="21.1.18256"},
-                      @{ModuleName="Microsoft.Graph.Groups";                ModuleVersion ="1.0.1"}
-    
+    RequiredModules = @{ModuleName="SqlServer";                             ModuleVersion ="21.1.18256" },
+                      @{ModuleName="Microsoft.Graph.Groups";                ModuleVersion ="1.0.1" },
+                      @{ModuleName="PnP.PowerShell";                        ModuleVersion ="1.7.0" }
+                      #@{ModuleName="Microsoft.PowerShell.SecretStore";      ModuleVersion ="1.0.0" }, 
+                      #@{ModuleName="Microsoft.PowerShell.SecretManagement"; ModuleVersion ="1.0.0"},
+                      
     # Functions to export from this module
     FunctionsToExport = 'Import-DeletedSiteMetadataFromTenantAPI',
                         'Import-M365GroupOwnershipData',

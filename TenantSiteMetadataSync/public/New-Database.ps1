@@ -23,7 +23,7 @@
 
     begin
     {
-        $databases = Get-ChildItem -Path "$PSScriptRoot\..\private\SQL\db_*.sql"
+        $databases = Get-ChildItem -Path "$PSScriptRoot\..\private\SQL" -Filter "db_*.sql"
     }
     process
     {

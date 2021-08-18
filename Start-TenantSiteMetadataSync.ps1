@@ -1,7 +1,7 @@
-#requires -Modules PnP.PowerShell
-#requires -Modules Microsoft.Graph.Groups
-#requires -Modules Posh-SSH
-#requires -Modules TenantSiteMetadataSync
+#requires -Modules @{ ModuleName="PnP.PowerShell";         ModuleVersion="1.7.0" }
+#requires -Modules @{ ModuleName="Posh-SSH";               ModuleVersion="2.3.0" }
+#requires -Modules @{ ModuleName="TenantSiteMetadataSync"; ModuleVersion="1.0.0" }
+#requires -Modules @{ ModuleName="Microsoft.Graph.Groups"; ModuleVersion="1.5.0" }
 
 param
 (
