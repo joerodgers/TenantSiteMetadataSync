@@ -16,7 +16,6 @@
                 }
             }
 
-
             It "should create database" {
             
                 $mockFile1 = [PSCustomObject] @{ FullName = "C:\temp\mock1.sql" }
@@ -24,7 +23,7 @@
 
                 $mockSqlFiles = $mockFile1, $mockFile2
 
-                Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "db_*.sql"    } -Verifiable -MockWith { $mockSqlFiles } 
+                Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "db_*.sql" } -Verifiable -MockWith { $mockSqlFiles } 
 
                 Mock -CommandName "Invoke-Sqlcmd" -ParameterFilter { $InputFile -eq $mockFile1.FullName } -Verifiable
                 Mock -CommandName "Invoke-Sqlcmd" -ParameterFilter { $InputFile -eq $mockFile2.FullName } -Verifiable
