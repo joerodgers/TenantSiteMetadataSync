@@ -21,12 +21,25 @@
 
                 function Get-PnPSite 
                 {
-                    param($Includes, $Connection) 
+                    param($Includes) 
                 }
 
                 function Get-PnPWeb
                 {
-                    param($Includes, $Connection) 
+                    param($Includes) 
+                }
+
+                function Get-PnPContext
+                {
+                }
+
+                function Get-PnPTenantSite 
+                {
+                }
+
+                function Set-PnPContext
+                {
+                    param($Context)
                 }
 
                 Mock `
@@ -47,9 +60,12 @@
                 Mock `
                     -CommandName "Disconnect-PnPOnline" `
                     -Verifiable
+                
+                Mock `
+                    -CommandName "Get-PnPContext" `
+                    -MockWith { return 1 } `
+                    -Verifiable
             }
-
-
 
             It "should read the basic SPO site info from the API" {
             
@@ -87,8 +103,6 @@
 
                 $mockSites = @( $mockSite1, $mockSite2 )
 
-                function Get-PnPSite {}
-                function Get-PnPWeb {}
                 function Get-PnPTenantSite {}
                 
                 Mock `
@@ -275,9 +289,16 @@
 
             It "should read the detailed SPO site info from the API" {
             
-                function Get-PnPTenantSite 
-                {
-                }
+                Mock `
+                    -CommandName "Copy-Context" `
+                    -MockWith { return 1 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName "Set-PnPContext" `
+                    -MockWith { return 1 } `
+                    -Verifiable
+
                 
                 $mockSites = [PSCustomObject] @{ 
                     DenyAddAndCustomizePages = "Disabled"
@@ -309,13 +330,6 @@
 
                 Mock `
                     -CommandName "Connect-PnPOnline" `
-                    -ParameterFilter { $Url -eq "https://contoso-admin.sharepoint.com" } `
-                    -MockWith { return 1 } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Connect-PnPOnline" `
-                    -ParameterFilter { $Url -eq "https://contoso.sharepoint.com/sites/site1" } `
                     -MockWith { return 1 } `
                     -Verifiable
 

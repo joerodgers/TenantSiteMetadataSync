@@ -1,16 +1,72 @@
 ﻿function Import-SiteMetadataFromTenantAPI
 {
+<#
+	.SYNOPSIS
+		Imports tenant site metadata from the tenant API into the SQL database.
+
+        Azure Active Directory Application Principal requires SharePoint > Application > Sites.FullControl
+	
+	.DESCRIPTION
+		Imports tenant site metadata from the tenant API into the SQL database.
+
+        Azure Active Directory Application Principal requires SharePoint > Application > Sites.FullControl
+
+    .PARAMETER ClientId
+		Azure Active Directory Application Principal Client/Application Id
+	
+	.PARAMETER Thumbprint
+		Thumbprint of certificate associated with the Azure Active Directory Application Principal
+	
+	.PARAMETER Tenant
+		Name of the O365 Tenant
+	
+	.PARAMETER DatabaseName
+		The SQL Server database name
+	
+	.PARAMETER DatabaseServer
+		Name of the SQL Server database server, including the instance name (if applicable).
+	
+	.PARAMETER Template
+		Optional template name to filter API results.  Valid values are 'APPCATALOG#0', 'BICenterSite#0', 'EDISC#0', 'EHS#1', 'PWA#0', 'SPSMSITEHOST#0', 'SRCHCEN#0', 'BLANKINTERNET#0', 'STS#-1', 'TEAMCHANNEL#0', 'RedirectSite#0', 'SITEPAGEPUBLISHING#0', 'STS#3', 'GROUP#0', 'STS#0'
+
+	.PARAMETER DetailedImport
+		Optional parameter to include detailed information during the import.  This option will add the following data to the import: 
+            ConditionalAccessPolicy
+            SensitivityLabel
+            SiteId
+            SiteOwnerEmail
+            SiteOwnerName
+            RelatedGroupId
+            TimeCreated
+
+        This option will drastically increase the execution time as it requries additionl requests to each tenant site being imported.
+
+	.PARAMETER IncludeOneDriveSites
+        Switch to include OneDrive for Business sites in the import process.
+
+    .EXAMPLE
+		PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+
+    .EXAMPLE
+		PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server> -Template 'TEAMCHANNEL#0'
+
+    .EXAMPLE
+		PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server> -DetailedImport
+
+    .EXAMPLE
+		PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server> -Template 'TEAMCHANNEL#0' -DetailedImport
+#>
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory=$true)]
-        [string]$Tenant,
-
         [Parameter(Mandatory=$true)]
         [string]$ClientId,
 
         [Parameter(Mandatory=$true)]
         [string]$Thumbprint,
+
+        [Parameter(Mandatory=$true)]
+        [string]$Tenant,
 
         [Parameter(Mandatory=$true)]
         [string]$DatabaseName,
@@ -55,7 +111,7 @@
             # query the tenant
             $tenantSites = Get-PnPTenantSite @parameters 
 
-            Disconnect-PnPOnline -Connection $connection
+            $tenantContext = Get-PnPContext
 
             # process each site
             foreach( $tenantSite in $tenantSites )
@@ -85,29 +141,32 @@
                 }
 
                 # process details is specified
-
                 if( $DetailedImport.IsPresent )
                 {
-                    # connect to indvidual site
-                    if( $connection = Connect-PnPOnline -Url $tenantSite.Url -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection $true )
-                    {
-                        $site = Get-PnPSite -Includes Owner, Id, RelatedGroupId, ConditionalAccessPolicy, SensitivityLabel -Connection $connection
-                        $web  = Get-PnPWeb  -Includes Created -Connection $connection
-                   
-                        $parameters.ConditionalAccessPolicy = $site.ConditionalAccessPolicy
-                        $parameters.SensitivityLabel        = $site.SensitivityLabel.ToString()
-                        $parameters.SiteId                  = $site.Id
-                        $parameters.SiteOwnerEmail          = $site.Owner.Email
-                        $parameters.SiteOwnerName           = $site.Owner.Title
-                        $parameters.RelatedGroupId          = $site.RelatedGroupId.ToString()
-                        $parameters.TimeCreated             = $web.Created
+                    # clone the current context
+                    $siteContext = Copy-Context -Context $tenantContext -Url $tenantSite.Url
 
-                        Disconnect-PnPOnline -Connection $connection
-                    }
+                    # set the context to the new site
+                    Set-PnPContext -Context $siteContext
+
+                    # pull site and web details
+                    $site = Get-PnPSite -Includes Owner, Id, RelatedGroupId, ConditionalAccessPolicy, SensitivityLabel
+                    $web  = Get-PnPWeb  -Includes Created
+                
+                    # add detailed properties to the parameter set
+                    $parameters.ConditionalAccessPolicy = $site.ConditionalAccessPolicy
+                    $parameters.SensitivityLabel        = $site.SensitivityLabel.ToString()
+                    $parameters.SiteId                  = $site.Id
+                    $parameters.SiteOwnerEmail          = $site.Owner.Email
+                    $parameters.SiteOwnerName           = $site.Owner.Title
+                    $parameters.RelatedGroupId          = $site.RelatedGroupId.ToString()
+                    $parameters.TimeCreated             = $web.Created
                 }
 
                 Update-SiteMetadata @parameters
             }
+
+            Disconnect-PnPOnline -Connection $connection
         }
     }
     end

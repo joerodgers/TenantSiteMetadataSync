@@ -1,18 +1,45 @@
 ﻿function Import-SensitivityLabel
 {
-    # requires InformationProtectionPolicy.Read.All
+<#
+	.SYNOPSIS
+		Imports tenant sensitivity label's Id (GUID) and Name into the SQL database 
 
+        Azure Active Directory Application Principal requires Graph > Application > InformationProtectionPolicy.Read.All
+	
+	.DESCRIPTION
+		Imports tenant sensitivity label's Id and Name into the SQL database 
+
+        Azure Active Directory Application Principal requires Graph > Application > InformationProtectionPolicy.Read.All
+
+    .PARAMETER ClientId
+		Azure Active Directory Application Principal Client/Application Id
+	
+	.PARAMETER Thumbprint
+		Thumbprint of certificate associated with the Azure Active Directory Application Principal
+	
+	.PARAMETER Tenant
+		Name of the O365 Tenant
+	
+	.PARAMETER DatabaseName
+		The SQL Server database name
+	
+	.PARAMETER DatabaseServer
+		Name of the SQL Server database server, including the instance name (if applicable).
+	
+	.EXAMPLE
+		PS C:\> Import-SensitivityLabel -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+#>
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory=$true)]
-        [string]$Tenant,
-
         [Parameter(Mandatory=$true)]
         [string]$ClientId,
 
         [Parameter(Mandatory=$true)]
         [string]$Thumbprint,
+
+        [Parameter(Mandatory=$true)]
+        [string]$Tenant,
 
         [Parameter(Mandatory=$true)]
         [string]$DatabaseName,

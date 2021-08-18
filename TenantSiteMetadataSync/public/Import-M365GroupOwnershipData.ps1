@@ -1,18 +1,45 @@
 ﻿function Import-M365GroupOwnershipData
 {
-    # requires GroupMember.Read.All
+<#
+	.SYNOPSIS
+		Uses the Graph API to read O365/M365 Group owner metadata and imports the data into the SQL database.  
+        
+        Azure Active Directory Application Principal requires Graph > Application > GroupMember.Read.All permissions.
+	
+	.DESCRIPTION
+		Uses the Graph API to read O365/M365 Group owner metadata and imports the data into the SQL database.  
 
+        Azure Active Directory Application Principal requires Graph > Application > GroupMember.Read.All permissions.
+	
+	.PARAMETER ClientId
+		Azure Active Directory Application Principal Client/Application Id
+	
+	.PARAMETER Thumbprint
+		Thumbprint of certificate associated with the Azure Active Directory Application Principal
+	
+	.PARAMETER Tenant
+		Name of the O365 Tenant
+	
+	.PARAMETER DatabaseName
+		The SQL Server database name
+	
+	.PARAMETER DatabaseServer
+		Name of the SQL Server database server, including the instance name (if applicable).
+	
+	.EXAMPLE
+		PS C:\> Import-M365GroupOwnershipData -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+#>
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory=$true)]
-        [string]$Tenant,
-
         [Parameter(Mandatory=$true)]
         [string]$ClientId,
 
         [Parameter(Mandatory=$true)]
         [string]$Thumbprint,
+
+        [Parameter(Mandatory=$true)]
+        [string]$Tenant,
 
         [Parameter(Mandatory=$true)]
         [string]$DatabaseName,

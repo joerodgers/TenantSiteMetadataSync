@@ -1,5 +1,52 @@
 ﻿function Import-MicrosoftGraphUsageAccountReportData
 {
+<#
+	.SYNOPSIS
+		Imports details about Microsoft 365 groups, SharePoint Sites or OneDrive sites into the SQL database.
+
+        Azure Active Directory Application Principal requires Graph > Application > Reports.Read.All permissions.
+	
+	.DESCRIPTION
+		Imports details about Microsoft 365 groups, SharePoint Sites or OneDrive sites into the SQL database.
+
+        Azure Active Directory Application Principal requires Graph > Application > Reports.Read.All permissions.
+	
+            - SharePoint report details: https://docs.microsoft.com/en-us/graph/api/reportroot-getsharepointsiteusagedetail?view=graph-rest-1.0
+
+            - OneDrive report details: https://docs.microsoft.com/en-us/graph/api/reportroot-getonedriveusageaccountdetail?view=graph-rest-1.0
+
+            - M365Group report details: https://docs.microsoft.com/en-us/graph/api/reportroot-getoffice365groupsactivitydetail?view=graph-rest-1.0
+
+	.PARAMETER ReportType
+		The type of report (SharePoint, OneDrive or M365Group) to download and import.  
+
+	.PARAMETER Period
+		The data aggregration period for the report. Valid options are 7, 30, 90, or 180 days.  Default value is 30 days.
+
+    .PARAMETER ClientId
+		Azure Active Directory Application Principal Client/Application Id
+	
+	.PARAMETER Thumbprint
+		Thumbprint of certificate associated with the Azure Active Directory Application Principal
+	
+	.PARAMETER Tenant
+		Name of the O365 Tenant
+	
+	.PARAMETER DatabaseName
+		The SQL Server database name
+	
+	.PARAMETER DatabaseServer
+		Name of the SQL Server database server, including the instance name (if applicable).
+	
+	.EXAMPLE
+		PS C:\> Import-MicrosoftGraphUsageAccountReportData -ReportType SharePoint -Period 30 -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+
+	.EXAMPLE
+		PS C:\> Import-MicrosoftGraphUsageAccountReportData -ReportType OneDrive -Period 90 -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+
+    .EXAMPLE
+		PS C:\> Import-MicrosoftGraphUsageAccountReportData -ReportType M365Group -Period 180 -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+#>
     [CmdletBinding()]
     param
     (
@@ -16,13 +63,13 @@
         [string]$ApiVersion = "v1.0",
 
         [Parameter(Mandatory=$true)]
-        [string]$Tenant,
-
-        [Parameter(Mandatory=$true)]
         [string]$ClientId,
 
         [Parameter(Mandatory=$true)]
         [string]$Thumbprint,
+
+        [Parameter(Mandatory=$true)]
+        [string]$Tenant,
 
         [Parameter(Mandatory=$true)]
         [string]$DatabaseName,

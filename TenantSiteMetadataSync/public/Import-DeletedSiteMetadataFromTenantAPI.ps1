@@ -1,5 +1,31 @@
 ﻿function Import-DeletedSiteMetadataFromTenantAPI
 {
+<#
+	.SYNOPSIS
+		Imports metadata about site collections that are in the tenant's recycle bin. 
+	
+	.DESCRIPTION
+		Imports metadata, specifically the 'TimeDeleted' property about site collections that are in the tenant's recycle bin. 
+	
+	.PARAMETER ClientId
+		Azure Active Directory Application Principal Client/Application Id
+	
+	.PARAMETER Thumbprint
+		Thumbprint of certificate associated with the Azure Active Directory Application Principal
+	
+	.PARAMETER Tenant
+		Name of the O365 Tenant
+	
+	.PARAMETER DatabaseName
+		The SQL Server database name
+	
+	.PARAMETER DatabaseServer
+		Name of the SQL Server database server, including the instance name (if applicable).
+	
+	.EXAMPLE
+		PS C:\> Import-DeletedSiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+	
+#>
     [CmdletBinding()]
     param
     (

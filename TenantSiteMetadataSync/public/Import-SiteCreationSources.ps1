@@ -1,5 +1,34 @@
 ﻿function Import-SiteCreationSources
 {
+<#
+	.SYNOPSIS
+		Imports tenant site creation source's Id (GUID) and DisplayName into the SQL database 
+
+        Azure Active Directory Application Principal requires SharePoint > Application > Sites.FullControl
+	
+	.DESCRIPTION
+		Imports tenant site creation source's Id (GUID) and DisplayName into the SQL database 
+
+        Azure Active Directory Application Principal requires SharePoint > Application > Sites.FullControl
+
+    .PARAMETER ClientId
+		Azure Active Directory Application Principal Client/Application Id
+	
+	.PARAMETER Thumbprint
+		Thumbprint of certificate associated with the Azure Active Directory Application Principal
+	
+	.PARAMETER Tenant
+		Name of the O365 Tenant
+	
+	.PARAMETER DatabaseName
+		The SQL Server database name
+	
+	.PARAMETER DatabaseServer
+		Name of the SQL Server database server, including the instance name (if applicable).
+	
+	.EXAMPLE
+		PS C:\> Import-SiteCreationSources -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+#>
     [CmdletBinding()]
     param
     (

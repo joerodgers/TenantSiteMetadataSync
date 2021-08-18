@@ -25,7 +25,7 @@
 Param 
 (
 	[Parameter(Mandatory=$false)]
-	[string]$Branch = "master",
+	[string]$Branch = "main",
 	
 	[Parameter(Mandatory=$false)]
 	[ValidateSet('AllUsers', 'CurrentUser')]
@@ -44,7 +44,7 @@ begin
 	$moduleName = "TenantSiteMetadataSync"
 	
 	# Name of the organization that is being cloned
-	$organizationName = ""
+	$organizationName = "joerodgers"
 
 	# Base path to the github repository
 	$baseUrl = "https://github.com/$organizationName/$moduleName"
@@ -70,7 +70,7 @@ process
 
 		# download files
 		Write-Verbose "$(Get-Date) - Downloading $fileName to '$downloadFilePath'"
-		Invoke-WebRequest -Uri "$($BaseUrl)/archive/$fileName" -UseBasicParsing -OutFile $downloadFilePath -ErrorAction Stop
+		Invoke-WebRequest -Uri "$($BaseUrl)/archive/$fileName" -MaximumRedirection 100 -UseBasicParsing -OutFile $downloadFilePath -ErrorAction Stop
 
 		# extract zip
 		Write-Verbose "$(Get-Date) - Extracting '$downloadFilePath' to '$downloadDirectory'"
@@ -105,11 +105,19 @@ process
 		$installationPath = Join-Path -Path $installationPath -ChildPath $moduleManifest.ModuleVersion
 
 		# stop if the this version is already installed for this scope, unless -Force was supplied
-		if ( -not $Force.IsPresent -and (Test-Path -Path $installationPath -PathType Container) )
+		if ( Test-Path -Path $installationPath -PathType Container )
 		{
-			Write-Error -Message "A module with the name '$moduleName' and version $($moduleManifest.ModuleVersion) already exists.  Use the -Force option to overwrite."
-			return
-		}
+            if( -not $Force.IsPresent )
+            {
+			    Write-Error -Message "A module with the name '$moduleName' and version $($moduleManifest.ModuleVersion) already exists.  Use the -Force option to overwrite."
+			    return
+    	    }
+            else
+            {
+		        Write-Warning "$(Get-Date) - Removing folder '$installationPath'"
+                Remove-Item -Path $installationPath -Force -Recurse
+            }
+        }
 
 		# create installation folder
 		Write-Verbose "$(Get-Date) - Creating installation folder at '$installationPath'"
@@ -121,9 +129,6 @@ process
 			Write-Verbose "$(Get-Date) - Copying '$($file.FullName)'' to '$installationPath'"
 			Copy-Item -Path $file.FullName -Destination $installationPath -Force -Recurse -ErrorAction Stop
 		}
-
-		# import new module
-		Import-Module -Name $moduleName -Force
 	}
 	finally
 	{
@@ -134,6 +139,5 @@ process
 end
 {
 }
-
 
 
