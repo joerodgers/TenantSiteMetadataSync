@@ -61,7 +61,7 @@ if( $ImportUsageAccountData.IsPresent )
         -Thumbprint     $Thumbprint `
         -Tenant         $Tenant `
         -DatabaseName   $DatabaseName `
-        -DatabaseServer $DatabaseServer -Verbose
+        -DatabaseServer $DatabaseServer
 
     # import usage data for SharePoint sites from Graph API reports
     Import-TSMSMicrosoftGraphUsageAccountReportData `
@@ -72,7 +72,7 @@ if( $ImportUsageAccountData.IsPresent )
         -Thumbprint     $Thumbprint `
         -Tenant         $Tenant `
         -DatabaseName   $DatabaseName `
-        -DatabaseServer $DatabaseServer -Verbose
+        -DatabaseServer $DatabaseServer
 
     # import usage data for M365 groups from Graph API reports
     Import-TSMSMicrosoftGraphUsageAccountReportData `
@@ -83,7 +83,7 @@ if( $ImportUsageAccountData.IsPresent )
         -Thumbprint     $Thumbprint `
         -Tenant         $Tenant `
         -DatabaseName   $DatabaseName `
-        -DatabaseServer $DatabaseServer -Verbose
+        -DatabaseServer $DatabaseServer
 
     Write-Host "$(Get-Date) - Completed Operation: ImportUsageAccountData"
 
@@ -100,7 +100,7 @@ if( $ImportSharePointTenantListData.IsPresent )
     {
         $Error.Clear()
 
-        $operation = "Operation - Import SharePoint Tenant List Data"
+        $operation = "Operation - ImportSharePointTenantListData"
     
         Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantListData" -TrimExistingLogFiles
     
@@ -114,7 +114,7 @@ if( $ImportSharePointTenantListData.IsPresent )
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
             -DatabaseName   $DatabaseName `
-            -DatabaseServer $DatabaseServer -Verbose
+            -DatabaseServer $DatabaseServer
     
         # import the guid/name mappings for site creation sources
         Import-TSMSSiteCreationSources `
@@ -122,7 +122,7 @@ if( $ImportSharePointTenantListData.IsPresent )
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
             -DatabaseName   $DatabaseName `
-            -DatabaseServer $DatabaseServer -Verbose
+            -DatabaseServer $DatabaseServer
     
         # full sync from tenant admin lists
         Import-TSMSSiteMetadataFromTenantAdminList `
@@ -131,7 +131,7 @@ if( $ImportSharePointTenantListData.IsPresent )
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
             -DatabaseName   $DatabaseName `
-            -DatabaseServer $DatabaseServer  -Verbose
+            -DatabaseServer $DatabaseServer
         
         Import-TSMSSiteMetadataFromTenantAdminList `
             -AdminList      "AggregatedSiteCollections" `
@@ -139,7 +139,7 @@ if( $ImportSharePointTenantListData.IsPresent )
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
             -DatabaseName   $DatabaseName `
-            -DatabaseServer $DatabaseServer  -Verbose
+            -DatabaseServer $DatabaseServer
     
         Write-Host "$(Get-Date) - Completed $operation"
     
@@ -160,7 +160,7 @@ if( $ImportSharePointTenantAPIData.IsPresent )
     {
         $Error.Clear()
 
-        $operation = "Operation - Import SharePoint Tenant API Data"
+        $operation = "Operation - ImportSharePointTenantAPIData"
     
         Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantAPIData" -TrimExistingLogFiles
     
@@ -211,7 +211,7 @@ if( $ImportDetailedSharePointTenantAPIData.IsPresent )
     {
         $Error.Clear()
 
-        $operation = "Operation - Import Detailed SharePoint Tenant API Data"
+        $operation = "Operation - ImportDetailedSharePointTenantAPIData"
     
         Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantAPIData" -TrimExistingLogFiles
     
@@ -247,9 +247,9 @@ if( $ImportM365GroupOwnershipData.IsPresent )
     {
         $Error.Clear()
 
-        $operation = "Operation - Import M365 Group Ownership Data"
+        $operation = "Operation - ImportM365GroupOwnershipData"
     
-        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "$ImportM365GroupOwnershipData" -TrimExistingLogFiles
+        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportM365GroupOwnershipData" -TrimExistingLogFiles
     
         Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
     

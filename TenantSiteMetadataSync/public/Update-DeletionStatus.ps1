@@ -103,7 +103,7 @@
     }
     end
     {
-        Update-DataRefreshStatus -Name $PSCmdlet.MyInvocation.InvocationName -Finished -ErrorCount $Error.Count -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Stop-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -ErrorCount $Error.Count -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
     }
 }
 
