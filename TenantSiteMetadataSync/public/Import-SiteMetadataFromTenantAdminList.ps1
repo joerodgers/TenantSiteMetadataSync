@@ -82,11 +82,11 @@
 
         if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection:$True )
         {
-            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Reading list items from list $listTitle"
+            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Reading list items from list '$listTitle'"
 
             $items = Get-PnPListItem -List $listTitle -PageSize 5000 -Fields $fields -Connection $connection
 
-            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Read $($items.Count) list items from list $listTitle"
+            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Read $($items.Count) list items from list '$listTitle'"
 
             Disconnect-PnPOnline -Connection $connection
 
@@ -134,6 +134,10 @@
                     {
                         $parameters.HubSiteId = $item.FieldValues["HubSiteId"]
                     }
+
+                    Update-SiteMetadata @parameters
+
+                    $counter++
                 }
             }
             elseif( $AdminList -eq "AllSitesAggregatedSiteCollections" )
@@ -156,11 +160,11 @@
                     $parameters.TemplateName            = $item.FieldValues["TemplateName"]
                     $parameters.TimeCreated             = $item.FieldValues["TimeCreated"]
                     $parameters.Title                   = $item.FieldValues["Title"]
+
+                    Update-SiteMetadata @parameters
+
+                    $counter++
                 }
-
-                Update-SiteMetadata @parameters
-
-                $counter++
             }
         }
     }

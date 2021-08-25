@@ -114,7 +114,7 @@ if( $ImportSharePointTenantListData.IsPresent )
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
             -DatabaseName   $DatabaseName `
-            -DatabaseServer $DatabaseServer
+            -DatabaseServer $DatabaseServer -Verbose
     
         # import the guid/name mappings for site creation sources
         Import-TSMSSiteCreationSources `
@@ -122,7 +122,7 @@ if( $ImportSharePointTenantListData.IsPresent )
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
             -DatabaseName   $DatabaseName `
-            -DatabaseServer $DatabaseServer
+            -DatabaseServer $DatabaseServer -Verbose
     
         # full sync from tenant admin lists
         Import-TSMSSiteMetadataFromTenantAdminList `
@@ -131,7 +131,7 @@ if( $ImportSharePointTenantListData.IsPresent )
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
             -DatabaseName   $DatabaseName `
-            -DatabaseServer $DatabaseServer 
+            -DatabaseServer $DatabaseServer  -Verbose
         
         Import-TSMSSiteMetadataFromTenantAdminList `
             -AdminList      "AggregatedSiteCollections" `
@@ -139,7 +139,7 @@ if( $ImportSharePointTenantListData.IsPresent )
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
             -DatabaseName   $DatabaseName `
-            -DatabaseServer $DatabaseServer 
+            -DatabaseServer $DatabaseServer  -Verbose
     
         Write-Host "$(Get-Date) - Completed $operation"
     
