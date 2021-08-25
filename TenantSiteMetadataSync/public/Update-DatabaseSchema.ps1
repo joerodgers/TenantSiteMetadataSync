@@ -30,7 +30,7 @@
     {
         $tables    = Get-ChildItem -Path "$PSScriptRoot\..\private\SQL" -Filter "tb_*.sql"
         $functions = Get-ChildItem -Path "$PSScriptRoot\..\private\SQL" -Filter "tvf_*.sql"
-        $procs     = Get-ChildItem -Path "$PSScriptRoot\..\private\SQL" -Filter "procs_*.sql"
+        $procs     = Get-ChildItem -Path "$PSScriptRoot\..\private\SQL" -Filter "proc_*.sql"
         $views     = Get-ChildItem -Path "$PSScriptRoot\..\private\SQL" -Filter "vw_*.sql"
     }
     process

@@ -96,158 +96,180 @@ if( $ImportUsageAccountData.IsPresent )
 # ImportSharePointTenantListData
 if( $ImportSharePointTenantListData.IsPresent )
 {
-    $Error.Clear()
+    try
+    {
+        $Error.Clear()
 
-    $operation = "Operation - Import SharePoint Tenant List Data"
-
-    Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantListData"
-
-    Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
-
-    Write-Host "$(Get-Date) - Starting $operation"
-
-    # import the guid/name mappings for sensitivity labels
-    Import-SensitivityLabel `
-        -ClientId       $ClientId `
-        -Thumbprint     $Thumbprint `
-        -Tenant         $Tenant `
-        -DatabaseName   $DatabaseName `
-        -DatabaseServer $DatabaseServer
-
-    # import the guid/name mappings for site creation sources
-    Import-SiteCreationSources `
-        -ClientId       $ClientId `
-        -Thumbprint     $Thumbprint `
-        -Tenant         $Tenant `
-        -DatabaseName   $DatabaseName `
-        -DatabaseServer $DatabaseServer
-
-    # full sync from tenant admin lists
-    Import-SiteMetadataFromTenantAdminList `
-        -AdminList      "AllSitesAggregatedSiteCollections" `
-        -ClientId       $ClientId `
-        -Thumbprint     $Thumbprint `
-        -Tenant         $Tenant `
-        -DatabaseName   $DatabaseName `
-        -DatabaseServer $DatabaseServer 
+        $operation = "Operation - Import SharePoint Tenant List Data"
     
-    Import-SiteMetadataFromTenantAdminList `
-        -AdminList      "AggregatedSiteCollections" `
-        -ClientId       $ClientId `
-        -Thumbprint     $Thumbprint `
-        -Tenant         $Tenant `
-        -DatabaseName   $DatabaseName `
-        -DatabaseServer $DatabaseServer 
+        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantListData"
+    
+        Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+    
+        Write-Host "$(Get-Date) - Starting $operation"
+    
+        # import the guid/name mappings for sensitivity labels
+        Import-SensitivityLabel `
+            -ClientId       $ClientId `
+            -Thumbprint     $Thumbprint `
+            -Tenant         $Tenant `
+            -DatabaseName   $DatabaseName `
+            -DatabaseServer $DatabaseServer
+    
+        # import the guid/name mappings for site creation sources
+        Import-SiteCreationSources `
+            -ClientId       $ClientId `
+            -Thumbprint     $Thumbprint `
+            -Tenant         $Tenant `
+            -DatabaseName   $DatabaseName `
+            -DatabaseServer $DatabaseServer
+    
+        # full sync from tenant admin lists
+        Import-SiteMetadataFromTenantAdminList `
+            -AdminList      "AllSitesAggregatedSiteCollections" `
+            -ClientId       $ClientId `
+            -Thumbprint     $Thumbprint `
+            -Tenant         $Tenant `
+            -DatabaseName   $DatabaseName `
+            -DatabaseServer $DatabaseServer 
+        
+        Import-SiteMetadataFromTenantAdminList `
+            -AdminList      "AggregatedSiteCollections" `
+            -ClientId       $ClientId `
+            -Thumbprint     $Thumbprint `
+            -Tenant         $Tenant `
+            -DatabaseName   $DatabaseName `
+            -DatabaseServer $DatabaseServer 
+    
+        Write-Host "$(Get-Date) - Completed $operation"
+    
+    }
+    finally
+    {
+        Stop-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
 
-    Write-Host "$(Get-Date) - Completed $operation"
-
-    Stop-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
-
-    Stop-TSMSLogFile
+        Stop-TSMSLogFile
+    }
 }
 
 
 # ImportSharePointTenantAPIData
 if( $ImportSharePointTenantAPIData.IsPresent )
 {
-    $Error.Clear()
+    try 
+    {
+        $Error.Clear()
 
-    $operation = "Operation - Import SharePoint Tenant API Data"
+        $operation = "Operation - Import SharePoint Tenant API Data"
+    
+        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantAPIData"
+    
+        Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+    
+        Write-Host "$(Get-Date) - Starting $operation"
+    
+        # make sure our deletion states are sync'd between the tenant and database
+        Update-DeletionStatus `
+            -ClientId       $ClientId `
+            -Thumbprint     $Thumbprint `
+            -Tenant         $Tenant `
+            -DatabaseName   $DatabaseName `
+            -DatabaseServer $DatabaseServer
+    
+        # import additional data about deleted sites from SharePoint tenant
+        Import-DeletedSiteMetadataFromTenantAPI `
+            -ClientId       $ClientId `
+            -Thumbprint     $Thumbprint `
+            -Tenant         $Tenant `
+            -DatabaseName   $DatabaseName `
+            -DatabaseServer $DatabaseServer
+    
+        # import additional data about active sites from SharePoint tenant
+        Import-SiteMetadataFromTenantAPI `
+            -ClientId       $ClientId `
+            -Thumbprint     $Thumbprint `
+            -Tenant         $Tenant `
+            -DatabaseName   $DatabaseName `
+            -DatabaseServer $DatabaseServer
+    
+        Write-Host "$(Get-Date) - Completed $operation"
+            
+    }
+    finally
+    {
+        Stop-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
 
-    Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantAPIData"
-
-    Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
-
-    Write-Host "$(Get-Date) - Starting $operation"
-
-    # make sure our deletion states are sync'd between the tenant and database
-    Update-DeletionStatus `
-        -ClientId       $ClientId `
-        -Thumbprint     $Thumbprint `
-        -Tenant         $Tenant `
-        -DatabaseName   $DatabaseName `
-        -DatabaseServer $DatabaseServer
-
-    # import additional data about deleted sites from SharePoint tenant
-    Import-DeletedSiteMetadataFromTenantAPI `
-        -ClientId       $ClientId `
-        -Thumbprint     $Thumbprint `
-        -Tenant         $Tenant `
-        -DatabaseName   $DatabaseName `
-        -DatabaseServer $DatabaseServer
-
-    # import additional data about active sites from SharePoint tenant
-    Import-SiteMetadataFromTenantAPI `
-        -ClientId       $ClientId `
-        -Thumbprint     $Thumbprint `
-        -Tenant         $Tenant `
-        -DatabaseName   $DatabaseName `
-        -DatabaseServer $DatabaseServer
-
-    Write-Host "$(Get-Date) - Completed $operation"
-
-    Stop-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
-
-    Stop-TSMSLogFile
+        Stop-TSMSLogFile
+    }
 }
 
 
 # ImportDetailedSharePointTenantAPIData
 if( $ImportDetailedSharePointTenantAPIData.IsPresent )
 {
-    $Error.Clear()
+    try 
+    {
+        $Error.Clear()
 
-    $operation = "Operation - Import Detailed SharePoint Tenant API Data"
+        $operation = "Operation - Import Detailed SharePoint Tenant API Data"
+    
+        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantAPIData"
+    
+        Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+    
+        Write-Host "$(Get-Date) - Starting $operation"
+    
+        # VERY long running operation on large tenants
+        Import-SiteMetadataFromTenantAPI `
+            -DetailedImport `
+            -ClientId       $ClientId `
+            -Thumbprint     $Thumbprint `
+            -Tenant         $Tenant `
+            -DatabaseName   $DatabaseName `
+            -DatabaseServer $DatabaseServer
+    
+    
+        Write-Host "$(Get-Date) - Completed $operation"
+    }
+    finally
+    {
+        Stop-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
 
-    Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantAPIData"
-
-    Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
-
-    Write-Host "$(Get-Date) - Starting $operation"
-
-    # VERY long running operation on large tenants
-    Import-SiteMetadataFromTenantAPI `
-        -DetailedImport `
-        -ClientId       $ClientId `
-        -Thumbprint     $Thumbprint `
-        -Tenant         $Tenant `
-        -DatabaseName   $DatabaseName `
-        -DatabaseServer $DatabaseServer
-
-
-    Write-Host "$(Get-Date) - Completed $operation"
-
-    Stop-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
-
-    Stop-TSMSLogFile
+        Stop-TSMSLogFile
+    }
 }
 
 
 # ImportM365GroupOwnershipData
 if( $ImportM365GroupOwnershipData.IsPresent )
 {
-    $Error.Clear()
+    try 
+    {
+        $Error.Clear()
 
-    $operation = "Operation - Import M365 Group Ownership Data"
+        $operation = "Operation - Import M365 Group Ownership Data"
+    
+        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "$ImportM365GroupOwnershipData"
+    
+        Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+    
+        Write-Host "$(Get-Date) - Starting $operation"
+    
+        # import the M365 group ownership
+        Import-M365GroupOwnershipData `
+            -ClientId       $ClientId `
+            -Thumbprint     $Thumbprint `
+            -Tenant         $Tenant `
+            -DatabaseName   $DatabaseName `
+            -DatabaseServer $DatabaseServer
+    
+        Write-Host "$(Get-Date) - Completed $operation"
+    }
+    finally
+    {
+        Stop-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
 
-    Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "$ImportM365GroupOwnershipData"
-
-    Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
-
-    Write-Host "$(Get-Date) - Starting $operation"
-
-    # import the M365 group ownership
-    Import-M365GroupOwnershipData `
-        -ClientId       $ClientId `
-        -Thumbprint     $Thumbprint `
-        -Tenant         $Tenant `
-        -DatabaseName   $DatabaseName `
-        -DatabaseServer $DatabaseServer
-
-    Write-Host "$(Get-Date) - Completed $operation"
-
-    Stop-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
-
-    Stop-TSMSLogFile
+        Stop-TSMSLogFile
+    }
 }
 
