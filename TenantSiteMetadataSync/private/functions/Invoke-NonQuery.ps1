@@ -39,49 +39,49 @@
          # Hashtable of parameters to the SQL query.  Do not include the '@' character in the key name.
          [Parameter(Mandatory=$false,ParameterSetName="Individual")]
          [Parameter(Mandatory=$false,ParameterSetName="ConnectionString")]
-         [HashTable]$Parameters = @{}    )
- 
-     begin
-     {
+         [HashTable]$Parameters = @{}    
+    )
+    begin
+    {
          if( $PSCmdlet.ParameterSetName -eq "Individual" )
          {
              $ConnectionString = "Data Source=$DatabaseServer;Initial Catalog=$DatabaseName;Integrated Security=True;Enlist=False;Connect Timeout=5"
          }
-     }
-     process
-     {
-         try
-         {
-             $connection = New-Object System.Data.SqlClient.SqlConnection($ConnectionString)
-             $connection.Open()
- 
-             $command = New-Object system.Data.SqlClient.SqlCommand($Query, $connection)     
-             $command.CommandTimeout = $CommandTimeout
- 
-             foreach( $Parameter in $Parameters.GetEnumerator() )
-             {
-                 $null = $command.Parameters.Add( "@$($Parameter.Key)", $Parameter.Value )
-             }
- 
-             $command.ExecuteNonQuery() | Out-Null
-         }
-         catch
-         {
-             throw $_.Exception
-         }
-         finally
-         {
-             if($connection)
-             {
-                 [System.Data.SqlClient.SqlConnection]::ClearAllPools()
-                 $connection.Close()
-                 $connection.Dispose()
-             }
-         }
-     }
-     end
-     {
-     }
- }
+    }
+    process
+    {
+        try
+        {
+            $connection = New-Object System.Data.SqlClient.SqlConnection($ConnectionString)
+            $connection.Open()
+
+            $command = New-Object system.Data.SqlClient.SqlCommand($Query, $connection)     
+            $command.CommandTimeout = $CommandTimeout
+
+            foreach( $Parameter in $Parameters.GetEnumerator() )
+            {
+                $null = $command.Parameters.AddWithValue( "@$($Parameter.Key)", $Parameter.Value )
+            }
+
+            $command.ExecuteNonQuery() | Out-Null
+        }
+        catch
+        {
+            throw $_.Exception
+        }
+        finally
+        {
+            if($connection)
+            {
+                [System.Data.SqlClient.SqlConnection]::ClearAllPools()
+                $connection.Close()
+                $connection.Dispose()
+            }
+        }
+    }
+    end
+    {
+    }
+}
  
 
