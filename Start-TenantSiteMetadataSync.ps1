@@ -53,7 +53,7 @@ if( $ImportUsageAccountData.IsPresent )
     Write-Host "$(Get-Date) - Starting Operation: ImportUsageAccountData"
 
     # import usage data for OD4B sites from Graph API reports
-    Import-MicrosoftGraphUsageAccountReportData `
+    Import-TSMSMicrosoftGraphUsageAccountReportData `
         -ReportType     "OneDrive" `
         -Period         30 `
         -ApiVersion     "v1.0" `
@@ -64,7 +64,7 @@ if( $ImportUsageAccountData.IsPresent )
         -DatabaseServer $DatabaseServer
 
     # import usage data for SharePoint sites from Graph API reports
-    Import-MicrosoftGraphUsageAccountReportData `
+    Import-TSMSMicrosoftGraphUsageAccountReportData `
         -ReportType     "SharePoint" `
         -Period         30 `
         -ApiVersion     "beta" `
@@ -75,7 +75,7 @@ if( $ImportUsageAccountData.IsPresent )
         -DatabaseServer $DatabaseServer
 
     # import usage data for M365 groups from Graph API reports
-    Import-MicrosoftGraphUsageAccountReportData `
+    Import-TSMSMicrosoftGraphUsageAccountReportData `
         -ReportType     "M365Group" `
         -Period         30 `
         -ApiVersion     "v1.0" `
