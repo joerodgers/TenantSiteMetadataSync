@@ -22,7 +22,7 @@
     {
         try
         { 
-            Stop-Transcript 
+            $null = Stop-Transcript 
         }
         catch
         {

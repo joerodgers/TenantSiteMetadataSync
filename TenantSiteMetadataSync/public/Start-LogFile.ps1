@@ -23,7 +23,14 @@
         [string]$Path,
 
         [Parameter(Mandatory=$true)]
-        [string]$Name
+        [string]$Name,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$TrimExistingLogFiles,
+
+        [Parameter(Mandatory=$false)]
+        [ValidateRange(1-21)]
+        [int]$RetentionDays = 7
     )
 
     begin
@@ -37,7 +44,15 @@
         
         $transcriptPath = Join-Path -Path $Path -ChildPath "$($Name)_$($timestamp).log"
 
-        Start-Transcript -Path $transcriptPath
+        if( $TrimExistingLogFiles.IsPresent )
+        {
+            Get-ChildItem -Path $Path -Filter "$($Name)_*.log" | 
+                Where-Object -Property Name -match "$($Name)_\d{8}T\d{10}.log" | 
+                    Where-Object -Property LastWriteTime -le ([DateTime]::Today.AddDays($RetentionDays * -1)) | 
+                        Remove-Item -Force -Confirm:$false
+        }
+
+        $null = Start-Transcript -Path $transcriptPath
     }
     end
     {
