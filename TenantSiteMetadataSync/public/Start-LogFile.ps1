@@ -29,7 +29,7 @@
         [switch]$TrimExistingLogFiles,
 
         [Parameter(Mandatory=$false)]
-        [ValidateRange(1-21)]
+        [ValidateRange(1,21)]
         [int]$RetentionDays = 7
     )
 
@@ -51,6 +51,8 @@
                     Where-Object -Property LastWriteTime -le ([DateTime]::Today.AddDays($RetentionDays * -1)) | 
                         Remove-Item -Force -Confirm:$false
         }
+
+        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Starting transcript log at $transcriptPath"
 
         $null = Start-Transcript -Path $transcriptPath
     }
