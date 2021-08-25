@@ -37,29 +37,33 @@
     {   
         foreach( $path in $tables )
         {
-            Write-Verbose "$(Get-Date) - Executing File: $($path.Fullname)"
+            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Executing table file: $($path.Fullname)"
+
             Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseServer -Database $DatabaseName
             if( -not $?) { return }
         }
 
         foreach( $path in $functions )
         {
-            Write-Verbose "$(Get-Date) - Executing File: $($path.Fullname)"
+            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Executing function file: $($path.Fullname)"
+
             Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseServer -Database $DatabaseName
             if( -not $?) { return }
         }
 
         foreach( $path in $procs )
         {
-            Write-Verbose "$(Get-Date) - Executing File: $($path.Fullname)"
-            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseName -Database $Database
+            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Executing proc file: $($path.Fullname)"
+
+            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseServer -Database $DatabaseName
             if( -not $?) { return }
         }
 
         foreach( $path in $views )
         {
-            Write-Verbose "$(Get-Date) - Executing File: $($path.Fullname)"
-            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseName -Database $Database
+            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Executing view file: $($path.Fullname)"
+
+            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseServer -Database $DatabaseName
             if( -not $?) { return }
         }
     }

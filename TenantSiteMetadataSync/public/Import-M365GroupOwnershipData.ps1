@@ -58,11 +58,17 @@
     }
     process
     {
+        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Querying for group connected sites"
+        
         if( $groups = Get-DataTable -Query "SELECT GroupId FROM GroupConnectedSites" -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer )
         {
-            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Discovered $($groups.Count) Groups"
+            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Discovered $($groups.Count) groups connected sites"
+
+            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Connecting to Microsoft Graph"
 
             $null = Connect-MgGraph -ClientId $ClientId -CertificateThumbprint $Thumbprint -TenantId "$Tenant.onmicrosoft.com"
+
+            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Connected to Microsoft Graph"
 
             foreach( $group in $groups )
             {
@@ -70,12 +76,16 @@
                 
                 try
                 {
+                    Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Getting group owners from Graph API"
+
                     $groupOwners = @(Get-MgGroupOwner -GroupId $group.GroupId -Top 500)
 
                     Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Owner count: $($groupOwners.Count)"
 
                     if( $groupOwners.Count -gt 0 )
                     {
+                        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Removing group owners for group $($group.GroupId)"
+
                         Invoke-NonQuery -Query "EXEC proc_RemoveGroupOwnersByGroupId @GroupId = @GroupId" -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Parameters @{ GroupId = $group.GroupId }
 
                         $parameters = @{}
@@ -87,6 +97,8 @@
                             
                             try
                             {
+                                Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Add group owner $($parameters.UserPrincipalName) for group $($group.GroupId)"
+
                                 Invoke-NonQuery -Query "EXEC proc_AddGroupOwnerByGroupId @GroupId = @GroupId, @UserPrincipalName = @UserPrincipalName" -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Parameters $parameters
                             }
                             catch
@@ -102,7 +114,6 @@
                 }
                 
                 $counter++
-
             }
 
             Disconnect-MgGraph

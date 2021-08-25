@@ -99,11 +99,17 @@
     }
     process
     {
+        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Connecting to SharePoint Online Tenant"
+
         if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection $true )
         {
             if( $accessToken = Get-PnPGraphAccessToken -Connection $connection )
             {
+                Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Requesting '$ReportType' report from Graph API"
+
                 $response = Invoke-RestMethod -Method Get -Uri $uri -Headers @{ Authorization = "Bearer $accessToken" } -MaximumRedirection 10 
+
+                Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Received '$ReportType' report from Graph API"
 
                 # strip off OM if present
                 $response = $response -replace "^\xEF\xBB\xBF", ""
@@ -111,6 +117,8 @@
                 if( $response )
                 {
                     $rows = ConvertFrom-Csv -InputObject $response -Delimiter ","
+
+                    Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Importing $($rows.Count) rows from report."
 
                     foreach( $row in $rows )
                     {

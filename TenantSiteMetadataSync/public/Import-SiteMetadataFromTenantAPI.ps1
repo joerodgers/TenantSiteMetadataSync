@@ -93,6 +93,8 @@
     }
     process
     {
+        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Connecting to SharePoint Online Tenant"
+
         if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection $true )
         {
             $parameters = @{}
@@ -108,6 +110,8 @@
                 $parameters.IncludeOneDriveSites = $true
             }   
 
+            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Querying tenant for sites."
+
             # query the tenant
             $tenantSites = Get-PnPTenantSite @parameters 
 
@@ -116,6 +120,8 @@
             # process each site
             foreach( $tenantSite in $tenantSites )
             {
+                Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Processsing $($tenantSite.Url)"
+
                 $parameters = @{}
                 $parameters.DatabaseName   = $DatabaseName
                 $parameters.DatabaseServer = $DatabaseServer

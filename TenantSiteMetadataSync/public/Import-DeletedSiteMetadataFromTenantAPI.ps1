@@ -57,7 +57,7 @@
     {
         $counter = 1
 
-        Write-Verbose "$(Get-Date) - Reading sites from tenant recycle bin"
+        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Reading sites from tenant recycle bin"
 
         if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection $true )
         {
@@ -67,13 +67,13 @@
                 {
                     try
                     {
-                        Write-Verbose "$(Get-Date) - ($counter/$($tenantSites.Count)) Processing Deleted Site: $($tenantSite.Url)"
+                        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - ($counter/$($tenantSites.Count)) Processing Url: $($tenantSite.Url)"
 
                         Update-SiteMetadata -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -SiteId $tenantSite.SiteId -SiteUrl $tenantSite.Url -TimeDeleted $tenantSite.DeletionTime
                     }
                     catch
                     {
-                        Write-Error "$($PSCmdlet.MyInvocation.MyCommand) - Error updating Deleted SiteUrl='$($tenantSite.Url)'. Error: $($_)"
+                        Write-Error "$($PSCmdlet.MyInvocation.MyCommand) - Error updating deleted site. SiteUrl='$($tenantSite.Url)'. Error='$($_)'"
                     }
 
                     $counter++

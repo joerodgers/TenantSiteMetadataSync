@@ -29,7 +29,8 @@
     {
         foreach( $path in $databases )
         {
-            Write-Verbose "$(Get-Date) - Executing File: $($path.Fullname) "
+            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Executing File: $($path.Fullname)"
+
             Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseServer
             if( -not $?) { return }
         }

@@ -60,13 +60,19 @@
     }
     process
     {
+        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Connecting to SharePoint Online Tenant"
+
         if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection $true )
         {
             if( $token = Get-PnPGraphAccessToken -Connection $connection )
             {
                 Write-Verbose "$(Get-Date) - Reading sensitivity labels from Graph"
 
+                Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Requesting labels from Microsoft Graph API"
+
                 $labels = Invoke-RestMethod -Method Get -Uri $uri -Headers @{ Authorization = "Bearer $token" } | Select-Object -ExpandProperty value
+
+                Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Received $($labels.Count) labels from Microsoft Graph API"
 
                 foreach( $label in $labels )
                 {

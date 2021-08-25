@@ -1,4 +1,7 @@
-﻿$importIndividualFiles = $true
+﻿# Force TLS 1.2 to communicate with Microsoft Graph API and SharePoint Online Tenant
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+
+$importIndividualFiles = $true
 
 if( $importIndividualFiles )
 {

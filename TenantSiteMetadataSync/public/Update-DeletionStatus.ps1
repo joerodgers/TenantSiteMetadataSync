@@ -55,31 +55,32 @@
     }
     process
     {
+        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Connecting to SharePoint Online Tenant"
+
         if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection )
         {
-            Write-Verbose "$(Get-Date) - Querying tenant for all sites"
-            
+            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Querying tenant for sites"
+
             $tenantSites = Get-PnPTenantSite -IncludeOneDriveSites -Connection $connection | Select-Object -ExpandProperty Url | ConvertTo-NormalizedUrl
 
             $tenantSites += Get-HiddenSiteUrl -Tenant $Tenant | ConvertTo-NormalizedUrl
 
             Disconnect-PnPOnline -Connection $connection
 
-            Write-Verbose "$(Get-Date) - Querying database for all active sites"
+            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Querying database for all active sites"
 
             $activeSites = Get-DataTable -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query "SELECT SiteId, SiteUrl FROM ActiveSites"
         
-            Write-Verbose "$(Get-Date) - Querying database for all deleted sites"
+            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Querying database for all deleted sites"
 
             $deletedSites = Get-DataTable -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query "SELECT SiteId, SiteUrl FROM DeletedSites"
 
             # mark sites as deleted if they are not in tenant list anymore and are not marked as deleted in the database
-
             foreach( $activeSite in $activeSites )
             {
                 if( $tenantSites -notcontains $activeSite.SiteUrl )
                 {
-                    Write-Verbose "$(Get-Date) - Marking $($activeSite.SiteUrl) as deleted"
+                    Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Marking $($activeSite.SiteUrl) as deleted"
 
                     Update-SiteMetadata -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -SiteId $activeSite.SiteId -SiteUrl $activeSite.SiteUrl -TimeDeleted ([System.Data.SqlTypes.SqlDateTime]::MinValue)
                 }
@@ -87,19 +88,17 @@
 
 
             # mark sites as not deleted if they are present in tenant list
-
             foreach( $deletedSite in $deletedSites )
             {
                 if( $tenantSites -contains $deletedSite.SiteUrl )
                 {
-                    Write-Verbose "$(Get-Date) - Marking $($deletedSite.SiteUrl) as not deleted"
+                    Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Marking $($activeSite.SiteUrl) as not deleted"
 
                     $query = "UPDATE SiteMetadata SET TimeDeleted = NULL WHERE @SiteId = @SiteId"
 
                     Invoke-NonQuery -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query $query -Parameters @{ SiteId = $deletedSite.SiteId }
                 }
             }
-
         }
     }
     end

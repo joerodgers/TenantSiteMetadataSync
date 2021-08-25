@@ -64,20 +64,37 @@
         Start-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
 
         $counter = 1
-    }
+
+        if( $AdminList -eq "AggregatedSiteCollections" )
+        {
+            $listTitle = "DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS"
+            $fields    = "FileViewedOrEdited", "GroupId", "HubSiteId", "Initiator", "IsGroupConnected", "LastActivityOn", "NumOfFiles", "PagesVisited", "PageViews", "SensitivityLabel", "SiteCreationSource", "SiteId", "SiteUrl", "State", "StorageUsed", "TimeDeleted", "LastItemModifiedDate", "SiteFlags"
+        }
+        else 
+        {
+            $listTitle = "DO_NOT_DELETE_SPLIST_TENANTADMIN_ALL_SITES_AGGREGATED_SITECOLLECTIONS"
+            $fields = "ConditionalAccessPolicy", "CreatedBy", "DeletedBy", "LastItemModifiedDate", "SiteOwnerEmail", "SiteOwnerName", "StorageQuota", "SiteId", "SiteUrl", "TemplateName", "TimeCreated", "Title"
+        }
+}
     process
     {
+        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Connecting to SharePoint Online Tenant"
+
         if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection $true )
         {
+            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Reading list items from list $listTitle"
+
+            $items = Get-PnPListItem -List $listTitle -PageSize 5000 -Fields $fields -Connection $connection
+
+            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Read $($items.Count) list items from list $listTitle"
+
+            Disconnect-PnPOnline -Connection $connection
+
             if( $AdminList -eq "AggregatedSiteCollections" )
             {
-                $fields = "FileViewedOrEdited", "GroupId", "HubSiteId", "Initiator", "IsGroupConnected", "LastActivityOn", "NumOfFiles", "PagesVisited", "PageViews", "SensitivityLabel", "SiteCreationSource", "SiteId", "SiteUrl", "State", "StorageUsed", "TimeDeleted", "LastItemModifiedDate", "SiteFlags"
-
-                $items = Get-PnPListItem -List "DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS" -PageSize 5000 -Fields $fields -Connection $connection
-
                 foreach( $item in $items )
                 {
-                    Write-Verbose "$(Get-Date) - ($counter/$($items.Count)) Processing Id: $($item.Id)"
+                    Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - ($counter/$($items.Count)) Item Id='$($item.Id)'"
 
                     $parameters = @{}
                     $parameters.DatabaseName         = $DatabaseName
@@ -96,7 +113,7 @@
                     $parameters.StorageUsed          = $item.FieldValues["StorageUsed"]
                     $parameters.TimeDeleted          = $item.FieldValues["TimeDeleted"]
                     $parameters.IsTeamsConnected     = $item.FieldValues["SiteFlags"] -eq 1
-                    $parameters.State                = -1
+                    $parameters.State                = -1 # "unknown"
 
                     if( -not [string]::IsNullOrWhiteSpace($item.FieldValues["State"]) )
                     {
@@ -117,18 +134,10 @@
                     {
                         $parameters.HubSiteId = $item.FieldValues["HubSiteId"]
                     }
-
-                    Update-SiteMetadata @parameters
-
-                    $counter++
                 }
             }
             elseif( $AdminList -eq "AllSitesAggregatedSiteCollections" )
             {
-                $fields = "ConditionalAccessPolicy", "CreatedBy", "DeletedBy", "LastItemModifiedDate", "SiteOwnerEmail", "SiteOwnerName", "StorageQuota", "SiteId", "SiteUrl", "TemplateName", "TimeCreated", "Title"
-
-                $items = Get-PnPListItem -List "DO_NOT_DELETE_SPLIST_TENANTADMIN_ALL_SITES_AGGREGATED_SITECOLLECTIONS" -PageSize 5000 -Fields $fields -Connection $connection
-
                 foreach( $item in $items )
                 {
                     Write-Verbose "$(Get-Date) - ($counter/$($items.Count)) Processing Id: $($item.Id)"
@@ -147,14 +156,12 @@
                     $parameters.TemplateName            = $item.FieldValues["TemplateName"]
                     $parameters.TimeCreated             = $item.FieldValues["TimeCreated"]
                     $parameters.Title                   = $item.FieldValues["Title"]
-
-                    Update-SiteMetadata @parameters
-
-                    $counter++
                 }
-            }
 
-            Disconnect-PnPOnline -Connection $connection
+                Update-SiteMetadata @parameters
+
+                $counter++
+            }
         }
     }
     end
