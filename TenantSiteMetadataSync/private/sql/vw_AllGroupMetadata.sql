@@ -11,7 +11,7 @@ AS
         ,GCS.IsTeamsConnected
         ,GM.*
     FROM 
-        GroupConnectedSites GCS
+        TVF_GroupSites_Active() GCS
         FULL OUTER JOIN
         GroupMetadata GM
         ON GM.GroupId = GCS.GroupId

@@ -7,8 +7,6 @@ AS
     SELECT        
         *
     FROM    
-        dbo.TVF_Sites_Active()
-    WHERE
-        (IsGroupConnected = 1)
+        dbo.TVF_GroupSites_Active()
 GO
 
