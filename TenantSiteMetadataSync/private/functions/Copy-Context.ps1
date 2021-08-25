@@ -4,7 +4,7 @@
     param
     (
         [Parameter(Mandatory=$true)]
-        [string]$Context,
+        [object]$Context,
 
         [Parameter(Mandatory=$true)]
         [string]$Url
@@ -15,15 +15,9 @@
     }
     process
     {
-        if( (Get-Command -Name "Get-PnPContext").Source -eq "PnP.PowerShell" )
-        {
-            return $Context.Clone($Url, $null)
-        }
-  
-        return [Microsoft.SharePoint.Client.ClientContextExtensions]::Clone($Context, $Url)
+        return [Microsoft.SharePoint.Client.ClientContextExtensions]::Clone( $Context, $Url, $null )
     }
     end
     {
     }
 }
-
