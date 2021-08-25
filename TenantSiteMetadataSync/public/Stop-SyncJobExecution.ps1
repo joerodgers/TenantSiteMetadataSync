@@ -37,7 +37,7 @@
     
     begin
     {
-        $query = "EXEC proc_StopSyncJobExecution @Name = @Name @ErrorCount = @ErrorCount"
+        $query = "EXEC proc_StopSyncJobExecution @Name = @Name, @ErrorCount = @ErrorCount"
     }
     process
     {
