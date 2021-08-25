@@ -109,7 +109,7 @@ if( $ImportSharePointTenantListData.IsPresent )
         Write-Host "$(Get-Date) - Starting $operation"
     
         # import the guid/name mappings for sensitivity labels
-        Import-SensitivityLabel `
+        Import-TSMSSensitivityLabel `
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
@@ -117,7 +117,7 @@ if( $ImportSharePointTenantListData.IsPresent )
             -DatabaseServer $DatabaseServer
     
         # import the guid/name mappings for site creation sources
-        Import-SiteCreationSources `
+        Import-TSMSSiteCreationSources `
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
@@ -125,7 +125,7 @@ if( $ImportSharePointTenantListData.IsPresent )
             -DatabaseServer $DatabaseServer
     
         # full sync from tenant admin lists
-        Import-SiteMetadataFromTenantAdminList `
+        Import-TSMSSiteMetadataFromTenantAdminList `
             -AdminList      "AllSitesAggregatedSiteCollections" `
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
@@ -133,7 +133,7 @@ if( $ImportSharePointTenantListData.IsPresent )
             -DatabaseName   $DatabaseName `
             -DatabaseServer $DatabaseServer 
         
-        Import-SiteMetadataFromTenantAdminList `
+        Import-TSMSSiteMetadataFromTenantAdminList `
             -AdminList      "AggregatedSiteCollections" `
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
@@ -169,7 +169,7 @@ if( $ImportSharePointTenantAPIData.IsPresent )
         Write-Host "$(Get-Date) - Starting $operation"
     
         # make sure our deletion states are sync'd between the tenant and database
-        Update-DeletionStatus `
+        Update-TSMSDeletionStatus `
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
@@ -177,7 +177,7 @@ if( $ImportSharePointTenantAPIData.IsPresent )
             -DatabaseServer $DatabaseServer
     
         # import additional data about deleted sites from SharePoint tenant
-        Import-DeletedSiteMetadataFromTenantAPI `
+        Import-TSMSDeletedSiteMetadataFromTenantAPI `
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
@@ -185,7 +185,7 @@ if( $ImportSharePointTenantAPIData.IsPresent )
             -DatabaseServer $DatabaseServer
     
         # import additional data about active sites from SharePoint tenant
-        Import-SiteMetadataFromTenantAPI `
+        Import-TSMSSiteMetadataFromTenantAPI `
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
@@ -220,7 +220,7 @@ if( $ImportDetailedSharePointTenantAPIData.IsPresent )
         Write-Host "$(Get-Date) - Starting $operation"
     
         # VERY long running operation on large tenants
-        Import-SiteMetadataFromTenantAPI `
+        Import-TSMSSiteMetadataFromTenantAPI `
             -DetailedImport `
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
@@ -256,7 +256,7 @@ if( $ImportM365GroupOwnershipData.IsPresent )
         Write-Host "$(Get-Date) - Starting $operation"
     
         # import the M365 group ownership
-        Import-M365GroupOwnershipData `
+        Import-TSMSM365GroupOwnershipData `
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
