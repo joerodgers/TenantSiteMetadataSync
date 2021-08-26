@@ -156,15 +156,37 @@
                     Set-PnPContext -Context $siteContext
 
                     # pull site and web details
-                    $site = Get-PnPSite -Includes Owner, Id, RelatedGroupId, ConditionalAccessPolicy, SensitivityLabel
-                    $web  = Get-PnPWeb  -Includes Created
+                    $siteDetail = Get-PnPTenantSite -Identity $tenantSite.Url
+                    $site       = Get-PnPSite -Includes Id, RelatedGroupId
+                    $web        = Get-PnPWeb  -Includes Created
                 
+                    <# The following properties are returned by a direct request for an individual site
+
+                        AllowDownloadingNonWebViewableFiles
+                        AllowEditing
+                        BlockDownloadLinksFileType
+                        ConditionalAccessPolicy
+                        Description
+                        DisableAppViews
+                        DisableCompanyWideSharingLinks
+                        DisableFlows
+                        LimitedAccessFileType
+                        Owner
+                        OwnerEmail
+                        OwnerLoginName
+                        OwnerName
+                        ProtectionLevelName
+                        SandboxedCodeActivationCapability
+                        SensitivityLabel
+                        WebsCount
+                    #>
+
                     # add detailed properties to the parameter set
-                    $parameters.ConditionalAccessPolicy = $site.ConditionalAccessPolicy
-                    $parameters.SensitivityLabel        = $site.SensitivityLabel.ToString()
+                    $parameters.ConditionalAccessPolicy = $siteDetail.ConditionalAccessPolicy
+                    $parameters.SensitivityLabel        = $siteDetail.SensitivityLabel
                     $parameters.SiteId                  = $site.Id
-                    $parameters.SiteOwnerEmail          = $site.Owner.Email
-                    $parameters.SiteOwnerName           = $site.Owner.Title
+                    $parameters.SiteOwnerEmail          = $siteDetail.OwnerEmail
+                    $parameters.SiteOwnerName           = $siteDetail.OwnerName
                     $parameters.RelatedGroupId          = $site.RelatedGroupId.ToString()
                     $parameters.TimeCreated             = $web.Created
                 }
