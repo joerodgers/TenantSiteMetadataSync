@@ -186,12 +186,20 @@
 
                     # add detailed properties to the parameter set
                     $parameters.ConditionalAccessPolicy = $siteDetail.ConditionalAccessPolicy
-                    $parameters.SensitivityLabel        = $siteDetail.SensitivityLabel
                     $parameters.SiteId                  = $site.Id
                     $parameters.SiteOwnerEmail          = $siteDetail.OwnerEmail
                     $parameters.SiteOwnerName           = $siteDetail.OwnerName
-                    $parameters.RelatedGroupId          = $site.RelatedGroupId.ToString()
                     $parameters.TimeCreated             = $web.Created
+                    
+                    if( $siteDetail.SensitivityLabel )
+                    {
+                        $parameters.SensitivityLabel = $siteDetail.SensitivityLabel
+                    }
+
+                    if( $siteDetail.RelatedGroupId )
+                    {
+                        $parameters.RelatedGroupId = $siteDetail.RelatedGroupId
+                    }
                 }
 
                 Update-SiteMetadata @parameters
