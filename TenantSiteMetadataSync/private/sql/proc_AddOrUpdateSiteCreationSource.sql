@@ -1,5 +1,5 @@
 ﻿IF OBJECT_ID('dbo.proc_AddOrUpdateSiteCreationSource', 'P') IS NOT NULL
-   DROP PROCEDURE dbo.proc_AddOrUpdateDataRefreshStatus
+   DROP PROCEDURE dbo.proc_AddOrUpdateSiteCreationSource
 GO
 
 CREATE PROCEDURE dbo.proc_AddOrUpdateSiteCreationSource
