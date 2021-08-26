@@ -147,58 +147,66 @@
                 }
 
                 # process details is specified
-                if( $DetailedImport.IsPresent )
+                if( $DetailedImport.IsPresent -and $tenantSite.LockState.ToString() -ne "NoAccess" )
                 {
-                    Set-PnPContext -Context $tenantContext
-
-                    # pull site and web details
-                    $siteDetail = Get-PnPTenantSite -Identity $tenantSite.Url
-
-                    # clone the current context
-                    $siteContext = Copy-Context -Context $tenantContext -Url $tenantSite.Url
-
-                    # set the context to the new site
-                    Set-PnPContext -Context $siteContext
-
-                    $site       = Get-PnPSite -Includes Id, RelatedGroupId
-                    $web        = Get-PnPWeb  -Includes Created
-                
-                    <# The following properties are returned by a direct request for an individual site
-
-                        AllowDownloadingNonWebViewableFiles
-                        AllowEditing
-                        BlockDownloadLinksFileType
-                        ConditionalAccessPolicy
-                        Description
-                        DisableAppViews
-                        DisableCompanyWideSharingLinks
-                        DisableFlows
-                        LimitedAccessFileType
-                        Owner
-                        OwnerEmail
-                        OwnerLoginName
-                        OwnerName
-                        ProtectionLevelName
-                        SandboxedCodeActivationCapability
-                        SensitivityLabel
-                        WebsCount
-                    #>
-
-                    # add detailed properties to the parameter set
-                    $parameters.ConditionalAccessPolicy = $siteDetail.ConditionalAccessPolicy
-                    $parameters.SiteId                  = $site.Id
-                    $parameters.SiteOwnerEmail          = $siteDetail.OwnerEmail
-                    $parameters.SiteOwnerName           = $siteDetail.OwnerName
-                    $parameters.TimeCreated             = $web.Created
-                    
-                    if( $siteDetail.SensitivityLabel )
+                    if( $tenantSite.LockState.ToString() -eq "NoAccess")
                     {
-                        $parameters.SensitivityLabel = $siteDetail.SensitivityLabel
+                        Write-Warning "Skipping detailed request for site $($tenantSite.Url). Site lock status is '$($tenantSite.LockState.ToString())'"
                     }
-
-                    if( $siteDetail.RelatedGroupId )
+                    else
                     {
-                        $parameters.RelatedGroupId = $siteDetail.RelatedGroupId
+                        Set-PnPContext -Context $tenantContext
+
+                        # pull site and web details
+                        $siteDetail = Get-PnPTenantSite -Identity $tenantSite.Url
+    
+                        # clone the current context
+                        $siteContext = Copy-Context -Context $tenantContext -Url $tenantSite.Url
+    
+                        # set the context to the new site
+                        Set-PnPContext -Context $siteContext
+    
+                        $site       = Get-PnPSite -Includes Id, RelatedGroupId
+                        $web        = Get-PnPWeb  -Includes Created
+                    
+                        <# The following properties are returned by a direct request for an individual site
+    
+                            AllowDownloadingNonWebViewableFiles
+                            AllowEditing
+                            BlockDownloadLinksFileType
+                            ConditionalAccessPolicy
+                            Description
+                            DisableAppViews
+                            DisableCompanyWideSharingLinks
+                            DisableFlows
+                            LimitedAccessFileType
+                            Owner
+                            OwnerEmail
+                            OwnerLoginName
+                            OwnerName
+                            ProtectionLevelName
+                            SandboxedCodeActivationCapability
+                            SensitivityLabel
+                            WebsCount
+                        #>
+    
+                        # add detailed properties to the parameter set
+                        $parameters.ConditionalAccessPolicy = $siteDetail.ConditionalAccessPolicy
+                        $parameters.SiteId                  = $site.Id
+                        $parameters.SiteOwnerEmail          = $siteDetail.OwnerEmail
+                        $parameters.SiteOwnerName           = $siteDetail.OwnerName
+                        $parameters.TimeCreated             = $web.Created
+                        
+                        if( $siteDetail.SensitivityLabel )
+                        {
+                            $parameters.SensitivityLabel = $siteDetail.SensitivityLabel
+                        }
+    
+                        if( $siteDetail.RelatedGroupId )
+                        {
+                            $parameters.RelatedGroupId = $siteDetail.RelatedGroupId
+                        }
+    
                     }
                 }
 
