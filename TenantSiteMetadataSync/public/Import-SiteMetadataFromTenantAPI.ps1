@@ -149,14 +149,17 @@
                 # process details is specified
                 if( $DetailedImport.IsPresent )
                 {
+                    Set-PnPContext -Context $tenantContext
+
+                    # pull site and web details
+                    $siteDetail = Get-PnPTenantSite -Identity $tenantSite.Url
+
                     # clone the current context
                     $siteContext = Copy-Context -Context $tenantContext -Url $tenantSite.Url
 
                     # set the context to the new site
                     Set-PnPContext -Context $siteContext
 
-                    # pull site and web details
-                    $siteDetail = Get-PnPTenantSite -Identity $tenantSite.Url
                     $site       = Get-PnPSite -Includes Id, RelatedGroupId
                     $web        = Get-PnPWeb  -Includes Created
                 
