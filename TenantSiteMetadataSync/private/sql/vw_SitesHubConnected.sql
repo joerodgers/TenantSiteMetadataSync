@@ -1,8 +1,8 @@
-﻿IF OBJECT_ID('dbo.HubConnectedSites', 'V') IS NOT NULL
-   DROP VIEW dbo.HubConnectedSites
+﻿IF OBJECT_ID('dbo.SitesHubConnected', 'V') IS NOT NULL
+   DROP VIEW dbo.SitesHubConnected
 GO
 
-CREATE VIEW dbo.HubConnectedSites
+CREATE VIEW dbo.SitesHubConnected
 AS
     SELECT
         *

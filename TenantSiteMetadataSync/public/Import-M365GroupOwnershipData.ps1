@@ -58,33 +58,32 @@
     }
     process
     {
-        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Querying for group connected sites"
-        
+        Write-PSFMessage -Level Verbose -Message "Querying for group connected sites"
+       
         if( $groups = Get-DataTable -Query "SELECT GroupId FROM GroupConnectedSites" -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer )
         {
-            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Discovered $($groups.Count) groups connected sites"
-
-            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Connecting to Microsoft Graph"
+            Write-PSFMessage -Level Verbose -Message "Discovered $($groups.Count) groups connected sites"
+            Write-PSFMessage -Level Verbose -Message "Connecting to Microsoft Graph"
 
             $null = Connect-MgGraph -ClientId $ClientId -CertificateThumbprint $Thumbprint -TenantId "$Tenant.onmicrosoft.com"
 
-            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Connected to Microsoft Graph"
+            Write-PSFMessage -Level Verbose -Message "Connected to Microsoft Graph"
 
             foreach( $group in $groups )
             {
-                Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - $counter/$($groups.Count) - Processing Group: $($group.GroupId)"
+                Write-PSFMessage -Level Verbose -Message "$counter/$($groups.Count) - Processing Group: $($group.GroupId)"
                 
                 try
                 {
-                    Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Getting group owners from Graph API"
+                    Write-PSFMessage -Level Verbose -Message "Getting group owners from Microsoft Graph API"
 
                     $groupOwners = @(Get-MgGroupOwner -GroupId $group.GroupId -Top 500)
 
-                    Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Owner count: $($groupOwners.Count)"
+                    Write-PSFMessage -Level Verbose -Message "Owner count: $($groupOwners.Count)"
 
                     if( $groupOwners.Count -gt 0 )
                     {
-                        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Removing group owners for group $($group.GroupId)"
+                        Write-PSFMessage -Level Verbose -Message "Removing group owners for group $($group.GroupId)"
 
                         Invoke-NonQuery -Query "EXEC proc_RemoveGroupOwnersByGroupId @GroupId = @GroupId" -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Parameters @{ GroupId = $group.GroupId }
 
@@ -97,20 +96,18 @@
                             
                             try
                             {
-                                Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Add group owner $($parameters.UserPrincipalName) for group $($group.GroupId)"
-
                                 Invoke-NonQuery -Query "EXEC proc_AddGroupOwnerByGroupId @GroupId = @GroupId, @UserPrincipalName = @UserPrincipalName" -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Parameters $parameters
                             }
                             catch
                             {
-                                Write-Error "$($PSCmdlet.MyInvocation.MyCommand) - Error updating group membership for Group='$($group.GroupId)'. Error: $($_)"
+                                Write-PSFMessage -Level Verbose -Message "Error updating group membership for Group='$($group.GroupId)'" -Exception $_
                             }
                         }
                     }
                 }
                 catch
                 {
-                    Write-Error $_
+                    Write-PSFMessage -Level Error -Message "Error updating group membership" -Exception $_
                 }
                 
                 $counter++

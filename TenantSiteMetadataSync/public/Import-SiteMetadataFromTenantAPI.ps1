@@ -93,7 +93,7 @@
     }
     process
     {
-        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Connecting to SharePoint Online Tenant"
+        Write-PSFMessage -Level Verbose -Message "Connecting to SharePoint Online Tenant"
 
         if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection:$True )
         {
@@ -110,17 +110,18 @@
                 $parameters.IncludeOneDriveSites = $true
             }   
 
-            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Querying tenant for sites."
+            Write-PSFMessage -Level Verbose -Message "Querying tenant for sites."
 
             # query the tenant
             $tenantSites = Get-PnPTenantSite @parameters 
 
             $tenantContext = Get-PnPContext
 
+            $counter = 0
             # process each site
             foreach( $tenantSite in $tenantSites )
             {
-                Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Processsing $($tenantSite.Url)"
+                Write-PSFMessage -Level Debug -Message "Processsing $($tenantSite.Url)"
 
                 $parameters = @{}
                 $parameters.DatabaseName   = $DatabaseName
@@ -147,11 +148,11 @@
                 }
 
                 # process details is specified
-                if( $DetailedImport.IsPresent -and $tenantSite.LockState.ToString() -ne "NoAccess" )
+                if( $DetailedImport.IsPresent )
                 {
                     if( $tenantSite.LockState.ToString() -eq "NoAccess")
                     {
-                        Write-Warning "Skipping detailed request for site $($tenantSite.Url). Site lock status is '$($tenantSite.LockState.ToString())'"
+                        Write-PSFMessage -Level Warning -Message "Skipping detailed request for site $($tenantSite.Url). Site lock status is '$($tenantSite.LockState.ToString())'"
                     }
                     else
                     {
@@ -204,13 +205,20 @@
     
                         if( $siteDetail.RelatedGroupId )
                         {
-                            $parameters.RelatedGroupId = $siteDetail.RelatedGroupId
+                            $parameters.RelatedGroupId = $site.RelatedGroupId
                         }
     
                     }
                 }
 
                 Update-SiteMetadata @parameters
+
+                $counter++
+
+                if( $counter -eq $tenantsites.Count -or $counter % 100 -eq 0 )
+                {
+                    Write-PSFMessage -Level Verbose -Message "Processed $counter of $($tenantSites.Count) sites."
+                }
             }
 
             Disconnect-PnPOnline -Connection $connection

@@ -64,18 +64,17 @@
     }
     process
     {
-        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Connecting to SharePoint Online Tenant"
+        Write-PSFMessage -Level Verbose -Message "Connecting to SharePoint Online Tenant"
 
         if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection:$True )
         {
-            Write-Verbose "$(Get-Date) - Reading site creation sources from tenant"
-
-            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Requesting site creation sources from SharePoint Tenant REST API"
-
+            Write-PSFMessage -Level Verbose -Message "Requesting site creation sources from SharePoint Tenant REST API"
+            
             $siteCreationSources = Invoke-PnPSPRestMethod -Method Get -Url $uri -Connection $connection | Select-Object -ExpandProperty value
-            $siteCreationSources += $additionalSources
 
-            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Received $($siteCreationSources.Count) creation sources from SharePoint Tenant REST API"
+            Write-PSFMessage -Level Verbose -Message "Received $($siteCreationSources.Count) creation sources from SharePoint Tenant REST API"
+
+            $siteCreationSources += $additionalSources
 
             Disconnect-PnPOnline -Connection $connection 
 

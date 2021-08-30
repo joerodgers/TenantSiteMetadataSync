@@ -57,23 +57,27 @@
     {
         $counter = 1
 
-        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Reading sites from tenant recycle bin"
+        Write-PSFMessage -Level Verbose -Message "Connecting to SharePoint Online Tenant"
 
         if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection:$True )
         {
+            Write-PSFMessage -Level Verbose -Message "Getting recycle bin items"
+
             if( $tenantSites = Get-PnPTenantRecycleBinItem -Connection $connection )
             {
+                Write-PSFMessage -Level Debug -Message "($counter/$($tenantSites.Count)) Processing $($tenantSites.Count) deleted sites."
+
                 foreach( $tenantSite in $tenantSites )
                 {
                     try
                     {
-                        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - ($counter/$($tenantSites.Count)) Processing Url: $($tenantSite.Url)"
+                        Write-PSFMessage -Level Debug -Message "($counter/$($tenantSites.Count)) Processing Url: $($tenantSite.Url)"
 
                         Update-SiteMetadata -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -SiteId $tenantSite.SiteId -SiteUrl $tenantSite.Url -TimeDeleted $tenantSite.DeletionTime
                     }
                     catch
                     {
-                        Write-Error "$($PSCmdlet.MyInvocation.MyCommand) - Error updating deleted site. SiteUrl='$($tenantSite.Url)'. Error='$($_)'"
+                        Write-PSFMessage -Level Error -Message "Error updating deleted site. SiteUrl='$($tenantSite.Url)'" -Exception $_
                     }
 
                     $counter++

@@ -1,4 +1,4 @@
-﻿function Update-DatabaseSchema
+﻿function Sync-DatabaseSchema
 {
 <#
 	.SYNOPSIS
@@ -32,6 +32,7 @@
         $functions = Get-ChildItem -Path "$PSScriptRoot\..\private\SQL" -Filter "tvf_*.sql"
         $procs     = Get-ChildItem -Path "$PSScriptRoot\..\private\SQL" -Filter "proc_*.sql"
         $views     = Get-ChildItem -Path "$PSScriptRoot\..\private\SQL" -Filter "vw_*.sql"
+        $upgrades  = Get-ChildItem -Path "$PSScriptRoot\..\private\SQL" -Filter "upgrade*.sql"
     }
     process
     {   
@@ -62,6 +63,14 @@
         foreach( $path in $views )
         {
             Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Executing view file: $($path.Fullname)"
+
+            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseServer -Database $DatabaseName
+            if( -not $?) { return }
+        }
+
+        foreach( $path in $upgrades )
+        {
+            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Executing upgrade file: $($path.Fullname)"
 
             Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseServer -Database $DatabaseName
             if( -not $?) { return }

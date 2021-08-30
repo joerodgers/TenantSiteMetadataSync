@@ -1,12 +1,22 @@
 ﻿Describe "TenantSiteMetadataSync functional tests" {
 
     BeforeDiscovery {
+        Remove-Module -Name "TenantSiteMetadataSync" -Force -ErrorAction Ignore
         Import-Module -Name "$PSScriptRoot\..\..\TenantSiteMetadataSync.psd1" -Force
     }
 
     Context "Update-GroupMetadata function" {
 
         InModuleScope -ModuleName "TenantSiteMetadataSync" {
+
+            BeforeAll {
+                function Write-PSFMessage
+                {
+                    param($Level, $Message, $Exception) 
+                }
+
+                Mock -CommandName "Write-PSFMessage"
+            }
 
             It "should update the group's DisplayName value" {
 

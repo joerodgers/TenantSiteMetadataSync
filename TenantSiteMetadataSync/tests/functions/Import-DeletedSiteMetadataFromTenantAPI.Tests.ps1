@@ -1,6 +1,7 @@
 ﻿Describe "TenantSiteMetadataSync functional tests" {
 
     BeforeDiscovery {
+        Remove-Module -Name "TenantSiteMetadataSync" -Force -ErrorAction Ignore
         Import-Module -Name "$PSScriptRoot\..\..\TenantSiteMetadataSync.psd1" -Force
     }
 
@@ -18,29 +19,20 @@
                 {
                     param($Connection) 
                 }
+                function Write-PSFMessage
+                {
+                    param($Level, $Message, $Exception) 
+                }
+
+                Mock -CommandName "Start-SyncJobExecution" -Verifiable
+                Mock -CommandName "Stop-SyncJobExecution"  -Verifiable
+                Mock -CommandName "Connect-PnPOnline"      -Verifiable -MockWith { return 1 }
+                Mock -CommandName "Disconnect-PnPOnline"   -Verifiable
+                Mock -CommandName "Write-PSFMessage"       
                 function Get-PnPTenantRecycleBinItem
                 {
                     param($Connection) 
                 }
-
-                Mock `
-                    -CommandName "Start-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Stop-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Connect-PnPOnline" `
-                    -MockWith { return 1 } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Disconnect-PnPOnline" `
-                    -Verifiable
             }
 
 

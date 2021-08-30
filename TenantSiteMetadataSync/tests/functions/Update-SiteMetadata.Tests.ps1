@@ -1,12 +1,22 @@
 ﻿Describe "TenantSiteMetadataSync functional tests" {
 
     BeforeDiscovery {
+        Remove-Module -Name "TenantSiteMetadataSync" -Force -ErrorAction Ignore
         Import-Module -Name "$PSScriptRoot\..\..\TenantSiteMetadataSync.psd1" -Force
     }
 
     Context "Update-SiteMetadata function" {
 
         InModuleScope -ModuleName "TenantSiteMetadataSync" {
+
+            BeforeAll {
+                function Write-PSFMessage
+                {
+                    param($Level, $Message, $Exception) 
+                }
+
+                Mock -CommandName "Write-PSFMessage"
+            }
 
             It "should update the site's AnonymousLinkCount value" {
 

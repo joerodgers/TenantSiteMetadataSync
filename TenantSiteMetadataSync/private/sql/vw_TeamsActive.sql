@@ -1,8 +1,8 @@
-﻿IF OBJECT_ID('dbo.TeamsSites', 'V') IS NOT NULL
-   DROP VIEW dbo.TeamsSites
+﻿IF OBJECT_ID('dbo.TeamsActive', 'V') IS NOT NULL
+   DROP VIEW dbo.TeamsActive
 GO
 
-CREATE VIEW [dbo].[TeamsSites]
+CREATE VIEW [dbo].[TeamsActive]
 AS
     SELECT
         *

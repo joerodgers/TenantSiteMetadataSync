@@ -1,7 +1,8 @@
-#requires -Modules @{ ModuleName="PnP.PowerShell";         ModuleVersion="1.7.0" }
-#requires -Modules @{ ModuleName="Posh-SSH";               ModuleVersion="2.3.0" }
-#requires -Modules @{ ModuleName="TenantSiteMetadataSync"; ModuleVersion="1.0.0" }
-#requires -Modules @{ ModuleName="Microsoft.Graph.Groups"; ModuleVersion="1.0.1" }
+#requires -Modules @{ ModuleName="PnP.PowerShell";         ModuleVersion="1.7.0"   }
+#requires -Modules @{ ModuleName="Posh-SSH";               ModuleVersion="2.3.0"   }
+#requires -Modules @{ ModuleName="TenantSiteMetadataSync"; ModuleVersion="1.0.0"   }
+#requires -Modules @{ ModuleName="Microsoft.Graph.Groups"; ModuleVersion="1.0.1"   }
+#requires -Modules @{ ModuleName="PSFramework";            ModuleVersion="1.6.205" }
 
 param
 (
@@ -39,6 +40,9 @@ param
     [string]$TranscriptDirectoryPath = (Join-Path -Path $PSScriptRoot -ChildPath "Logs")
 )
 
+# disable default 'filesystem' logging provider
+Set-PSFLoggingProvider -Name 'filesystem' -Enabled $false
+
 # ImportUsageAccountData
 if( $ImportUsageAccountData.IsPresent )
 {
@@ -46,7 +50,7 @@ if( $ImportUsageAccountData.IsPresent )
 
     $operation = "Operation - Import Usage Account Data"
 
-    Start-TSMSLogFile -Path $TranscriptDirectoryPath -Name "ImportUsageAccountData" -TrimExistingLogFiles
+    Start-TSMSLogFile -Path $TranscriptDirectoryPath -Name "ImportUsageAccountData"
 
     Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
 
@@ -102,7 +106,7 @@ if( $ImportSharePointTenantListData.IsPresent )
 
         $operation = "Operation - ImportSharePointTenantListData"
     
-        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantListData" -TrimExistingLogFiles
+        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantListData"
     
         Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
     
@@ -162,14 +166,14 @@ if( $ImportSharePointTenantAPIData.IsPresent )
 
         $operation = "Operation - ImportSharePointTenantAPIData"
     
-        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantAPIData" -TrimExistingLogFiles
+        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantAPIData"
     
         Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
     
         Write-Host "$(Get-Date) - Starting $operation"
     
         # make sure our deletion states are sync'd between the tenant and database
-        Update-TSMSDeletionStatus `
+        Sync-TSMSDeletionStatus `
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
@@ -213,7 +217,7 @@ if( $ImportDetailedSharePointTenantAPIData.IsPresent )
 
         $operation = "Operation - ImportDetailedSharePointTenantAPIData"
     
-        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantAPIData" -TrimExistingLogFiles
+        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantAPIData"
     
         Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
     
@@ -227,7 +231,6 @@ if( $ImportDetailedSharePointTenantAPIData.IsPresent )
             -Tenant         $Tenant `
             -DatabaseName   $DatabaseName `
             -DatabaseServer $DatabaseServer
-    
     
         Write-Host "$(Get-Date) - Completed $operation"
     }
@@ -249,7 +252,7 @@ if( $ImportM365GroupOwnershipData.IsPresent )
 
         $operation = "Operation - ImportM365GroupOwnershipData"
     
-        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportM365GroupOwnershipData" -TrimExistingLogFiles
+        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportM365GroupOwnershipData"
     
         Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
     

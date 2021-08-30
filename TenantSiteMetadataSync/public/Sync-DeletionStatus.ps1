@@ -1,4 +1,4 @@
-﻿function Update-DeletionStatus
+﻿function Sync-DeletionStatus
 {
 <#
 	.SYNOPSIS
@@ -23,7 +23,7 @@
 		Name of the SQL Server database server, including the instance name (if applicable).
 	
 	.EXAMPLE
-		PS C:\> Update-DeletionStatus -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+		PS C:\> Sync-DeletionStatus -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
 	
 #>
     [CmdletBinding()]
@@ -55,11 +55,11 @@
     }
     process
     {
-        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Connecting to SharePoint Online Tenant"
+        Write-PSFMessage -Level Verbose -Message "Connecting to SharePoint Online Tenant"
 
         if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection )
         {
-            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Querying tenant for sites"
+            Write-PSFMessage -Level Verbose -Message "Querying tenant for sites"
 
             $tenantSites = Get-PnPTenantSite -IncludeOneDriveSites -Connection $connection | Select-Object -ExpandProperty Url | ConvertTo-NormalizedUrl
 
@@ -67,11 +67,11 @@
 
             Disconnect-PnPOnline -Connection $connection
 
-            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Querying database for all active sites"
+            Write-PSFMessage -Level Verbose -Message "Querying database for all active sites"
 
             $activeSites = Get-DataTable -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query "SELECT SiteId, SiteUrl FROM ActiveSites"
         
-            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Querying database for all deleted sites"
+            Write-PSFMessage -Level Verbose -Message "Querying database for all deleted sites"
 
             $deletedSites = Get-DataTable -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query "SELECT SiteId, SiteUrl FROM DeletedSites"
 
@@ -80,8 +80,7 @@
             {
                 if( $tenantSites -notcontains $activeSite.SiteUrl )
                 {
-                    Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Marking $($activeSite.SiteUrl) as deleted"
-
+                    Write-PSFMessage -Level Verbose -Message "Marking $($activeSite.SiteUrl) as deleted"
                     Update-SiteMetadata -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -SiteId $activeSite.SiteId -SiteUrl $activeSite.SiteUrl -TimeDeleted ([System.Data.SqlTypes.SqlDateTime]::MinValue)
                 }
             }
@@ -92,11 +91,8 @@
             {
                 if( $tenantSites -contains $deletedSite.SiteUrl )
                 {
-                    Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Marking $($activeSite.SiteUrl) as not deleted"
-
-                    $query = "UPDATE SiteMetadata SET TimeDeleted = NULL WHERE @SiteId = @SiteId"
-
-                    Invoke-NonQuery -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query $query -Parameters @{ SiteId = $deletedSite.SiteId }
+                    Write-PSFMessage -Level Verbose -Message "Marking $($activeSite.SiteUrl) as not deleted"
+                    Invoke-NonQuery -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query "UPDATE SiteMetadata SET TimeDeleted = NULL WHERE @SiteId = @SiteId" -Parameters @{ SiteId = $deletedSite.SiteId }
                 }
             }
         }

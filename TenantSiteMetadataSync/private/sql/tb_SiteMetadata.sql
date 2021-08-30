@@ -2,6 +2,7 @@
 BEGIN
 
     CREATE TABLE dbo.SiteMetadata(
+        [SiteId]                     uniqueidentifier NOT NULL,
         [AnonymousLinkCount]         int              NULL,
         [CompanyLinkCount]           int              NULL,
         [ConditionalAccessPolicy]    int              NULL,
@@ -11,8 +12,6 @@ BEGIN
         [FileViewedOrEdited]         int              NULL,
         [GroupId]                    uniqueidentifier NULL,
         [GuestLinkCount]             int              NULL,
-        [HasEveryoneOrEEEU]          bit              NULL,
-        [HasLegalHold]               bit              NULL,
         [HubSiteId]                  uniqueidentifier NULL,
         [Initiator]                  nvarchar(255)    NULL,
         [IsGroupConnected]           bit              NULL,
@@ -34,7 +33,6 @@ BEGIN
         [SharedExternallyyFileCount] int              NULL,
         [SharingCapability]          nvarchar(50)     NULL,
         [SiteCreationSource]         uniqueidentifier NULL,
-        [SiteId]                     uniqueidentifier NOT NULL,
         [SiteOwnerEmail]             nvarchar(255)    NULL,
         [SiteOwnerName]              nvarchar(255)    NULL,
         [SiteUrl]                    nvarchar(450)    NOT NULL,
@@ -66,39 +64,3 @@ IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_SiteMetadata_GroupId')
 BEGIN
     CREATE INDEX [IX_SiteMetadata_GroupId] ON [dbo].[SiteMetadata]([GroupId]) ON [PRIMARY]
 END
-
-
-
-
-
-
-
-
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE type = 'U' AND OBJECT_ID = OBJECT_ID('dbo.LegalHold'))
-BEGIN
-
-    CREATE TABLE [dbo].[LegalHold](
-        [UserName]      nvarchar(50) NOT NULL,
-        [DateAdded]     date         NOT NULL,
-        [DateRefreshed] date         NOT NULL,
-        CONSTRAINT PK_LegalHoldUserName PRIMARY KEY (UserName)
-    )
-
-END
-
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE type = 'U' AND OBJECT_ID = OBJECT_ID('dbo.LeftBusiness'))
-BEGIN
-
-    CREATE TABLE [dbo].[LeftBusiness](
-        [UserName] nvarchar(50) NOT NULL,
-        [DateLeft] date         NOT NULL,
-        CONSTRAINT PK_LeftBusinessUserName PRIMARY KEY (UserName)
-    )
-
-END
-
-
-
-
-
-

@@ -1,6 +1,7 @@
 ﻿Describe "TenantSiteMetadataSync functional tests" {
 
     BeforeDiscovery {
+        Remove-Module -Name "TenantSiteMetadataSync" -Force -ErrorAction Ignore
         Import-Module -Name "$PSScriptRoot\..\..\TenantSiteMetadataSync.psd1" -Force
     }
 
@@ -9,6 +10,11 @@
         InModuleScope -ModuleName "TenantSiteMetadataSync" {
 
             BeforeAll {
+
+                function Write-PSFMessage
+                {
+                    param($Level, $Message, $Exception) 
+                }
 
                 function Connect-MgGraph 
                 { 
@@ -24,10 +30,10 @@
                     param($GroupId, $Top) 
                 }
 
-
                 Mock -CommandName "Start-SyncJobExecution" -Verifiable
                 Mock -CommandName "Stop-SyncJobExecution"  -Verifiable
                 Mock -CommandName "Disconnect-MgGraph"     -Verifiable
+                Mock -CommandName "Write-PSFMessage"
             }
 
 

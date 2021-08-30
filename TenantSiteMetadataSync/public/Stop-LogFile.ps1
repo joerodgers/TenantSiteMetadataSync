@@ -20,13 +20,7 @@
     }
     process
     {
-        try
-        { 
-            $null = Stop-Transcript 
-        }
-        catch
-        {
-        }
+        Set-PSFLoggingProvider -Name 'logfile' -Enabled $false
     }
     end
     {

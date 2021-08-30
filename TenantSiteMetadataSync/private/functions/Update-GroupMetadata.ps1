@@ -95,6 +95,7 @@
                 $query = $sb.ToString().TrimEnd(",") # trim trailing comma
 
                 Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.InvocationName) - Executing: $query"
+                Write-PSFMessage -Level Debug -Message "Query parameter data: '@$($Parameter.Key)', Parameter Value: '$($Parameter.Value)'"
 
                 Invoke-NonQuery -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query $query -Parameters $parameters
             }

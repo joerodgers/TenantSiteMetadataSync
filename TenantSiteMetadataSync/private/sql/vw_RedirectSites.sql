@@ -1,14 +1,14 @@
-﻿IF OBJECT_ID('dbo.RedirectSites', 'V') IS NOT NULL
-   DROP VIEW dbo.RedirectSites
+﻿IF OBJECT_ID('dbo.SitesRedirectors', 'V') IS NOT NULL
+   DROP VIEW dbo.SitesRedirectors
 GO
 
-CREATE VIEW dbo.RedirectSites
+CREATE VIEW dbo.SitesRedirectors
 AS
     SELECT        
         *
     FROM 
         dbo.TVF_Sites_Active()
     WHERE
-        (TemplateName = 'RedirectSite#0')
+        (TemplateName like 'RedirectSite%')
 GO
 

@@ -26,7 +26,7 @@
         [string]$Name,
 
         [Parameter(Mandatory=$false)]
-        [switch]$TrimExistingLogFiles,
+        [PSFramework.Message.MessageLevel]$MinLogLevel = [PSFramework.Message.MessageLevel]::Verbose,
 
         [Parameter(Mandatory=$false)]
         [ValidateRange(1,21)]
@@ -35,26 +35,36 @@
 
     begin
     {
+        # info on message log level
+        # https://github.com/PowershellFrameworkCollective/psframework/blob/e92578234204a61f81802959e622cfc9a9540cb5/library/PSFramework/Message/MessageLevel.cs
+
+        # headers in desired order
+        $headers = 'Timestamp', 'ComputerName', 'File', 'FunctionName', 'Level', 'Line', 'Message', 'ModuleName', 'Runspace', 'Tags', 'TargetObject', 'Timestamp', 'Type', 'Username'
+
+        # file timestamp
+        $timestamp = Get-Date -Format FileDateTime
+        
+        # full path to to log file
+        $transcriptPath = Join-Path -Path $Path -ChildPath "$($Name)_$($timestamp).csv"
     }
     process
     {
-        Stop-LogFile
+        <#
+            1-3 Direct verbose output to the user (using Write-Host)
+            4-6 Output only visible when requesting extra verbosity (using Write-Verbose)
+            1-9 Debugging information, written using Write-Debug
+        #>
 
-        $timestamp = Get-Date -Format FileDateTime
-        
-        $transcriptPath = Join-Path -Path $Path -ChildPath "$($Name)_$($timestamp).log"
+        Set-PSFLoggingProvider `
+            -Name             'logfile' `
+            -Enabled          $true `
+            -FilePath         $transcriptPath `
+            -Headers          $headers `
+            -LogRetentionTime $RetentionDays `
+            -MinLevel         ([int][PSFramework.Message.MessageLevel]::Critical) `
+            -MaxLevel         ([int]$MinLogLevel)
 
-        if( $TrimExistingLogFiles.IsPresent )
-        {
-            Get-ChildItem -Path $Path -Filter "$($Name)_*.log" | 
-                Where-Object -Property Name -match "$($Name)_\d{8}T\d{10}.log" | 
-                    Where-Object -Property LastWriteTime -le ([DateTime]::Today.AddDays($RetentionDays * -1)) | 
-                        Remove-Item -Force -Confirm:$false
-        }
-
-        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Starting transcript log at $transcriptPath"
-
-        $null = Start-Transcript -Path $transcriptPath
+        Write-PSFMessage -Level Verbose -Message "Started new log file"
     }
     end
     {

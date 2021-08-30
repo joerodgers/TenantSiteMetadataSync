@@ -1,8 +1,8 @@
-﻿IF OBJECT_ID('dbo.LockedSites', 'V') IS NOT NULL
-   DROP VIEW dbo.LockedSites
+﻿IF OBJECT_ID('dbo.SitesLocked', 'V') IS NOT NULL
+   DROP VIEW dbo.SitesLocked
 GO
 
-CREATE VIEW dbo.LockedSites
+CREATE VIEW dbo.SitesLocked
 AS
     SELECT
         *

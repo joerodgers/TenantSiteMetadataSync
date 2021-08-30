@@ -1,6 +1,7 @@
 ﻿Describe "TenantSiteMetadataSync functional tests" {
 
     BeforeDiscovery {
+        Remove-Module -Name "TenantSiteMetadataSync" -Force -ErrorAction Ignore
         Import-Module -Name "$PSScriptRoot\..\..\TenantSiteMetadataSync.psd1" -Force
     }
 
@@ -9,7 +10,6 @@
         InModuleScope -ModuleName "TenantSiteMetadataSync" {
 
             BeforeAll {
-
                 function Connect-PnPOnline
                 {
                     param($Url, $ClientId, $Thumbprint, $Tenant, $ReturnConnection) 
@@ -18,32 +18,16 @@
                 {
                     param($Connection) 
                 }
-
-                function Get-PnPListItem 
+                function Write-PSFMessage
                 {
-                    param($List, $PageSize, $Fields, $Connection) 
+                    param($Level, $Message, $Exception) 
                 }
 
-                Get-PnPListItem
-
-                Mock `
-                    -CommandName "Start-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Stop-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Connect-PnPOnline" `
-                    -MockWith { return 1 } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Disconnect-PnPOnline" `
-                    -Verifiable
+                Mock -CommandName "Start-SyncJobExecution"  -Verifiable
+                Mock -CommandName "Stop-SyncJobExecution"   -Verifiable
+                Mock -CommandName "Connect-PnPOnline"       -Verifiable -MockWith { return 1 }
+                Mock -CommandName "Disconnect-PnPOnline"    -Verifiable
+                Mock -CommandName "Write-PSFMessage"
             }
 
             It "should read the AggregatedSiteCollections list and save entries to database" {

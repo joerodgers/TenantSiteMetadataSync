@@ -78,15 +78,15 @@
 }
     process
     {
-        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Connecting to SharePoint Online Tenant"
+        Write-PSFMessage -Level Verbose -Message "Connecting to SharePoint Online Tenant"
 
         if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection:$True )
         {
-            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Reading list items from list '$listTitle'"
+            Write-PSFMessage -Level Verbose -Message "Reading list items from list '$listTitle'"
 
             $items = Get-PnPListItem -List $listTitle -PageSize 5000 -Fields $fields -Connection $connection
 
-            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Read $($items.Count) list items from list '$listTitle'"
+            Write-PSFMessage -Level Verbose -Message "Read $($items.Count) list items from list '$listTitle'"
 
             Disconnect-PnPOnline -Connection $connection
 
@@ -94,7 +94,7 @@
             {
                 foreach( $item in $items )
                 {
-                    Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - ($counter/$($items.Count)) Item Id='$($item.Id)'"
+                    Write-PSFMessage -Level Debug -Message "($counter/$($items.Count)) Item Id='$($item.Id)'"
 
                     $parameters = @{}
                     $parameters.DatabaseName         = $DatabaseName
@@ -144,7 +144,7 @@
             {
                 foreach( $item in $items )
                 {
-                    Write-Verbose "$(Get-Date) - ($counter/$($items.Count)) Processing Id: $($item.Id)"
+                    Write-PSFMessage -Level Debug -Message "($counter/$($items.Count)) Item Id='$($item.Id)'"
 
                     $parameters = @{}
                     $parameters.DatabaseName            = $DatabaseName

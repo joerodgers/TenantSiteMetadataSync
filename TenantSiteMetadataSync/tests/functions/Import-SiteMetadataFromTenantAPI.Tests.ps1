@@ -1,6 +1,7 @@
 ﻿Describe "TenantSiteMetadataSync functional tests" {
 
     BeforeDiscovery {
+        Remove-Module -Name "TenantSiteMetadataSync" -Force -ErrorAction Ignore
         Import-Module -Name "$PSScriptRoot\..\..\TenantSiteMetadataSync.psd1" -Force
     }
 
@@ -16,9 +17,12 @@
                 }
                 function Disconnect-PnPOnline 
                 {
-                    param($Includes,$Connection) 
+                    param($Connection) 
                 }
-
+                function Write-PSFMessage
+                {
+                    param($Level, $Message, $Exception) 
+                }
                 function Get-PnPSite 
                 {
                     param($Includes) 
@@ -35,6 +39,7 @@
 
                 function Get-PnPTenantSite 
                 {
+                    param($Identity)
                 }
 
                 function Set-PnPContext
@@ -42,29 +47,12 @@
                     param($Context)
                 }
 
-                Mock `
-                    -CommandName "Start-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Stop-SyncJobExecution" `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Connect-PnPOnline" `
-                    -MockWith { return 1 } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName "Disconnect-PnPOnline" `
-                    -Verifiable
-                
-                Mock `
-                    -CommandName "Get-PnPContext" `
-                    -MockWith { return 1 } `
-                    -Verifiable
+                Mock -CommandName "Start-SyncJobExecution"  -Verifiable
+                Mock -CommandName "Stop-SyncJobExecution"   -Verifiable
+                Mock -CommandName "Connect-PnPOnline"       -Verifiable -MockWith { return 1 }
+                Mock -CommandName "Disconnect-PnPOnline"    -Verifiable
+                Mock -CommandName "Write-PSFMessage"        -Verifiable -MockWith { }
+                Mock -CommandName "Get-PnPContext"          -Verifiable -MockWith { return 1 }
             }
 
             It "should read the basic SPO site info from the API" {
@@ -296,11 +284,10 @@
 
                 Mock `
                     -CommandName "Set-PnPContext" `
-                    -MockWith { return 1 } `
                     -Verifiable
 
                 
-                $mockSites = [PSCustomObject] @{ 
+                $mockTenantSite = [PSCustomObject] @{ 
                     DenyAddAndCustomizePages = "Disabled"
                     GroupId                  = [Guid]::Empty.ToString()
                     HubSiteId                = [Guid]::Empty.ToString()
@@ -314,24 +301,25 @@
                     Template                 = 'STS#3'
                     Title                    = "Classic Team Site"
                     SharingCapability        = "ExternalUserSharingOnly"
+                    OwnerEmail               = ""
+                    OwnerName                = ""
+                    ConditionalAccessPolicy  = 0
+                }
+
+                $mockTenantSiteDetail = [PSCustomObject] @{ 
+                    OwnerEmail               = ""
+                    OwnerName                = ""
+                    ConditionalAccessPolicy  = 0
                 }
 
                 $mockSiteDetail = [PSCustomObject] @{
-                    ConditionalAccessPolicy = 0 
-                    SensitivityLabel        = [Guid]::NewGuid()
                     Id                      = [Guid]::NewGuid()
-                    Owner                   = [PSCustomObject]@{ Email = "john.doe@contoso.com"; Title = "John Doe" }
                     RelatedGroupId          = [Guid]::NewGuid()
                 }
 
                 $mockWebDetail = [PSCustomObject] @{
                     Created = [DateTime]::Today                
                 }
-
-                Mock `
-                    -CommandName "Connect-PnPOnline" `
-                    -MockWith { return 1 } `
-                    -Verifiable
 
                 Mock `
                     -CommandName "Get-PnPSite" `
@@ -345,16 +333,24 @@
 
                 Mock `
                     -CommandName "Get-PnPTenantSite" `
-                    -MockWith { $mockSites } `
+                    -ParameterFilter { $Identity -eq $mockTenantSite.Url } `
+                    -MockWith { $mockTenantSiteDetail } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName "Get-PnPTenantSite" `
+                    -ParameterFilter { $Identity -eq $null } `
+                    -MockWith { $mockTenantSite } `
                     -Verifiable
 
                 Mock `
                     -CommandName "Update-SiteMetadata" `
-                    -ParameterFilter { $SensitivityLabel -eq $mockSiteDetail.SensitivityLabel -and 
-                                       $SiteId           -eq $mockSiteDetail.Id -and 
-                                       $SiteOwnerEmail   -eq $mockSiteDetail.Owner.Email -and 
-                                       $SiteOwnerName    -eq $mockSiteDetail.Owner.Title -and 
-                                       $RelatedGroupId   -eq $mockSiteDetail.RelatedGroupId } `
+                    -ParameterFilter { $SensitivityLabel        -eq $mockTenantSite.SensitivityLabel -and 
+                                       $SiteId                  -eq $mockSiteDetail.Id -and 
+                                       $ConditionalAccessPolicy -eq $mockTenantSiteDetail.ConditionalAccessPolicy -and
+                                       $SiteOwnerEmail          -eq $mockTenantSiteDetail.OwnerEmail -and
+                                       $SiteOwnerName           -eq $mockTenantSiteDetail.OwnerName -and 
+                                       $TimeCreated             -eq $mockWebDetail.Created } `
                     -Verifiable
 
                 Import-SiteMetadataFromTenantAPI `

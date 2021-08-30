@@ -12,7 +12,7 @@ AS
         ,GM.*
         ,STUFF((SELECT N', ' + UserPrincipalName FROM GroupOwner WHERE GroupId = O.GroupId FOR XML PATH(''),TYPE).value('text()[1]','nvarchar(max)'),1,2,N'') AS 'GroupOwners'
     FROM 
-        GroupConnectedSites GCS
+        dbo.TVF_GroupSites_Active() GCS
         FULL OUTER JOIN
         GroupOwner O
         ON GCS.GroupId = O.GroupId

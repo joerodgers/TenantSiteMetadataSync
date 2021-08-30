@@ -1,10 +1,11 @@
 ﻿Describe "TenantSiteMetadataSync functional tests" {
 
     BeforeDiscovery {
+        Remove-Module -Name "TenantSiteMetadataSync" -Force -ErrorAction Ignore
         Import-Module -Name "$PSScriptRoot\..\..\TenantSiteMetadataSync.psd1" -Force
     }
 
-    Context "Update-DatabaseSchema function" {
+    Context "Sync-DatabaseSchema function" {
 
         InModuleScope -ModuleName "TenantSiteMetadataSync" {
 
@@ -26,13 +27,13 @@
 
                 Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "tb_*.sql"    } -Verifiable -MockWith { $mockSqlFiles } 
                 Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "tvf_*.sql"   } -Verifiable
-                Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "procs_*.sql" } -Verifiable
+                Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "proc_*.sql"  } -Verifiable
                 Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "vw_*.sql"    } -Verifiable
 
                 Mock -CommandName "Invoke-Sqlcmd" -ParameterFilter { $InputFile -eq $mockFile1.FullName } -Verifiable
                 Mock -CommandName "Invoke-Sqlcmd" -ParameterFilter { $InputFile -eq $mockFile2.FullName } -Verifiable
 
-                Update-DatabaseSchema `
+                Sync-DatabaseSchema `
                     -DatabaseName   "TenantSiteMetadataSync" `
                     -DatabaseServer "localhost/mssql" `
 
@@ -48,13 +49,13 @@
 
                 Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "tb_*.sql"    } -Verifiable
                 Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "tvf_*.sql"   } -Verifiable -MockWith { $mockSqlFiles } 
-                Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "procs_*.sql" } -Verifiable
+                Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "proc_*.sql"  } -Verifiable
                 Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "vw_*.sql"    } -Verifiable
 
                 Mock -CommandName "Invoke-Sqlcmd" -ParameterFilter { $InputFile -eq $mockFile1.FullName } -Verifiable
                 Mock -CommandName "Invoke-Sqlcmd" -ParameterFilter { $InputFile -eq $mockFile2.FullName } -Verifiable
 
-                Update-DatabaseSchema `
+                Sync-DatabaseSchema `
                     -DatabaseName   "TenantSiteMetadataSync" `
                     -DatabaseServer "localhost/mssql" `
 
@@ -70,13 +71,13 @@
 
                 Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "tb_*.sql"    } -Verifiable
                 Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "tvf_*.sql"   } -Verifiable
-                Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "procs_*.sql" } -Verifiable -MockWith { $mockSqlFiles } 
+                Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "proc_*.sql"  } -Verifiable -MockWith { $mockSqlFiles } 
                 Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "vw_*.sql"    } -Verifiable
 
                 Mock -CommandName "Invoke-Sqlcmd" -ParameterFilter { $InputFile -eq $mockFile1.FullName } -Verifiable
                 Mock -CommandName "Invoke-Sqlcmd" -ParameterFilter { $InputFile -eq $mockFile2.FullName } -Verifiable
 
-                Update-DatabaseSchema `
+                Sync-DatabaseSchema `
                     -DatabaseName   "TenantSiteMetadataSync" `
                     -DatabaseServer "localhost/mssql" `
 
@@ -92,13 +93,13 @@
 
                 Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "tb_*.sql"    } -Verifiable
                 Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "tvf_*.sql"   } -Verifiable
-                Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "procs_*.sql" } -Verifiable
+                Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "proc_*.sql"  } -Verifiable
                 Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "vw_*.sql"    } -Verifiable -MockWith { $mockSqlFiles } 
 
                 Mock -CommandName "Invoke-Sqlcmd" -ParameterFilter { $InputFile -eq $mockFile1.FullName } -Verifiable
                 Mock -CommandName "Invoke-Sqlcmd" -ParameterFilter { $InputFile -eq $mockFile2.FullName } -Verifiable
 
-                Update-DatabaseSchema `
+                Sync-DatabaseSchema `
                     -DatabaseName   "TenantSiteMetadataSync" `
                     -DatabaseServer "localhost/mssql" `
 
@@ -114,13 +115,13 @@
 
                 Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "tb_*.sql"    } -Verifiable -MockWith { $mockSqlFiles } 
                 Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "tvf_*.sql"   } -Verifiable -MockWith { $mockSqlFiles } 
-                Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "procs_*.sql" } -Verifiable -MockWith { $mockSqlFiles } 
+                Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "proc_*.sql"  } -Verifiable -MockWith { $mockSqlFiles } 
                 Mock -CommandName "Get-ChildItem" -ParameterFilter { $Filter -eq "vw_*.sql"    } -Verifiable -MockWith { $mockSqlFiles } 
 
                 Mock -CommandName "Invoke-Sqlcmd" -ParameterFilter { $InputFile -eq $mockFile1.FullName } -Verifiable
                 Mock -CommandName "Invoke-Sqlcmd" -ParameterFilter { $InputFile -eq $mockFile2.FullName } -Verifiable
 
-                Update-DatabaseSchema `
+                Sync-DatabaseSchema `
                     -DatabaseName   "TenantSiteMetadataSync" `
                     -DatabaseServer "localhost/mssql" `
 

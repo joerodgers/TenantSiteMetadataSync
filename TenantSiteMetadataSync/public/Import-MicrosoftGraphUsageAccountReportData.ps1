@@ -99,29 +99,32 @@
     }
     process
     {
-        Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Connecting to SharePoint Online Tenant"
+        Write-PSFMessage -Level Verbose -Message "Connecting to SharePoint Online Tenant"
 
         if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection:$true )
         {
             if( $accessToken = Get-PnPGraphAccessToken -Connection $connection )
             {
-                Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Requesting '$ReportType' report from Graph API"
+                Write-PSFMessage -Level Verbose -Message "Requesting '$ReportType' report from Graph API"
 
                 $response = Invoke-RestMethod -Method Get -Uri $uri -Headers @{ Authorization = "Bearer $accessToken" } -MaximumRedirection 10 
 
-                Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Received '$ReportType' report from Graph API"
+                Write-PSFMessage -Level Verbose -Message "Received '$ReportType' report from Graph API"
 
-                # strip off OM if present
+                # strip off BOM if present
                 $response = $response -replace "^\xEF\xBB\xBF", ""
         
                 if( $response )
                 {
                     $rows = ConvertFrom-Csv -InputObject $response -Delimiter ","
 
-                    Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Importing $($rows.Count) rows from report."
+                    Write-PSFMessage -Level Verbose -Message "Importing $($rows.Count) rows from report."
 
+                    $counter = 0
                     foreach( $row in $rows )
                     {
+                        $counter++
+
                         try
                         {
                             $parameters = @{}
@@ -130,6 +133,8 @@
 
                             if( $ReportType -eq 'M365Group' ) 
                             {
+                                Write-PSFMessage -Level Debug -Message "Processing row: $counter/$($rows.Count). GroupId='$($row.'Group Id')'"
+
                                 <#  Columns in v1.0 and beta report:
 
                                     Report Refresh Date
@@ -179,6 +184,7 @@
                             }
                             else
                             {
+                                Write-PSFMessage -Level Debug -Message "Processing row: $counter/$($rows.Count). SiteUrl='$($row.'Site URL')'"
 
                                 # these fields are present in reports and report versions
                                 $parameters.SiteUrl        = $row.'Site URL'
@@ -271,7 +277,7 @@
                         }
                         catch
                         {
-                            Write-Error "$($PSCmdlet.MyInvocation.MyCommand) - Error updating account usage detail.  Error: $_"
+                            Write-PSFMessage -Level Error -Message "Error updating account usage detail data." -Exception $_
                         }            
                     }
                 }

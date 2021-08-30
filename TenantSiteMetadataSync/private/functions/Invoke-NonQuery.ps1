@@ -60,6 +60,7 @@
 
             foreach( $Parameter in $Parameters.GetEnumerator() )
             {
+                Write-PSFMessage -Level Debug -Message "Query parameter data: '@$($Parameter.Key)', Parameter Value: '$($Parameter.Value)'"
                 $null = $command.Parameters.AddWithValue( "@$($Parameter.Key)", $Parameter.Value )
             }
 
@@ -67,7 +68,9 @@
         }
         catch
         {
+            Write-PSFMessage -Level Critical -Message "Error executing query: '$query'" -Exception $_
             throw $_.Exception
+
         }
         finally
         {
