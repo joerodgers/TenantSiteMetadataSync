@@ -1,20 +1,20 @@
 ﻿function Sync-DatabaseSchema
 {
 <#
-	.SYNOPSIS
-        Updates the database schema to match the module build. 
+    .SYNOPSIS
+    Updates the database schema to match the module build. 
 
-	.DESCRIPTION
-        Updates the database schema to match the module build. 
+    .DESCRIPTION
+    Updates the database schema to match the module build. 
 
-	.PARAMETER DatabaseName
-		The SQL Server database name
-	
-	.PARAMETER DatabaseServer
-		Name of the SQL Server database server, including the instance name (if applicable).
+    .PARAMETER DatabaseName
+    The SQL Server database name
+
+    .PARAMETER DatabaseServer
+    Name of the SQL Server database server, including the instance name (if applicable).
 
     .EXAMPLE
-		PS C:\> Update-DatabaseSchema -DatabaseName <database name> -DatabaseServer <database server> 
+    PS C:\> Update-DatabaseSchema -DatabaseName <database name> -DatabaseServer <database server> 
 #>
     [CmdletBinding()]
     param

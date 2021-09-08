@@ -1,17 +1,16 @@
-﻿<#
- .Synopsis
+﻿ function Invoke-NonQuery
+ {
+<#
+    .Synopsis
     Executes the provided TSQL statement against the specified database and SQL instance.
 
- .EXAMPLE
+    .EXAMPLE
     Invoke-NonQuery -DatabaseName "Users" -DatabaseServer "SQL01\INSTANCENAME" -Query "INSERT INTO Users (UserName, Email) VALUES ('johndoe', 'johndoe@contoso.com')"
 
- .EXAMPLE
+    .EXAMPLE
     Invoke-NonQuery -DatabaseName "Users" -DatabaseServer "SQL01\INSTANCENAME" -Query "INSERT INTO Users (UserName, Email) VALUES (@UserName, @EmailAddress)" -Parameters @{ UserName = "johndoe"; EmailAddress = "johndoe@contoso.com" } 
-
- #>
- function Invoke-NonQuery
- {
-     [cmdletbinding()]
+#>
+    [CmdletBinding()]
      param
      (
          # Name of the SQL database

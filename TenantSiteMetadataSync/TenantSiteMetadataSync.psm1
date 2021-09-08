@@ -5,7 +5,7 @@ $importIndividualFiles = $true
 
 if( $importIndividualFiles )
 {
-	. "$PSScriptRoot\private\scripts\Invoke-PreImport.ps1"
+    . "$PSScriptRoot\private\scripts\Invoke-PreImport.ps1"
 
     foreach ($function in (Get-ChildItem "$PSScriptRoot\private\functions" -Filter "*.ps1" -Recurse -ErrorAction Ignore))
     {
@@ -19,7 +19,7 @@ if( $importIndividualFiles )
         . $function.FullName
     }
 
-	. "$PSScriptRoot\private\scripts\Invoke-PostImport.ps1"
+    . "$PSScriptRoot\private\scripts\Invoke-PostImport.ps1"
 
     return
 }

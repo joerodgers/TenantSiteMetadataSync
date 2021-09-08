@@ -1,30 +1,29 @@
 ﻿function Sync-DeletionStatus
 {
 <#
-	.SYNOPSIS
-		Updates the deleted status of sites based on sites being restored from the tenant recycle bin or moved into the recycle bin. 
-	
-	.DESCRIPTION
-		Updates the deleted status of sites based on sites being restored from the tenant recycle bin or moved into the recycle bin. 
-	
-	.PARAMETER ClientId
-		Azure Active Directory Application Principal Client/Application Id
-	
-	.PARAMETER Thumbprint
-		Thumbprint of certificate associated with the Azure Active Directory Application Principal
-	
-	.PARAMETER Tenant
-		Name of the O365 Tenant
-	
-	.PARAMETER DatabaseName
-		The SQL Server database name
-	
-	.PARAMETER DatabaseServer
-		Name of the SQL Server database server, including the instance name (if applicable).
-	
-	.EXAMPLE
-		PS C:\> Sync-DeletionStatus -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
-	
+    .SYNOPSIS
+    Updates the deleted status of sites based on sites being restored from the tenant recycle bin or moved into the recycle bin. 
+
+    .DESCRIPTION
+    Updates the deleted status of sites based on sites being restored from the tenant recycle bin or moved into the recycle bin. 
+
+    .PARAMETER ClientId
+    Azure Active Directory Application Principal Client/Application Id
+
+    .PARAMETER Thumbprint
+    Thumbprint of certificate associated with the Azure Active Directory Application Principal
+
+    .PARAMETER Tenant
+    Name of the O365 Tenant
+
+    .PARAMETER DatabaseName
+    The SQL Server database name
+
+    .PARAMETER DatabaseServer
+    Name of the SQL Server database server, including the instance name (if applicable).
+
+    .EXAMPLE
+    PS C:\> Sync-DeletionStatus -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
 #>
     [CmdletBinding()]
     param
@@ -45,8 +44,7 @@
         [string]$DatabaseServer
     )
 
-    begin
-    {
+    begin    {
         $tenantSites = $activeSites = $deletedSites = $null
 
         $Error.Clear()
@@ -69,11 +67,11 @@
 
             Write-PSFMessage -Level Verbose -Message "Querying database for all active sites"
 
-            $activeSites = Get-DataTable -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query "SELECT SiteId, SiteUrl FROM ActiveSites"
+            $activeSites = Get-DataTable -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query "SELECT SiteId, SiteUrl FROM SitesActive"
         
             Write-PSFMessage -Level Verbose -Message "Querying database for all deleted sites"
 
-            $deletedSites = Get-DataTable -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query "SELECT SiteId, SiteUrl FROM DeletedSites"
+            $deletedSites = Get-DataTable -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query "SELECT SiteId, SiteUrl FROM SitesDeleted"
 
             # mark sites as deleted if they are not in tenant list anymore and are not marked as deleted in the database
             foreach( $activeSite in $activeSites )
@@ -102,4 +100,3 @@
         Stop-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -ErrorCount $Error.Count -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
     }
 }
-

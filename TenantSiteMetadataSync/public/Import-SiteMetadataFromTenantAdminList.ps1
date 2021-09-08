@@ -1,38 +1,38 @@
 ﻿function Import-SiteMetadataFromTenantAdminList
 {
 <#
-	.SYNOPSIS
-		Imports tenant site metadata from the tenant site hidden lists (DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS and DO_NOT_DELETE_SPLIST_TENANTADMIN_ALL_SITES_AGGREGATED_SITECOLLECTIONS) 
-        into the SQL database.
+    .SYNOPSIS
+    Imports tenant site metadata from the tenant site hidden lists (DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS and DO_NOT_DELETE_SPLIST_TENANTADMIN_ALL_SITES_AGGREGATED_SITECOLLECTIONS) 
+    into the SQL database.
 
-        Azure Active Directory Application Principal requires SharePoint > Application > Sites.FullControl
-	
-	.DESCRIPTION
-		Imports tenant site metadata from the tenant site hidden lists (DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS and DO_NOT_DELETE_SPLIST_TENANTADMIN_ALL_SITES_AGGREGATED_SITECOLLECTIONS) 
-        into the SQL database.
+    Azure Active Directory Application Principal requires SharePoint > Application > Sites.FullControl
 
-        Azure Active Directory Application Principal requires SharePoint > Application > Sites.FullControl
+    .DESCRIPTION
+    Imports tenant site metadata from the tenant site hidden lists (DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS and DO_NOT_DELETE_SPLIST_TENANTADMIN_ALL_SITES_AGGREGATED_SITECOLLECTIONS) 
+    into the SQL database.
+
+    Azure Active Directory Application Principal requires SharePoint > Application > Sites.FullControl
 
     .PARAMETER AdminList
-		The list to target as the input source.  Valid values are AggregatedSiteCollections and AllSitesAggregatedSiteCollections
+    The list to target as the input source.  Valid values are AggregatedSiteCollections and AllSitesAggregatedSiteCollections
 
     .PARAMETER ClientId
-		Azure Active Directory Application Principal Client/Application Id
-	
-	.PARAMETER Thumbprint
-		Thumbprint of certificate associated with the Azure Active Directory Application Principal
-	
-	.PARAMETER Tenant
-		Name of the O365 Tenant
-	
-	.PARAMETER DatabaseName
-		The SQL Server database name
-	
-	.PARAMETER DatabaseServer
-		Name of the SQL Server database server, including the instance name (if applicable).
-	
-	.EXAMPLE
-		PS C:\> Import-SiteMetadataFromTenantAdminList -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+    Azure Active Directory Application Principal Client/Application Id
+
+    .PARAMETER Thumbprint
+    Thumbprint of certificate associated with the Azure Active Directory Application Principal
+
+    .PARAMETER Tenant
+    Name of the O365 Tenant
+
+    .PARAMETER DatabaseName
+    The SQL Server database name
+
+    .PARAMETER DatabaseServer
+    Name of the SQL Server database server, including the instance name (if applicable).
+
+    .EXAMPLE
+    PS C:\> Import-SiteMetadataFromTenantAdminList -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
 #>
     [CmdletBinding()]
     param
@@ -75,7 +75,7 @@
             $listTitle = "DO_NOT_DELETE_SPLIST_TENANTADMIN_ALL_SITES_AGGREGATED_SITECOLLECTIONS"
             $fields = "ConditionalAccessPolicy", "CreatedBy", "DeletedBy", "LastItemModifiedDate", "SiteOwnerEmail", "SiteOwnerName", "StorageQuota", "SiteId", "SiteUrl", "TemplateName", "TimeCreated", "Title"
         }
-}
+    }
     process
     {
         Write-PSFMessage -Level Verbose -Message "Connecting to SharePoint Online Tenant"

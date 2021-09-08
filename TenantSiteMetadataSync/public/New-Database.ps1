@@ -1,18 +1,18 @@
 ﻿function New-Database
 {
 <#
-	.SYNOPSIS
-		Creates the required 'TenantSiteMetadataSync' SQL database
+    .SYNOPSIS
+    Creates the required 'TenantSiteMetadataSync' SQL database
 
 
-	.DESCRIPTION
-		Creates the required 'TenantSiteMetadataSync' SQL database
+    .DESCRIPTION
+    Creates the required 'TenantSiteMetadataSync' SQL database
 
-	.PARAMETER DatabaseServer
-		Name of the SQL Server database server, including the instance name (if applicable).
-	
+    .PARAMETER DatabaseServer
+    Name of the SQL Server database server, including the instance name (if applicable).
+
     .EXAMPLE
-		PS C:\> New-Database -DatabaseServer <database server>
+    PS C:\> New-Database -DatabaseServer <database server>
 #>
     [CmdletBinding()]
     param

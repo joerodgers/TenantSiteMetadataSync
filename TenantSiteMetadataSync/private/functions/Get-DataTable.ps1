@@ -1,6 +1,6 @@
 ﻿function Get-DataTable
 {
-    [cmdletbinding()]
+    [CmdletBinding()]
     param
     (
         # Name of the SQL database

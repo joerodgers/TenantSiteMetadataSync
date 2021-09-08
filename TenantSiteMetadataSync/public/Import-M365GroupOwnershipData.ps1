@@ -1,33 +1,33 @@
 ﻿function Import-M365GroupOwnershipData
 {
 <#
-	.SYNOPSIS
-		Uses the Graph API to read O365/M365 Group owner metadata and imports the data into the SQL database.  
-        
-        Azure Active Directory Application Principal requires Graph > Application > GroupMember.Read.All permissions.
-	
-	.DESCRIPTION
-		Uses the Graph API to read O365/M365 Group owner metadata and imports the data into the SQL database.  
+    .SYNOPSIS
+    Uses the Graph API to read O365/M365 Group owner metadata and imports the data into the SQL database.  
 
-        Azure Active Directory Application Principal requires Graph > Application > GroupMember.Read.All permissions.
-	
-	.PARAMETER ClientId
-		Azure Active Directory Application Principal Client/Application Id
-	
-	.PARAMETER Thumbprint
-		Thumbprint of certificate associated with the Azure Active Directory Application Principal
-	
-	.PARAMETER Tenant
-		Name of the O365 Tenant
-	
-	.PARAMETER DatabaseName
-		The SQL Server database name
-	
-	.PARAMETER DatabaseServer
-		Name of the SQL Server database server, including the instance name (if applicable).
-	
-	.EXAMPLE
-		PS C:\> Import-M365GroupOwnershipData -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+    Azure Active Directory Application Principal requires Graph > Application > GroupMember.Read.All permissions.
+
+    .DESCRIPTION
+    Uses the Graph API to read O365/M365 Group owner metadata and imports the data into the SQL database.  
+
+    Azure Active Directory Application Principal requires Graph > Application > GroupMember.Read.All permissions.
+
+    .PARAMETER ClientId
+    Azure Active Directory Application Principal Client/Application Id
+
+    .PARAMETER Thumbprint
+    Thumbprint of certificate associated with the Azure Active Directory Application Principal
+
+    .PARAMETER Tenant
+    Name of the O365 Tenant
+
+    .PARAMETER DatabaseName
+    The SQL Server database name
+
+    .PARAMETER DatabaseServer
+    Name of the SQL Server database server, including the instance name (if applicable).
+
+    .EXAMPLE
+    PS C:\> Import-M365GroupOwnershipData -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
 #>
     [CmdletBinding()]
     param
@@ -58,11 +58,12 @@
     }
     process
     {
-        Write-PSFMessage -Level Verbose -Message "Querying for group connected sites"
+        Write-PSFMessage -Level Verbose -Message "Querying $DatabaseName for GROUP connected sites"
        
-        if( $groups = Get-DataTable -Query "SELECT GroupId FROM GroupConnectedSites" -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer )
+        if( $groups = @(Get-DataTable -Query "SELECT GroupId FROM GroupConnectedSites" -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer) )
         {
             Write-PSFMessage -Level Verbose -Message "Discovered $($groups.Count) groups connected sites"
+
             Write-PSFMessage -Level Verbose -Message "Connecting to Microsoft Graph"
 
             $null = Connect-MgGraph -ClientId $ClientId -CertificateThumbprint $Thumbprint -TenantId "$Tenant.onmicrosoft.com"

@@ -1,6 +1,6 @@
 ﻿ function Test-DatabaseColumnExists
  {
-     [cmdletbinding()]
+    [CmdletBinding()]
      param
      (
          # Name of the SQL database

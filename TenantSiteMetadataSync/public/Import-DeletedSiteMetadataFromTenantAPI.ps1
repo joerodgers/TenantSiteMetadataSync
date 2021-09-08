@@ -1,30 +1,29 @@
 ﻿function Import-DeletedSiteMetadataFromTenantAPI
 {
 <#
-	.SYNOPSIS
-		Imports metadata about site collections that are in the tenant's recycle bin. 
-	
-	.DESCRIPTION
-		Imports metadata, specifically the 'TimeDeleted' property about site collections that are in the tenant's recycle bin. 
-	
-	.PARAMETER ClientId
-		Azure Active Directory Application Principal Client/Application Id
-	
-	.PARAMETER Thumbprint
-		Thumbprint of certificate associated with the Azure Active Directory Application Principal
-	
-	.PARAMETER Tenant
-		Name of the O365 Tenant
-	
-	.PARAMETER DatabaseName
-		The SQL Server database name
-	
-	.PARAMETER DatabaseServer
-		Name of the SQL Server database server, including the instance name (if applicable).
-	
-	.EXAMPLE
-		PS C:\> Import-DeletedSiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
-	
+    .SYNOPSIS
+    Imports metadata about site collections that are in the tenant's recycle bin. 
+
+    .DESCRIPTION
+    Imports metadata, specifically the 'TimeDeleted' property about site collections that are in the tenant's recycle bin. 
+
+    .PARAMETER ClientId
+    Azure Active Directory Application Principal Client/Application Id
+
+    .PARAMETER Thumbprint
+    Thumbprint of certificate associated with the Azure Active Directory Application Principal
+
+    .PARAMETER Tenant
+    Name of the O365 Tenant
+
+    .PARAMETER DatabaseName
+    The SQL Server database name
+
+    .PARAMETER DatabaseServer
+    Name of the SQL Server database server, including the instance name (if applicable).
+
+    .EXAMPLE
+    PS C:\> Import-DeletedSiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
 #>
     [CmdletBinding()]
     param
@@ -55,33 +54,32 @@
     }
     process
     {
-        $counter = 1
-
         Write-PSFMessage -Level Verbose -Message "Connecting to SharePoint Online Tenant"
 
         if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection:$True )
         {
-            Write-PSFMessage -Level Verbose -Message "Getting recycle bin items"
+            Write-PSFMessage -Level Verbose -Message "Querying tenant for deleted site collections"
 
-            if( $tenantSites = Get-PnPTenantRecycleBinItem -Connection $connection )
+            $tenantSites = @(Get-PnPTenantDeletedSite -IncludePersonalSite:$true -Limit 1000000 -Connection $connection)
+
+            Write-PSFMessage -Level Debug -Message "Discovered $($tenantSites.Count) deleted site collections"
+
+            $counter = 1
+
+            foreach( $tenantSite in $tenantSites )
             {
-                Write-PSFMessage -Level Debug -Message "($counter/$($tenantSites.Count)) Processing $($tenantSites.Count) deleted sites."
-
-                foreach( $tenantSite in $tenantSites )
+                try
                 {
-                    try
-                    {
-                        Write-PSFMessage -Level Debug -Message "($counter/$($tenantSites.Count)) Processing Url: $($tenantSite.Url)"
+                    Write-PSFMessage -Level Debug -Message "($counter/$($tenantSites.Count)) Processing Url: $($tenantSite.Url)"
 
-                        Update-SiteMetadata -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -SiteId $tenantSite.SiteId -SiteUrl $tenantSite.Url -TimeDeleted $tenantSite.DeletionTime
-                    }
-                    catch
-                    {
-                        Write-PSFMessage -Level Error -Message "Error updating deleted site. SiteUrl='$($tenantSite.Url)'" -Exception $_
-                    }
-
-                    $counter++
+                    Update-SiteMetadata -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -SiteId $tenantSite.SiteId -SiteUrl $tenantSite.Url -TimeDeleted $tenantSite.DeletionTime
                 }
+                catch
+                {
+                    Write-PSFMessage -Level Error -Message "Error updating deleted site. SiteUrl='$($tenantSite.Url)'" -Exception $_
+                }
+
+                $counter++
             }
 
             Disconnect-PnPOnline -Connection $connection

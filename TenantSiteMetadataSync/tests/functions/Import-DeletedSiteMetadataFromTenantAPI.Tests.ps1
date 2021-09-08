@@ -29,9 +29,10 @@
                 Mock -CommandName "Connect-PnPOnline"      -Verifiable -MockWith { return 1 }
                 Mock -CommandName "Disconnect-PnPOnline"   -Verifiable
                 Mock -CommandName "Write-PSFMessage"       
-                function Get-PnPTenantRecycleBinItem
+
+                function Get-PnPTenantDeletedSite
                 {
-                    param($Connection) 
+                    param($Connection, $IncludePersonalSite, $Limit ) 
                 }
             }
 
@@ -43,8 +44,7 @@
                                     [PSCustomObject] @{ Url = "https://contoso.sharepoint.com/sites/bar"; SiteId = [Guid]::NewGuid() } 
 
                 Mock `
-                    -CommandName "Get-PnPTenantRecycleBinItem" `
-                    -RemoveParameterType "Connection" `
+                    -CommandName "Get-PnPTenantDeletedSite" `
                     -MockWith { $mockDeletedSites } `
                     -Verifiable
 

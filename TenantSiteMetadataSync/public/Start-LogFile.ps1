@@ -1,20 +1,29 @@
 ﻿function Start-LogFile
 {
 <#
-	.SYNOPSIS
-		Starts a new PowerShell transcript file in the specified path 
+    .SYNOPSIS
+    Starts a new PowerShell transcript file in the specified path 
 
-	.DESCRIPTION
-		Starts a new PowerShell transcript file in the specified path. File name will include a timestamp to avoid name collisions. 
+    .DESCRIPTION
+    Starts a new PowerShell transcript file in the specified path. File name will include a timestamp to avoid name collisions. 
 
-	.PARAMETER Path
-		Directory path to create the log file in.
-	
-	.PARAMETER Path
-		File name prefix.  Name will have a _<timestamp>.log suffix.
+    .PARAMETER Path
+    Directory path to create the log file in.
+
+    .PARAMETER Name
+    File name prefix.  Name will have a _<timestamp>.log suffix.
+
+    .PARAMETER MessageLevel
+    Logging level.  Default level is Verbose.
+
+    .PARAMETER RetentionDays
+    Days to retain logs.  Default is 7 days.
 
     .EXAMPLE
-		PS C:\> Start-LogFile -Path "E:\Logs" -Name "Example"
+    PS C:\> Start-LogFile -Path "E:\Logs" -Name "Example"
+
+    .EXAMPLE
+    PS C:\> Start-LogFile -Path "E:\Logs" -Name "Example"
 #>
     [CmdletBinding()]
     param
@@ -26,7 +35,7 @@
         [string]$Name,
 
         [Parameter(Mandatory=$false)]
-        [PSFramework.Message.MessageLevel]$MinLogLevel = [PSFramework.Message.MessageLevel]::Verbose,
+        [PSFramework.Message.MessageLevel]$MessageLevel = [PSFramework.Message.MessageLevel]::Verbose,
 
         [Parameter(Mandatory=$false)]
         [ValidateRange(1,21)]

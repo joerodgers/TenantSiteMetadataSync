@@ -94,19 +94,18 @@
             {
                 $query = $sb.ToString().TrimEnd(",") # trim trailing comma
 
-                Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.InvocationName) - Executing: $query"
-                Write-PSFMessage -Level Debug -Message "Query parameter data: '@$($Parameter.Key)', Parameter Value: '$($Parameter.Value)'"
+                Write-PSFMessage -Level Debug -Message "Executing: '$query'"
 
                 Invoke-NonQuery -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query $query -Parameters $parameters
             }
             catch
             {
-                Write-Error "$($PSCmdlet.MyInvocation.MyCommand) - Error executing update query $($query). Error: $_"
+                Write-PSFMessage -Level Error -Message "Error executing update query '$($query)'" -Exception $_
             }
         }
         else 
         {
-            Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.InvocationName) - No property updates required"
+            Write-PSFMessage -Level Verbose -Message "No property updates required"
         }
     }
     end

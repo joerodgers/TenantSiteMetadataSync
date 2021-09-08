@@ -1,23 +1,23 @@
 ﻿function Start-SyncJobExecution
 {
 <#
-	.SYNOPSIS
-        Adds an entry into the SyncJob table with the provided name and current start time.
+    .SYNOPSIS
+    Adds an entry into the SyncJob table with the provided name and current start time.
 
-	.DESCRIPTION
-        Adds an entry into the SyncJob table with the provided name and current start time.  You will use the same job name to mark the job exection with a completion time in the SyncJob table.
+    .DESCRIPTION
+    Adds an entry into the SyncJob table with the provided name and current start time.  You will use the same job name to mark the job exection with a completion time in the SyncJob table.
 
-	.PARAMETER Name
-		Name of the operation
-	
-	.PARAMETER DatabaseName
-		The SQL Server database name
-	
-	.PARAMETER DatabaseServer
-		Name of the SQL Server database server, including the instance name (if applicable).
+    .PARAMETER Name
+    Name of the operation
+
+    .PARAMETER DatabaseName
+    The SQL Server database name
+
+    .PARAMETER DatabaseServer
+    Name of the SQL Server database server, including the instance name (if applicable).
 
     .EXAMPLE
-		PS C:\> Start-SyncJobExecution -Name <job name> -DatabaseName <database name> -DatabaseServer <database server> 
+    PS C:\> Start-SyncJobExecution -Name <job name> -DatabaseName <database name> -DatabaseServer <database server> 
 #>
     [CmdletBinding()]
     param

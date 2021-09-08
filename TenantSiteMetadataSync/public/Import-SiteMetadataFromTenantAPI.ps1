@@ -1,60 +1,60 @@
 ﻿function Import-SiteMetadataFromTenantAPI
 {
 <#
-	.SYNOPSIS
-		Imports tenant site metadata from the tenant API into the SQL database.
+    .SYNOPSIS
+    Imports tenant site metadata from the tenant API into the SQL database.
 
-        Azure Active Directory Application Principal requires SharePoint > Application > Sites.FullControl
-	
-	.DESCRIPTION
-		Imports tenant site metadata from the tenant API into the SQL database.
+    Azure Active Directory Application Principal requires SharePoint > Application > Sites.FullControl
 
-        Azure Active Directory Application Principal requires SharePoint > Application > Sites.FullControl
+    .DESCRIPTION
+    Imports tenant site metadata from the tenant API into the SQL database.
+
+    Azure Active Directory Application Principal requires SharePoint > Application > Sites.FullControl
 
     .PARAMETER ClientId
-		Azure Active Directory Application Principal Client/Application Id
-	
-	.PARAMETER Thumbprint
-		Thumbprint of certificate associated with the Azure Active Directory Application Principal
-	
-	.PARAMETER Tenant
-		Name of the O365 Tenant
-	
-	.PARAMETER DatabaseName
-		The SQL Server database name
-	
-	.PARAMETER DatabaseServer
-		Name of the SQL Server database server, including the instance name (if applicable).
-	
-	.PARAMETER Template
-		Optional template name to filter API results.  Valid values are 'APPCATALOG#0', 'BICenterSite#0', 'EDISC#0', 'EHS#1', 'PWA#0', 'SPSMSITEHOST#0', 'SRCHCEN#0', 'BLANKINTERNET#0', 'STS#-1', 'TEAMCHANNEL#0', 'RedirectSite#0', 'SITEPAGEPUBLISHING#0', 'STS#3', 'GROUP#0', 'STS#0'
+    Azure Active Directory Application Principal Client/Application Id
 
-	.PARAMETER DetailedImport
-		Optional parameter to include detailed information during the import.  This option will add the following data to the import: 
-            ConditionalAccessPolicy
-            SensitivityLabel
-            SiteId
-            SiteOwnerEmail
-            SiteOwnerName
-            RelatedGroupId
-            TimeCreated
+    .PARAMETER Thumbprint
+    Thumbprint of certificate associated with the Azure Active Directory Application Principal
 
-        This option will drastically increase the execution time as it requries additionl requests to each tenant site being imported.
+    .PARAMETER Tenant
+    Name of the O365 Tenant
 
-	.PARAMETER IncludeOneDriveSites
-        Switch to include OneDrive for Business sites in the import process.
+    .PARAMETER DatabaseName
+    The SQL Server database name
 
-    .EXAMPLE
-		PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+    .PARAMETER DatabaseServer
+    Name of the SQL Server database server, including the instance name (if applicable).
+
+    .PARAMETER Template
+    Optional template name to filter API results.  Valid values are 'APPCATALOG#0', 'BICenterSite#0', 'EDISC#0', 'EHS#1', 'PWA#0', 'SPSMSITEHOST#0', 'SRCHCEN#0', 'BLANKINTERNET#0', 'STS#-1', 'TEAMCHANNEL#0', 'RedirectSite#0', 'SITEPAGEPUBLISHING#0', 'STS#3', 'GROUP#0', 'STS#0'
+
+    .PARAMETER DetailedImport
+    Optional parameter to include detailed information during the import.  This option will add the following data to the import: 
+    ConditionalAccessPolicy
+    SensitivityLabel
+    SiteId
+    SiteOwnerEmail
+    SiteOwnerName
+    RelatedGroupId
+    TimeCreated
+
+    This option will drastically increase the execution time as it requries additionl requests to each tenant site being imported.
+
+    .PARAMETER IncludeOneDriveSites
+    Switch to include OneDrive for Business sites in the import process.
 
     .EXAMPLE
-		PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server> -Template 'TEAMCHANNEL#0'
+    PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
 
     .EXAMPLE
-		PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server> -DetailedImport
+    PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server> -Template 'TEAMCHANNEL#0'
 
     .EXAMPLE
-		PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server> -Template 'TEAMCHANNEL#0' -DetailedImport
+    PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server> -DetailedImport
+
+    .EXAMPLE
+    PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server> -Template 'TEAMCHANNEL#0' -DetailedImport
 #>
     [CmdletBinding()]
     param
@@ -117,7 +117,8 @@
 
             $tenantContext = Get-PnPContext
 
-            $counter = 0
+            $counter = 1
+
             # process each site
             foreach( $tenantSite in $tenantSites )
             {
@@ -167,8 +168,8 @@
                         # set the context to the new site
                         Set-PnPContext -Context $siteContext
     
-                        $site       = Get-PnPSite -Includes Id, RelatedGroupId
-                        $web        = Get-PnPWeb  -Includes Created
+                        $site = Get-PnPSite -Includes Id, RelatedGroupId
+                        $web  = Get-PnPWeb  -Includes Created
                     
                         <# The following properties are returned by a direct request for an individual site
     
@@ -211,14 +212,22 @@
                     }
                 }
 
-                Update-SiteMetadata @parameters
+                try 
+                {
+                    Update-SiteMetadata @parameters
+                }
+                catch
+                {
+                    Write-PSFMessage -Level Error -Message "Failed to update site metatadata for $($tenantSite.Url)" -Exception $_
+                }
+
+
+                if( $counter -eq ($tenantsites.Count) -or ($counter % 100) -eq 0 )
+                {
+                    Write-PSFMessage -Level Verbose -Message "Processed $counter of $($tenantSites.Count) sites"
+                }
 
                 $counter++
-
-                if( $counter -eq $tenantsites.Count -or $counter % 100 -eq 0 )
-                {
-                    Write-PSFMessage -Level Verbose -Message "Processed $counter of $($tenantSites.Count) sites."
-                }
             }
 
             Disconnect-PnPOnline -Connection $connection
@@ -229,4 +238,3 @@
         Stop-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -ErrorCount $Error.Count -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
     }
 }
-

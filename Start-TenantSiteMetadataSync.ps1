@@ -50,7 +50,7 @@ if( $ImportUsageAccountData.IsPresent )
 
     $operation = "Operation - Import Usage Account Data"
 
-    Start-TSMSLogFile -Path $TranscriptDirectoryPath -Name "ImportUsageAccountData"
+    Start-TSMSLogFile -Path $TranscriptDirectoryPath -Name "ImportUsageAccountData" -MessageLevel ([PSFramework.Message.MessageLevel]::Verbose)
 
     Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
 
@@ -106,7 +106,7 @@ if( $ImportSharePointTenantListData.IsPresent )
 
         $operation = "Operation - ImportSharePointTenantListData"
     
-        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantListData"
+        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantListData" -MessageLevel ([PSFramework.Message.MessageLevel]::Verbose)
     
         Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
     
@@ -166,7 +166,7 @@ if( $ImportSharePointTenantAPIData.IsPresent )
 
         $operation = "Operation - ImportSharePointTenantAPIData"
     
-        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantAPIData"
+        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantAPIData" -MessageLevel ([PSFramework.Message.MessageLevel]::Verbose)
     
         Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
     
@@ -217,7 +217,7 @@ if( $ImportDetailedSharePointTenantAPIData.IsPresent )
 
         $operation = "Operation - ImportDetailedSharePointTenantAPIData"
     
-        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantAPIData"
+        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantAPIData" -MessageLevel ([PSFramework.Message.MessageLevel]::Verbose)
     
         Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
     
@@ -252,7 +252,7 @@ if( $ImportM365GroupOwnershipData.IsPresent )
 
         $operation = "Operation - ImportM365GroupOwnershipData"
     
-        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportM365GroupOwnershipData"
+        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportM365GroupOwnershipData" -MessageLevel ([PSFramework.Message.MessageLevel]::Verbose)
     
         Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
     
