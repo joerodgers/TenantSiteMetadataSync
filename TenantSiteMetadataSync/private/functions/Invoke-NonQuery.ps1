@@ -1,81 +1,81 @@
-﻿ function Invoke-NonQuery
- {
-<#
-    .Synopsis
+﻿<#
+ .Synopsis
     Executes the provided TSQL statement against the specified database and SQL instance.
 
-    .EXAMPLE
+ .EXAMPLE
     Invoke-NonQuery -DatabaseName "Users" -DatabaseServer "SQL01\INSTANCENAME" -Query "INSERT INTO Users (UserName, Email) VALUES ('johndoe', 'johndoe@contoso.com')"
 
-    .EXAMPLE
+ .EXAMPLE
     Invoke-NonQuery -DatabaseName "Users" -DatabaseServer "SQL01\INSTANCENAME" -Query "INSERT INTO Users (UserName, Email) VALUES (@UserName, @EmailAddress)" -Parameters @{ UserName = "johndoe"; EmailAddress = "johndoe@contoso.com" } 
-#>
+
+ #>
+ function Invoke-NonQuery
+ {
     [CmdletBinding()]
-     param
-     (
-         # Name of the SQL database
-         [Parameter(Mandatory=$true,ParameterSetName="Individual")]
-         [string]$DatabaseName,
- 
-         # Name of the SQL server or SQL and instance name
-         [Parameter(Mandatory=$true,ParameterSetName="Individual")]
-         [string]$DatabaseServer,
- 
-         # Full connection string.  Necessary if using SQL authentication
-         [Parameter(Mandatory=$true,ParameterSetName="ConnectionString")]
-         [string]$ConnectionString,
- 
-         # TSQL statement
-         [Parameter(Mandatory=$true,ParameterSetName="Individual")]
-         [Parameter(Mandatory=$true,ParameterSetName="ConnectionString")]
-         [string]$Query,
- 
-         # Command Timeout
-         [Parameter(Mandatory=$false,ParameterSetName="Individual")]
-         [Parameter(Mandatory=$false,ParameterSetName="ConnectionString")]
-         [int]$CommandTimeout=30, # The default is 30 seconds
- 
-         # Hashtable of parameters to the SQL query.  Do not include the '@' character in the key name.
-         [Parameter(Mandatory=$false,ParameterSetName="Individual")]
-         [Parameter(Mandatory=$false,ParameterSetName="ConnectionString")]
-         [HashTable]$Parameters = @{}    
+    param
+    (
+        # Name of the SQL database
+        [Parameter(Mandatory=$true)]
+        [string]$DatabaseName,
+
+        # Name of the SQL server or SQL and instance name
+        [Parameter(Mandatory=$true)]
+        [string]$DatabaseServer,
+
+        # TSQL statement
+        [Parameter(Mandatory=$true)]
+        [string]$Query,
+
+        # Hashtable of parameters to the SQL query.  Do not include the '@' character in the key name.
+        [Parameter(Mandatory=$false)]
+        [HashTable]$Parameters = @{},
+
+        # SQL command timeout. Default is 30 seconds
+        [Parameter(Mandatory=$false)]
+        [int]$CommandTimeout = 30
     )
+
     begin
     {
-         if( $PSCmdlet.ParameterSetName -eq "Individual" )
-         {
-             $ConnectionString = "Data Source=$DatabaseServer;Initial Catalog=$DatabaseName;Integrated Security=True;Enlist=False;Connect Timeout=5"
-         }
+        $connectionString = New-SqlConnectionString -DatabaseServer $DatabaseServer -DatabaseName $DatabaseName    
     }
     process
     {
         try
         {
-            $connection = New-Object System.Data.SqlClient.SqlConnection($ConnectionString)
+            $connection = New-Object System.Data.SqlClient.SqlConnection($connectionString)
             $connection.Open()
 
             $command = New-Object system.Data.SqlClient.SqlCommand($Query, $connection)     
             $command.CommandTimeout = $CommandTimeout
 
-            foreach( $Parameter in $Parameters.GetEnumerator() )
+            foreach( $parameter in $Parameters.GetEnumerator() )
             {
-                Write-PSFMessage -Level Debug -Message "Query parameter data: '@$($Parameter.Key)', Parameter Value: '$($Parameter.Value)'"
-                $null = $command.Parameters.AddWithValue( "@$($Parameter.Key)", $Parameter.Value )
+                if( $null -eq $parameter.Value )
+                {
+                    $null = $command.Parameters.AddWithValue( "@$($parameter.Key)", [System.DBNull]::Value )
+                }
+                else 
+                {
+                    $null = $command.Parameters.AddWithValue( "@$($parameter.Key)", $parameter.Value )
+                }
             }
 
-            $command.ExecuteNonQuery() | Out-Null
+            $null = $command.ExecuteNonQuery()
         }
         catch
         {
-            Write-PSFMessage -Level Critical -Message "Error executing query: '$query'" -Exception $_
             throw $_.Exception
-
         }
         finally
         {
+            if($command)
+            {
+                $command.Dispose()
+            }
+
             if($connection)
             {
-                [System.Data.SqlClient.SqlConnection]::ClearAllPools()
                 $connection.Close()
                 $connection.Dispose()
             }
