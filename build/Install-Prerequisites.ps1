@@ -1,7 +1,5 @@
 ﻿$modules = @( "Pester", "PSScriptAnalyzer" )
 
-<#
-
 # define the module root
 $moduleRoot = Resolve-Path -Path "$PSScriptRoot\.." | Select-Object -ExpandProperty Path
 
@@ -24,8 +22,6 @@ foreach ($dependency in $data.RequiredModules)
         $modules += $dependency.ModuleName
     }
 }
-
-#>
 
 foreach ($module in $modules)
 {
