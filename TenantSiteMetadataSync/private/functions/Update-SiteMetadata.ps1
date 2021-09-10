@@ -1,5 +1,6 @@
 ﻿function Update-SiteMetadata
 {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseSingularNouns", "")]
     [CmdletBinding()]
     param
     (

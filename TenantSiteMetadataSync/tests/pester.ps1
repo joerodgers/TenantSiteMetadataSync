@@ -8,10 +8,9 @@ $generalTests  = Get-ChildItem "$PSScriptRoot\general"   -Filter "*.Tests.ps1" -
 $functionTests = Get-ChildItem "$PSScriptRoot\functions" -Filter "*.Tests.ps1" -Recurse -ErrorAction Ignore
 
 $configuration = New-PesterConfiguration
-$configuration.TestResult.Enabled   = $true
-$configuration.CodeCoverage.Enabled = $false
-$configuration.Run.PassThru         = $true
-$configuration.Output.Verbosity     = "Detailed"
+$configuration.TestResult.Enabled = $true
+$configuration.Run.PassThru       = $true
+$configuration.Output.Verbosity   = "Detailed"
 
 foreach( $file in $generalTests )
 {
@@ -42,7 +41,6 @@ foreach( $file in $functionTests )
 {
     $configuration.TestResult.OutputPath = Join-Path -Path "$PSScriptRoot\..\..\TestResults" -ChildPath "$($file.BaseName).xml"
     $configuration.Run.Path              = $file.FullName
-    $configuration.CodeCoverage.Enabled  = $true
 
     $results = Invoke-Pester -Configuration $configuration
 
@@ -64,6 +62,11 @@ foreach( $file in $functionTests )
 
 }
 
+[PSCustomObject] @{
+    "Total Tests Executed" = $totalTestCount
+    "Total Tests Passed"   = $totalTestCount - $failedTestCount
+    "Total Tests Failed"   = $failedTestCount
+}
 
 $testFailureResults | Sort-Object Describe, Context, Name, Result, Message | Format-List
 
