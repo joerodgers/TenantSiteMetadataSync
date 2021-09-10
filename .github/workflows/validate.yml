@@ -1,23 +1,31 @@
-on: [push]
+on:
+  push:
+    branches: [ main ]
+
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
 
-  validate:
+  test:
 
     runs-on: windows-latest
 
     steps:
-
-    - uses: actions/checkout@v1
-
-    - name: Install Prerequisites
-      run: .\build\Install-Prerequisites.ps1
-      shell: pwsh
-
-    - name: Validate
-      run: .\build\Invoke-Validation.ps1
-      shell: pwsh
-
-    - name: Build
-      run: .\build\Invoke-Build.ps1
-      shell: pwsh
+    
+    - name: Run PSScriptAnalyzer
+      uses: microsoft/psscriptanalyzer-action@v1.0
+      with:
+          # Specifies the path to the scripts or module to be analyzed. Wildcard characters are supported.
+          path: .\
+          recurse: true 
+          ignorePattern: "tests"
+          output: results.sarif
+    
+    - name: Upload SARIF results file
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+          sarif_file: results.sarif
