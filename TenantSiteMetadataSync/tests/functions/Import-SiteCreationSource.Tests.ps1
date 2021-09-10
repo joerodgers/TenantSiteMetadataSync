@@ -5,7 +5,7 @@
         Import-Module -Name "$PSScriptRoot\..\..\TenantSiteMetadataSync.psd1" -Force
     }
 
-    Context "Import-SiteCreationSources function" {
+    Context "Import-SiteCreationSource function" {
 
         InModuleScope -ModuleName "TenantSiteMetadataSync" {
 
@@ -76,7 +76,7 @@
                     -ParameterFilter { $query -eq "EXEC proc_AddOrUpdateSiteCreationSource @Id = @Id, @Source = @Source" -and $Parameters.Id -eq "5D9FFF84-5B34-4204-BC91-3AAF5F298C5D" -and $Parameters.Source -eq "PnP Lookbook" } `
                     -Verifiable    
 
-                Import-SiteCreationSources `
+                Import-SiteCreationSource `
                     -DatabaseName   "TenantSiteMetadataSync" `
                     -DatabaseServer "localhost/mssql" `
                     -ClientId       "00000000-0000-0000-0000-000000000000" `

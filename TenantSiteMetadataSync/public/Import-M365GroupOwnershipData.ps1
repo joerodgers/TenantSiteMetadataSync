@@ -60,7 +60,7 @@
     {
         Write-PSFMessage -Level Verbose -Message "Querying $DatabaseName for GROUP connected sites"
        
-        if( $groups = @(Get-DataTable -Query "SELECT GroupId FROM GroupConnectedSites" -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer) )
+        if( $groups = @(Get-DataTable -Query "SELECT GroupId FROM GroupConnectedSites" -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -As 'PSObject') )
         {
             Write-PSFMessage -Level Verbose -Message "Discovered $($groups.Count) groups connected sites"
 

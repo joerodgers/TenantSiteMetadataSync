@@ -1,4 +1,4 @@
-﻿function Import-SiteCreationSources
+﻿function Import-SiteCreationSource
 {
 <#
     .SYNOPSIS
@@ -27,7 +27,7 @@
     Name of the SQL Server database server, including the instance name (if applicable).
 
     .EXAMPLE
-    PS C:\> Import-SiteCreationSources -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+    PS C:\> Import-SiteCreationSource -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
 #>
     [CmdletBinding()]
     param

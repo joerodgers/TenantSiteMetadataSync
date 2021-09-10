@@ -1,4 +1,4 @@
-﻿ function Test-DatabaseColumnExists
+﻿ function Test-DatabaseColumnExist
  {
     [CmdletBinding()]
      param

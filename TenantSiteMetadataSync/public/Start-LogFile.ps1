@@ -71,7 +71,7 @@
             -Headers          $headers `
             -LogRetentionTime $RetentionDays `
             -MinLevel         ([int][PSFramework.Message.MessageLevel]::Critical) `
-            -MaxLevel         ([int]$MinLogLevel)
+            -MaxLevel         ([int]$MessageLevel)
 
         Write-PSFMessage -Level Verbose -Message "Started new log file"
     }

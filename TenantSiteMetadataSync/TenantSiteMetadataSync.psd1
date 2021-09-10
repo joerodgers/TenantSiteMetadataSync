@@ -25,7 +25,7 @@
                         'Import-M365GroupOwnershipData',
                         'Import-MicrosoftGraphUsageAccountReportData',
                         'Import-SensitivityLabel',
-                        'Import-SiteCreationSources',
+                        'Import-SiteCreationSource',
                         'Import-SiteMetadataFromTenantAdminList',
                         'Import-SiteMetadataFromTenantAPI',
                         'New-Database',
