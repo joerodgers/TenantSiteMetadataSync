@@ -5,7 +5,7 @@ $functionTests = Get-ChildItem "$PSScriptRoot\functions" -Filter "*.Tests.ps1" -
 
 foreach( $file in $generalTests )
 {
-    # Invoke-Pester -Path $file.FullName -Output Detailed
+    Invoke-Pester -Path $file.FullName -Output Detailed
 }
 
 foreach( $file in $functionTests )
