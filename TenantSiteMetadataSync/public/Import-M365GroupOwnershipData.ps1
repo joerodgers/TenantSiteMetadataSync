@@ -108,7 +108,7 @@
                 }
                 catch
                 {
-                    Write-PSFMessage -Level Error -Message "Error updating group membership" -Exception $_
+                    Write-PSFMessage -Level Error -Message "Error updating group membership" -Exception $_.Exception
                 }
                 
                 $counter++

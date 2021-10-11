@@ -76,7 +76,7 @@
                 }
                 catch
                 {
-                    Write-PSFMessage -Level Error -Message "Error updating deleted site. SiteUrl='$($tenantSite.Url)'" -Exception $_
+                    Write-PSFMessage -Level Error -Message "Error updating deleted site. SiteUrl='$($tenantSite.Url)'" -Exception $_.Exception
                 }
 
                 $counter++

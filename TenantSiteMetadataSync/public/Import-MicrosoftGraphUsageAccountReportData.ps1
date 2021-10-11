@@ -277,7 +277,7 @@
                         }
                         catch
                         {
-                            Write-PSFMessage -Level Error -Message "Error updating account usage detail data." -Exception $_
+                            Write-PSFMessage -Level Error -Message "Error updating account usage detail data." -Exception $_.Exception
                         }            
                     }
                 }

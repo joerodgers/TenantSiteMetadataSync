@@ -100,7 +100,7 @@
             }
             catch
             {
-                Write-PSFMessage -Level Error -Message "Error executing update query '$($query)'" -Exception $_
+                Write-PSFMessage -Level Error -Message "Error executing update query '$($query)'" -Exception $_.Exception
             }
         }
         else 
