@@ -15,7 +15,6 @@ SELECT
     SM.FileViewedOrEdited, 
     SM.GroupId, 
     SM.RelatedGroupId, 
-    CASE WHEN SM.HasLegalHold IS NULL THEN 0 ELSE SM.HasLegalHold END AS 'HasLegalHold',
     SM.HubSiteId, 
     SM.Initiator, 
     CASE WHEN SM.IsGroupConnected IS NULL THEN 0 ELSE SM.IsGroupConnected END AS 'IsGroupConnected',

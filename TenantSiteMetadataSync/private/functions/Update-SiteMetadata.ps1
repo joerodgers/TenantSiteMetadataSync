@@ -43,9 +43,6 @@
         [int]$GuestLinkCount,
 
         [Parameter(Mandatory=$false)]
-        [bool]$HasLegalHold,
-
-        [Parameter(Mandatory=$false)]
         [Guid]$HubSiteId,
 
         [Parameter(Mandatory=$false)]

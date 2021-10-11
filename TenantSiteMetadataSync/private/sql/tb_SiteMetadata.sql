@@ -12,7 +12,6 @@ BEGIN
         [FileViewedOrEdited]         int              NULL,
         [GroupId]                    uniqueidentifier NULL,
         [GuestLinkCount]             int              NULL,
-        [HasLegalHold]               bit              NULL,
         [HubSiteId]                  uniqueidentifier NULL,
         [Initiator]                  nvarchar(255)    NULL,
         [IsGroupConnected]           bit              NULL,

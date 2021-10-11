@@ -190,19 +190,6 @@
                 {  Update-SiteMetadata -DatabaseName "TenantSiteMetadataSync" -DatabaseServer "localhost/mssql" -SiteUrl "https://contoso.sharepoint.com" -GuestLinkCount  -1 } | Should -Throw -ExpectedMessage "Cannot validate argument on parameter 'GuestLinkCount'. The argument `"-1`" cannot be validated because its value is not greater than or equal to zero."
             } 
 
-            It "should update the site's HasLegalHold value" {
-
-                Mock `
-                    -CommandName "Invoke-NonQuery" `
-                    -ParameterFilter { $DatabaseName -eq "TenantSiteMetadataSync" -and $DatabaseServer -eq "localhost/mssql" -and $SiteUrl -eq "https://contoso.sharepoint.com" -and $parameters.HasLegalHold -eq $true } `
-                    -ModuleName "TenantSiteMetadataSync" `
-                    -Verifiable
-
-                Update-SiteMetadata -DatabaseName "TenantSiteMetadataSync" -DatabaseServer "localhost/mssql" -SiteUrl "https://contoso.sharepoint.com" -HasLegalHold $true
-        
-                Should -InvokeVerifiable
-            }
-
             It "should update the site's HubSiteId value" {
 
                 Mock `
