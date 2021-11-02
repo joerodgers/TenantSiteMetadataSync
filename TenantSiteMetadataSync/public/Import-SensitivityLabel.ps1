@@ -20,14 +20,11 @@
     .PARAMETER Tenant
     Name of the O365 Tenant
 
-    .PARAMETER DatabaseName
-    The SQL Server database name
-
-    .PARAMETER DatabaseServer
-    Name of the SQL Server database server, including the instance name (if applicable).
+    .PARAMETER DatabaseConnectionInformation
+    Database Connection Information
 
     .EXAMPLE
-    PS C:\> Import-SensitivityLabel -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+    PS C:\> Import-SensitivityLabel -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseConnectionInformation <database connection information>
 #>
     [CmdletBinding()]
     param
@@ -42,17 +39,15 @@
         [string]$Tenant,
 
         [Parameter(Mandatory=$true)]
-        [string]$DatabaseName,
-        
-        [Parameter(Mandatory=$true)]
-        [string]$DatabaseServer
+        [DatabaseConnectionInformation]
+        $DatabaseConnectionInformation
     )
 
     begin
     {
         $Error.Clear()
 
-        Start-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Start-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -DatabaseConnectionInformation $DatabaseConnectionInformation
 
         $query = "EXEC proc_AddOrUpdateSensitivityLabel @Id = @Id, @Label = @Label"
 
@@ -79,7 +74,7 @@
                     $parameters.Id    = $label.Id
                     $parameters.Label = $label.Name
                 
-                    Invoke-NonQuery -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query $query -Parameters $parameters
+                    Invoke-NonQuery -DatabaseConnectionInformation $DatabaseConnectionInformation -Query $query -Parameters $parameters
                 }
             }
 
@@ -88,6 +83,6 @@
     }
     end
     {
-        Stop-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -ErrorCount $Error.Count -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Stop-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -ErrorCount $Error.Count -DatabaseConnectionInformation $DatabaseConnectionInformation
     }
 }

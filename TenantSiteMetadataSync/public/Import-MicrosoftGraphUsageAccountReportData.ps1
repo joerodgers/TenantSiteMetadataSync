@@ -32,20 +32,17 @@
     .PARAMETER Tenant
     Name of the O365 Tenant
 
-    .PARAMETER DatabaseName
-    The SQL Server database name
-
-    .PARAMETER DatabaseServer
-    Name of the SQL Server database server, including the instance name (if applicable).
+    .PARAMETER DatabaseConnectionInformation
+    Database Connection Information
 
     .EXAMPLE
-    PS C:\> Import-MicrosoftGraphUsageAccountReportData -ReportType SharePoint -Period 30 -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+    PS C:\> Import-MicrosoftGraphUsageAccountReportData -ReportType SharePoint -Period 30 -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseConnectionInformation <database connection information>
 
     .EXAMPLE
-    PS C:\> Import-MicrosoftGraphUsageAccountReportData -ReportType OneDrive -Period 90 -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+    PS C:\> Import-MicrosoftGraphUsageAccountReportData -ReportType OneDrive -Period 90 -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseConnectionInformation <database connection information>
 
     .EXAMPLE
-    PS C:\> Import-MicrosoftGraphUsageAccountReportData -ReportType M365Group -Period 180 -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+    PS C:\> Import-MicrosoftGraphUsageAccountReportData -ReportType M365Group -Period 180 -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseConnectionInformation <database connection information>
 #>
     [CmdletBinding()]
     param
@@ -72,17 +69,15 @@
         [string]$Tenant,
 
         [Parameter(Mandatory=$true)]
-        [string]$DatabaseName,
-        
-        [Parameter(Mandatory=$true)]
-        [string]$DatabaseServer
+        [DatabaseConnectionInformation]
+        $DatabaseConnectionInformation
     )
 
     begin
     {
         $Error.Clear()
 
-        Start-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Start-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -DatabaseConnectionInformation $DatabaseConnectionInformation
 
         if( $ReportType -eq 'SharePoint' )
         {
@@ -128,8 +123,7 @@
                         try
                         {
                             $parameters = @{}
-                            $parameters.DatabaseName   = $DatabaseName
-                            $parameters.DatabaseServer = $DatabaseServer
+                            $parameters.DatabaseConnectionInformation = $DatabaseConnectionInformation
 
                             if( $ReportType -eq 'M365Group' ) 
                             {
@@ -168,7 +162,7 @@
                                 $parameters.ExchangeReceivedEmailCount    = $row.'Exchange Received Email Count'
                                 $parameters.SharePointActiveFileCount     = $row.'SharePoint Active File Count'
                                 $parameters.SharePointTotalFileCount      = $row.'SharePoint Total File Count'
-                                # $parameters.SharePointSiteStorageUsed     = $row.'SharePoint Site Storage Used (Byte)'
+                                #$parameters.SharePointSiteStorageUsed     = $row.'SharePoint Site Storage Used (Byte)'
                                 $parameters.YammerPostedMessageCount      = $row.'Yammer Posted Message Count'
                                 $parameters.YammerReadMessageCount        = $row.'Yammer Read Message Count'
                                 $parameters.YammerLikedMessageCount       = $row.'Yammer Liked Message Count'
@@ -217,7 +211,6 @@
                                             - Root Web Template
                                             - Owner Principal Name
                                             - Report Period
-
                                     #>
 
                                     $parameters.SiteId       = $row.'Site Id'
@@ -288,7 +281,7 @@
     }
     end
     {
-        Stop-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -ErrorCount $Error.Count -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Stop-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -ErrorCount $Error.Count -DatabaseConnectionInformation $DatabaseConnectionInformation
     }
 }
 

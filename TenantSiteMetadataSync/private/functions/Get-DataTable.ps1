@@ -3,37 +3,35 @@
     [CmdletBinding()]
     param
     (
-        # Name of the SQL database
+        # Database Connection Information
         [Parameter(Mandatory=$true)]
-        [string]$DatabaseName,
-
-        # Name of the SQL server or SQL and instance name
-        [Parameter(Mandatory=$true)]
-        [string]$DatabaseServer,
+        [DatabaseConnectionInformation]
+        $DatabaseConnectionInformation,
 
         # TSQL statement
         [Parameter(Mandatory=$true)]
-        [string]$Query,
+        [string]
+        $Query,
 
         # Hashtable of parameters to the SQL query.  Do not include the '@' character in the key name.
         [Parameter(Mandatory=$false)]
-        [HashTable]$Parameters = @{},
+        [HashTable]
+        $Parameters = @{},
 
         # Specifies output type. Valid options for this parameter are 'DataSet', 'DataTable', 'DataRow', 'PSObject', and 'SingleValue'
         [Parameter(Mandatory=$false)]
         [ValidateSet("DataSet", "DataTable", "DataRow", "PSObject", "SingleValue")]
-        [string]$As = "DataRow"
+        [string]
+        $As = "DataRow"
     )
     begin
     {
-        $connectionString = New-SqlConnectionString -DatabaseServer $DatabaseServer -DatabaseName $DatabaseName    
     }
     process
     {
         try
         {
-            $connection = New-Object System.Data.SqlClient.SqlConnection($connectionString)
-            $connection.Open()
+            $connection = New-SqlServerDatabaseConnection -DatabaseConnectionInformation $DatabaseConnectionInformation
 
             $command = New-Object system.Data.SqlClient.SqlCommand($Query, $connection)     
             $command.CommandTimeout = $CommandTimeout

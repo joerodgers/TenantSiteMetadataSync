@@ -5,10 +5,8 @@
     param
     (
         [Parameter(Mandatory=$true)]
-        [string]$DatabaseName,
-        
-        [Parameter(Mandatory=$true)]
-        [string]$DatabaseServer,
+        [DatabaseConnectionInformation]
+        $DatabaseConnectionInformation,
 
         [Parameter(Mandatory=$false)]
         [ValidateRange("NonNegative")]
@@ -143,7 +141,7 @@
     {
         foreach( $PSBoundParameter in $PSBoundParameters.GetEnumerator() )
         {
-            if( $PSBoundParameter.Key -eq "DatabaseName" -or $PSBoundParameter.Key -eq "DatabaseServer" )
+            if( $PSBoundParameter.Key -eq "DatabaseConnectionInformation" )
             {
                 continue
             }
@@ -164,7 +162,7 @@
 
                 Write-PSFMessage -Level Debug -Message "Executing: '$query'"
 
-                Invoke-NonQuery -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query $query -Parameters $parameters
+                Invoke-NonQuery -DatabaseConnectionInformation $DatabaseConnectionInformation -Query $query -Parameters $parameters
             }
             catch
             {

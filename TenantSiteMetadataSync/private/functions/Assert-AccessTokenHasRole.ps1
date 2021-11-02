@@ -23,10 +23,12 @@
     param
     (
         [Parameter(Mandatory=$true)]
-        [System.Management.Automation.Cmdlet]$Cmdlet,
+        [System.Management.Automation.Cmdlet]
+        $Cmdlet,
 
         [Parameter(Mandatory=$true)]
-        [string[]]$RequiredRole
+        [string[]]
+        $RequiredRole
     )
 
     begin

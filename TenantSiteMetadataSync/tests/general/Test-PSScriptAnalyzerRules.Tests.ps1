@@ -1,4 +1,4 @@
-﻿Describe "Validating code quality" {
+﻿Describe "Validating code quality" -Tag "General" {
 
     BeforeAll {
 
@@ -42,7 +42,8 @@
             }
 
             It "<FileName> should not violate rule: <RuleName>" -TestCases $testCases {
-                $record = Invoke-ScriptAnalyzer -Path $FilePath -IncludeRule $RuleName -ExcludeRule "PSAvoidUsingConvertToSecureStringWithPlainText", "PSAvoidUsingEmptyCatchBlock", "PSAvoidTrailingWhitespace", "PSUseShouldProcessForStateChangingFunctions", "PSUseOutputTypeCorrectly" 
+
+                $record = Invoke-ScriptAnalyzer -Path $FilePath -IncludeRule $RuleName -ExcludeRule "PSAvoidUsingConvertToSecureStringWithPlainText", "PSAvoidUsingEmptyCatchBlock", "PSAvoidTrailingWhitespace", "PSUseShouldProcessForStateChangingFunctions", "PSUseOutputTypeCorrectly", "PSUseSingularNouns"
 
                 if( $record )
                 {

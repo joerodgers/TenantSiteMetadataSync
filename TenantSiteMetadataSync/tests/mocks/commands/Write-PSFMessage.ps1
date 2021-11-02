@@ -1,0 +1,1 @@
+﻿Mock -CommandName "Write-PSFMessage" -ModuleName "PSFramework"

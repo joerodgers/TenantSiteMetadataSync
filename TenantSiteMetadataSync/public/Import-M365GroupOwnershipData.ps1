@@ -42,10 +42,8 @@
         [string]$Tenant,
 
         [Parameter(Mandatory=$true)]
-        [string]$DatabaseName,
-        
-        [Parameter(Mandatory=$true)]
-        [string]$DatabaseServer
+        [DatabaseConnectionInformation]
+        $DatabaseConnectionInformation
     )
 
     begin
@@ -54,13 +52,13 @@
 
         $counter = 1
 
-        Start-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Start-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -DatabaseConnectionInformation $DatabaseConnectionInformation
     }
     process
     {
-        Write-PSFMessage -Level Verbose -Message "Querying $DatabaseName for GROUP connected sites"
+        Write-PSFMessage -Level Verbose -Message "Querying $DatabaseName for group connected sites"
        
-        if( $groups = @(Get-DataTable -Query "SELECT GroupId FROM GroupConnectedSites" -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -As 'PSObject') )
+        if( $groups = @(Get-DataTable -Query "SELECT GroupId FROM GroupConnectedSites" -DatabaseConnectionInformation $DatabaseConnectionInformation -As 'PSObject') )
         {
             Write-PSFMessage -Level Verbose -Message "Discovered $($groups.Count) groups connected sites"
 
@@ -86,7 +84,7 @@
                     {
                         Write-PSFMessage -Level Verbose -Message "Removing group owners for group $($group.GroupId)"
 
-                        Invoke-NonQuery -Query "EXEC proc_RemoveGroupOwnersByGroupId @GroupId = @GroupId" -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Parameters @{ GroupId = $group.GroupId }
+                        Invoke-NonQuery -Query "EXEC proc_RemoveGroupOwnersByGroupId @GroupId = @GroupId" -DatabaseConnectionInformation $DatabaseConnectionInformation -Parameters @{ GroupId = $group.GroupId }
 
                         $parameters = @{}
                         $parameters.GroupId = $group.GroupId
@@ -97,13 +95,17 @@
                             
                             try
                             {
-                                Invoke-NonQuery -Query "EXEC proc_AddGroupOwnerByGroupId @GroupId = @GroupId, @UserPrincipalName = @UserPrincipalName" -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Parameters $parameters
+                                Invoke-NonQuery -Query "EXEC proc_AddGroupOwnerByGroupId @GroupId = @GroupId, @UserPrincipalName = @UserPrincipalName" -DatabaseConnectionInformation $DatabaseConnectionInformation -Parameters $parameters
                             }
                             catch
                             {
                                 Write-PSFMessage -Level Verbose -Message "Error updating group membership for Group='$($group.GroupId)'" -Exception $_
                             }
                         }
+                    }
+                    else
+                    {
+                        Write-PSFMessage -Level Verbose -Message "Group Owner count is zero, preserving existing owners"
                     }
                 }
                 catch
@@ -116,10 +118,16 @@
 
             Disconnect-MgGraph
         }
+        else 
+        {
+            Write-PSFMessage -Level Verbose -Message "No groups found."
+        }
     }
     end
     {
-        Stop-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -ErrorCount $Error.Count -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Stop-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -ErrorCount $Error.Count -DatabaseConnectionInformation $DatabaseConnectionInformation
     }
 }
 
+$cmd = Get-Command -Name "Import-M365GroupOwnershipData"
+$cmd

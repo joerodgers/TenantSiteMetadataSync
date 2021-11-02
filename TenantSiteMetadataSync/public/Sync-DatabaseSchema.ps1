@@ -7,23 +7,18 @@
     .DESCRIPTION
     Updates the database schema to match the module build. 
 
-    .PARAMETER DatabaseName
-    The SQL Server database name
-
-    .PARAMETER DatabaseServer
-    Name of the SQL Server database server, including the instance name (if applicable).
+    .PARAMETER DatabaseConnectionInformation
+    Database Connection Information
 
     .EXAMPLE
-    PS C:\> Update-DatabaseSchema -DatabaseName <database name> -DatabaseServer <database server> 
+    PS C:\> Update-DatabaseSchema -DatabaseConnectionInformation <database connection information> 
 #>
     [CmdletBinding()]
     param
     (
         [Parameter(Mandatory=$true)]
-        [string]$DatabaseName,
-
-        [Parameter(Mandatory=$true)]
-        [string]$DatabaseServer
+        [DatabaseConnectionInformation]
+        $DatabaseConnectionInformation
     )
 
     begin
@@ -35,12 +30,43 @@
         $upgrades  = Get-ChildItem -Path "$PSScriptRoot\..\private\SQL" -Filter "upgrade*.sql"
     }
     process
-    {   
+    {
+        if( $DatabaseConnectionInformation -is [TrustedConnectionDatabaseConnectionInformation] )
+        {
+            $parameters = @{ 
+                ServerInstance = $DatabaseConnectionInformation.DatabaseServer
+                Database       = $DatabaseConnectionInformation.DatabaseName
+            }
+        }
+        elseif ( $DatabaseConnectionInformation -is [SqlAuthenticationDatabaseConnectionInformation] )
+        {
+            $parameters = @{ 
+                ServerInstance = $DatabaseConnectionInformation.DatabaseServer
+                Database       = $DatabaseConnectionInformation.DatabaseName
+                UserName       = $DatabaseConnectionInformation.SqlCredential.UserId
+                Password       = $DatabaseConnectionInformation.SqlCredential.Password | ConvertFrom-SecureString -AsPlainText
+            }
+        }
+        elseif ( $DatabaseConnectionInformation -is [ServicePrincipalDatabaseConnectionInformation] )
+        {
+            $accessToken = New-AzureSqlAccessToken `
+                                -ClientId     $DatabaseConnectionInformation.ClientId `
+                                -ClientSecret $DatabaseConnectionInformation.ClientSecret `
+                                -TenantId     $DatabaseConnectionInformation.TenantId
+
+            $parameters = @{ 
+                ServerInstance = $DatabaseConnectionInformation.DatabaseServer
+                Database       = $DatabaseConnectionInformation.DatabaseName
+                AccessToken    = $accessToken
+            }
+        }
+
         foreach( $path in $tables )
         {
             Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Executing table file: $($path.Fullname)"
 
-            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseServer -Database $DatabaseName
+            Invoke-Sqlcmd @parameters -InputFile $path.FullName
+
             if( -not $?) { return }
         }
 
@@ -48,7 +74,8 @@
         {
             Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Executing function file: $($path.Fullname)"
 
-            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseServer -Database $DatabaseName
+            Invoke-Sqlcmd @parameters -InputFile $path.FullName
+
             if( -not $?) { return }
         }
 
@@ -56,7 +83,8 @@
         {
             Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Executing proc file: $($path.Fullname)"
 
-            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseServer -Database $DatabaseName
+            Invoke-Sqlcmd @parameters -InputFile $path.FullName
+
             if( -not $?) { return }
         }
 
@@ -64,7 +92,8 @@
         {
             Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Executing view file: $($path.Fullname)"
 
-            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseServer -Database $DatabaseName
+            Invoke-Sqlcmd @parameters -InputFile $path.FullName
+
             if( -not $?) { return }
         }
 
@@ -72,7 +101,8 @@
         {
             Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Executing upgrade file: $($path.Fullname)"
 
-            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseServer -Database $DatabaseName
+            Invoke-Sqlcmd @parameters -InputFile $path.FullName
+
             if( -not $?) { return }
         }
     }

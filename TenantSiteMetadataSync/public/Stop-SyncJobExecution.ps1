@@ -10,14 +10,11 @@
     .PARAMETER Name
     Name of the operation
 
-    .PARAMETER DatabaseName
-    The SQL Server database name
-
-    .PARAMETER DatabaseServer
-    Name of the SQL Server database server, including the instance name (if applicable).
+    .PARAMETER DatabaseConnectionInformation
+    Database Connection Information
 
     .EXAMPLE
-    PS C:\> Stop-SyncJobExecution -Name <job name> -DatabaseName <database name> -DatabaseServer <database server> 
+    PS C:\> Stop-SyncJobExecution -Name <job name> -DatabaseConnectionInformation <database connection information>
 #>
     [CmdletBinding()]
     param
@@ -26,10 +23,8 @@
         [string]$Name,
 
         [Parameter(Mandatory=$true)]
-        [string]$DatabaseName,
-        
-        [Parameter(Mandatory=$true)]
-        [string]$DatabaseServer,
+        [DatabaseConnectionInformation]
+        $DatabaseConnectionInformation,
 
         [Parameter(Mandatory=$false)]
         [int]$ErrorCount = $Error.Count
@@ -37,11 +32,13 @@
     
     begin
     {
-        $query = "EXEC proc_StopSyncJobExecution @Name = @Name, @ErrorCount = @ErrorCount"
     }
     process
     {
-        Invoke-NonQuery -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query $query -Parameters @{ Name = $Name; ErrorCount = $ErrorCount }
+        Invoke-NonQuery `
+            -DatabaseConnectionInformation $DatabaseConnectionInformation `
+            -Query "EXEC proc_StopSyncJobExecution @Name = @Name, @ErrorCount = @ErrorCount" `
+            -Parameters @{ Name = $Name; ErrorCount = $ErrorCount }
     }
     end
     {

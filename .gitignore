@@ -1,3 +1,7 @@
 
 # ignore the TestResults
 TestResults/*
+
+# ignore test logs
+
+Logs/*

@@ -4,7 +4,8 @@
     param
     (
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
-        [string]$Url
+        [string]
+        $Url
     )
     
     begin

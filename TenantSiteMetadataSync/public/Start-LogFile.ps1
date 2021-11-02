@@ -48,7 +48,7 @@
         # https://github.com/PowershellFrameworkCollective/psframework/blob/e92578234204a61f81802959e622cfc9a9540cb5/library/PSFramework/Message/MessageLevel.cs
 
         # headers in desired order
-        $headers = 'Timestamp', 'ComputerName', 'File', 'FunctionName', 'Level', 'Line', 'Message', 'ModuleName', 'Runspace', 'Tags', 'TargetObject', 'Timestamp', 'Type', 'Username'
+        $headers = 'Timestamp', 'ComputerName', 'Username', 'File', 'FunctionName', 'Level', 'Line', 'Message', 'ModuleName'
 
         # file timestamp
         $timestamp = Get-Date -Format FileDateTime

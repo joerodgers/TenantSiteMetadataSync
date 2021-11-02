@@ -1,4 +1,4 @@
-﻿Describe "verifying module integrity" {
+﻿Describe "verifying module integrity" -Tag "General" {
 
     BeforeAll {
 

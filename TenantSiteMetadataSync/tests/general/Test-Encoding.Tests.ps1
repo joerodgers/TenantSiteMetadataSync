@@ -1,4 +1,4 @@
-﻿Describe "Validating file encoding" {
+﻿Describe "Validating file encoding" -Tag "General" {
 
     BeforeAll {
         . $PSScriptRoot\Get-FileEncoding.ps1

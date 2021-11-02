@@ -14,37 +14,35 @@
     [CmdletBinding()]
     param
     (
-        # Name of the SQL database
+        # Database Connection Information
         [Parameter(Mandatory=$true)]
-        [string]$DatabaseName,
-
-        # Name of the SQL server or SQL and instance name
-        [Parameter(Mandatory=$true)]
-        [string]$DatabaseServer,
+        [DatabaseConnectionInformation]
+        $DatabaseConnectionInformation,
 
         # TSQL statement
         [Parameter(Mandatory=$true)]
-        [string]$Query,
+        [string]
+        $Query,
 
         # Hashtable of parameters to the SQL query.  Do not include the '@' character in the key name.
         [Parameter(Mandatory=$false)]
-        [HashTable]$Parameters = @{},
+        [HashTable]
+        $Parameters = @{},
 
         # SQL command timeout. Default is 30 seconds
         [Parameter(Mandatory=$false)]
-        [int]$CommandTimeout = 30
+        [int]
+        $CommandTimeout = 30
     )
 
     begin
     {
-        $connectionString = New-SqlConnectionString -DatabaseServer $DatabaseServer -DatabaseName $DatabaseName    
     }
     process
     {
         try
         {
-            $connection = New-Object System.Data.SqlClient.SqlConnection($connectionString)
-            $connection.Open()
+            $connection = New-SqlServerDatabaseConnection -DatabaseConnectionInformation $DatabaseConnectionInformation
 
             $command = New-Object system.Data.SqlClient.SqlCommand($Query, $connection)     
             $command.CommandTimeout = $CommandTimeout

@@ -1,9 +1,9 @@
 #requires -Modules @{ ModuleName="PnP.PowerShell";         ModuleVersion="1.7.0"   }
-#requires -Modules @{ ModuleName="Posh-SSH";               ModuleVersion="2.3.0"   }
 #requires -Modules @{ ModuleName="TenantSiteMetadataSync"; ModuleVersion="1.0.0"   }
 #requires -Modules @{ ModuleName="Microsoft.Graph.Groups"; ModuleVersion="1.0.1"   }
 #requires -Modules @{ ModuleName="PSFramework";            ModuleVersion="1.6.205" }
 
+[CmdletBinding(DefaultParameterSetName='TrustedConnection')]
 param
 (
     [Parameter(Mandatory=$false)]
@@ -37,8 +37,64 @@ param
     [string]$Tenant,
 
     [Parameter(Mandatory=$false)]
-    [string]$TranscriptDirectoryPath = (Join-Path -Path $PSScriptRoot -ChildPath "Logs")
+    [string]$TranscriptDirectoryPath = (Join-Path -Path $PSScriptRoot -ChildPath "Logs"),
+
+    [Parameter(Mandatory=$false,ParameterSetName='SqlAuthentication')]
+    [string]$DatabaseUserName,
+
+    [Parameter(Mandatory=$false,ParameterSetName='SqlAuthentication')]
+    [SecureString]$DatabaseUserPassword,
+
+    [Parameter(Mandatory=$false,ParameterSetName='AzureServicePrincipal')]
+    [Guid]$AzureSqlServicePrincipalClientId,
+
+    [Parameter(Mandatory=$false,ParameterSetName='AzureServicePrincipal')]
+    [SecureString]$AzureSqlServicePrincipalClientSecret,
+
+    [Parameter(Mandatory=$false,ParameterSetName='AzureServicePrincipal')]
+    [Guid]$TenantId
 )
+
+if( $PSVersionTable.PSVersion.Major -ge 7 )
+{
+    # set powershell 7+ proxy
+    [System.Net.Http.HttpClient]::DefaultProxy.Credentials = [System.Net.CredentialCache]::DefaultCredentials
+}
+else
+{
+    # set powershell 5 proxy
+    [System.Net.WebRequest]::DefaultWebProxy.Credentials = [System.Net.CredentialCache]::DefaultCredentials 
+}
+
+$parameters = @{}
+$parameters.DatabaseName   = $DatabaseName
+$parameters.DatabaseServer = $DatabaseServer
+
+switch -Exact ( $PScmdlet.ParameterSetName )
+{
+    "TrustedConnection"
+    {
+        # no action required
+        break
+    }
+    "SqlAuthentication"
+    {
+        $parameters.UserName = $DatabaseUserName
+        $parameters.Password = $DatabaseUserPassword
+        $parameters.Encrypt  = $true
+        break
+    }
+    "AzureServicePrincipal"
+    {
+        $parameters.ClientId     = $AzureSqlServicePrincipalClientId
+        $parameters.ClientSecret = $AzureSqlServicePrincipalClientSecret
+        $parameters.TenantId     = $TenantId
+        $parameters.Encrypt      = $true
+        break
+    }
+}
+
+$databaseConnectionInformation = New-TSMSSqlServerDatabaseConnectionInformation @parameters
 
 # disable default 'filesystem' logging provider
 Set-PSFLoggingProvider -Name 'filesystem' -Enabled $false
@@ -52,7 +108,7 @@ if( $ImportUsageAccountData.IsPresent )
 
     Start-TSMSLogFile -Path $TranscriptDirectoryPath -Name "ImportUsageAccountData" -MessageLevel ([PSFramework.Message.MessageLevel]::Verbose)
 
-    Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+    Start-TSMSSyncJobExecution -Name $operation -DatabaseConnectionInformation $databaseConnectionInformation
 
     Write-Host "$(Get-Date) - Starting Operation: ImportUsageAccountData"
 
@@ -64,8 +120,7 @@ if( $ImportUsageAccountData.IsPresent )
         -ClientId       $ClientId `
         -Thumbprint     $Thumbprint `
         -Tenant         $Tenant `
-        -DatabaseName   $DatabaseName `
-        -DatabaseServer $DatabaseServer
+        -DatabaseConnectionInformation $databaseConnectionInformation
 
     # import usage data for SharePoint sites from Graph API reports
     Import-TSMSMicrosoftGraphUsageAccountReportData `
@@ -75,8 +130,7 @@ if( $ImportUsageAccountData.IsPresent )
         -ClientId       $ClientId `
         -Thumbprint     $Thumbprint `
         -Tenant         $Tenant `
-        -DatabaseName   $DatabaseName `
-        -DatabaseServer $DatabaseServer
+        -DatabaseConnectionInformation $databaseConnectionInformation
 
     # import usage data for M365 groups from Graph API reports
     Import-TSMSMicrosoftGraphUsageAccountReportData `
@@ -86,12 +140,11 @@ if( $ImportUsageAccountData.IsPresent )
         -ClientId       $ClientId `
         -Thumbprint     $Thumbprint `
         -Tenant         $Tenant `
-        -DatabaseName   $DatabaseName `
-        -DatabaseServer $DatabaseServer
+        -DatabaseConnectionInformation $databaseConnectionInformation
 
     Write-Host "$(Get-Date) - Completed Operation: ImportUsageAccountData"
 
-    Stop-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+    Stop-TSMSSyncJobExecution -Name $operation -DatabaseConnectionInformation $databaseConnectionInformation
 
     Stop-TSMSLogFile
 }
@@ -108,7 +161,7 @@ if( $ImportSharePointTenantListData.IsPresent )
     
         Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantListData" -MessageLevel ([PSFramework.Message.MessageLevel]::Verbose)
     
-        Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Start-TSMSSyncJobExecution -Name $operation -DatabaseConnectionInformation $databaseConnectionInformation
     
         Write-Host "$(Get-Date) - Starting $operation"
     
@@ -117,40 +170,36 @@ if( $ImportSharePointTenantListData.IsPresent )
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
-            -DatabaseName   $DatabaseName `
-            -DatabaseServer $DatabaseServer
-    
+            -DatabaseConnectionInformation $databaseConnectionInformation
+
         # import the guid/name mappings for site creation sources
         Import-TSMSSiteCreationSources `
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
-            -DatabaseName   $DatabaseName `
-            -DatabaseServer $DatabaseServer
-    
+            -DatabaseConnectionInformation $databaseConnectionInformation
+
         # full sync from tenant admin lists
         Import-TSMSSiteMetadataFromTenantAdminList `
             -AdminList      "AllSitesAggregatedSiteCollections" `
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
-            -DatabaseName   $DatabaseName `
-            -DatabaseServer $DatabaseServer
-        
+            -DatabaseConnectionInformation $databaseConnectionInformation
+
         Import-TSMSSiteMetadataFromTenantAdminList `
             -AdminList      "AggregatedSiteCollections" `
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
-            -DatabaseName   $DatabaseName `
-            -DatabaseServer $DatabaseServer
-    
+            -DatabaseConnectionInformation $databaseConnectionInformation
+
         Write-Host "$(Get-Date) - Completed $operation"
     
     }
     finally
     {
-        Stop-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Stop-TSMSSyncJobExecution -Name $operation -DatabaseConnectionInformation $databaseConnectionInformation
 
         Stop-TSMSLogFile
     }
@@ -168,7 +217,7 @@ if( $ImportSharePointTenantAPIData.IsPresent )
     
         Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantAPIData" -MessageLevel ([PSFramework.Message.MessageLevel]::Verbose)
     
-        Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Start-TSMSSyncJobExecution -Name $operation -DatabaseConnectionInformation $databaseConnectionInformation
     
         Write-Host "$(Get-Date) - Starting $operation"
     
@@ -177,31 +226,28 @@ if( $ImportSharePointTenantAPIData.IsPresent )
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
-            -DatabaseName   $DatabaseName `
-            -DatabaseServer $DatabaseServer
-    
+            -DatabaseConnectionInformation $databaseConnectionInformation
+
         # import additional data about deleted sites from SharePoint tenant
         Import-TSMSDeletedSiteMetadataFromTenantAPI `
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
-            -DatabaseName   $DatabaseName `
-            -DatabaseServer $DatabaseServer
-    
+            -DatabaseConnectionInformation $databaseConnectionInformation
+
         # import additional data about active sites from SharePoint tenant
         Import-TSMSSiteMetadataFromTenantAPI `
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
-            -DatabaseName   $DatabaseName `
-            -DatabaseServer $DatabaseServer
-    
+            -DatabaseConnectionInformation $databaseConnectionInformation
+
         Write-Host "$(Get-Date) - Completed $operation"
             
     }
     finally
     {
-        Stop-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Stop-TSMSSyncJobExecution -Name $operation -DatabaseConnectionInformation $databaseConnectionInformation
 
         Stop-TSMSLogFile
     }
@@ -219,7 +265,7 @@ if( $ImportDetailedSharePointTenantAPIData.IsPresent )
     
         Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantAPIData" -MessageLevel ([PSFramework.Message.MessageLevel]::Verbose)
     
-        Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Start-TSMSSyncJobExecution -Name $operation -DatabaseConnectionInformation $databaseConnectionInformation
     
         Write-Host "$(Get-Date) - Starting $operation"
     
@@ -229,14 +275,13 @@ if( $ImportDetailedSharePointTenantAPIData.IsPresent )
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
-            -DatabaseName   $DatabaseName `
-            -DatabaseServer $DatabaseServer
-    
+            -DatabaseConnectionInformation $databaseConnectionInformation
+
         Write-Host "$(Get-Date) - Completed $operation"
     }
     finally
     {
-        Stop-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Stop-TSMSSyncJobExecution -Name $operation -DatabaseConnectionInformation $databaseConnectionInformation
 
         Stop-TSMSLogFile
     }
@@ -254,7 +299,7 @@ if( $ImportM365GroupOwnershipData.IsPresent )
     
         Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportM365GroupOwnershipData" -MessageLevel ([PSFramework.Message.MessageLevel]::Verbose)
     
-        Start-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Start-TSMSSyncJobExecution -Name $operation -DatabaseConnectionInformation $databaseConnectionInformation
     
         Write-Host "$(Get-Date) - Starting $operation"
     
@@ -263,14 +308,13 @@ if( $ImportM365GroupOwnershipData.IsPresent )
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
-            -DatabaseName   $DatabaseName `
-            -DatabaseServer $DatabaseServer
-    
+            -DatabaseConnectionInformation $databaseConnectionInformation
+
         Write-Host "$(Get-Date) - Completed $operation"
     }
     finally
     {
-        Stop-TSMSSyncJobExecution -Name $operation -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Stop-TSMSSyncJobExecution -Name $operation -DatabaseConnectionInformation $databaseConnectionInformation
 
         Stop-TSMSLogFile
     }

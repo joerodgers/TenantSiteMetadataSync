@@ -4,7 +4,8 @@
     param
     (
         [Parameter(Mandatory=$true)]
-        [string]$Tenant
+        [string]
+        $Tenant
     )
     
     begin

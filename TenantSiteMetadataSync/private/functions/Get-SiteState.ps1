@@ -1,15 +1,21 @@
 ﻿function Get-SiteState
 {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName="None")]
     param
     (
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false,ParameterSetName="StateId")]
         [ValidateRange(-1,11)]
-        [int]$StateId
+        [int]
+        $StateId,
+
+        [Parameter(Mandatory=$false,ParameterSetName="StateName")]
+        [string]
+        $StateName
     )
     
     begin
     {
+        # keep in sync with New-MockTenantSiteData.ps1
         $states = @(
             [PSCustomObject] @{ Id = -1; State = "Unknown"   }
             [PSCustomObject] @{ Id =  0; State = "Creating"  }
@@ -28,9 +34,13 @@
     }
     process
     {
-        if( $PSBoundParameters.ContainsKey( "StateId" ) )
+        if( $PSCmdlet.ParameterSetName -eq "StateId" )
         {
             return $states | Where-Object -Property Id -eq $StateId
+        }
+        elseif( $PSCmdlet.ParameterSetName -eq "StateName" )
+        {
+            return $states | Where-Object -Property State -eq $StateName
         }
 
         return ,$states
@@ -40,3 +50,7 @@
     }
 }
 
+
+Get-SiteState -StateId 1
+
+Get-SiteState -StateName "Active"

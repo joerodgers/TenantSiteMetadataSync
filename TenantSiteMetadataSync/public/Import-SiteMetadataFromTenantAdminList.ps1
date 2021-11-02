@@ -25,14 +25,11 @@
     .PARAMETER Tenant
     Name of the O365 Tenant
 
-    .PARAMETER DatabaseName
-    The SQL Server database name
-
-    .PARAMETER DatabaseServer
-    Name of the SQL Server database server, including the instance name (if applicable).
+    .PARAMETER DatabaseConnectionInformation
+    Database Connection Information
 
     .EXAMPLE
-    PS C:\> Import-SiteMetadataFromTenantAdminList -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+    PS C:\> Import-SiteMetadataFromTenantAdminList -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseConnectionInformation <database connection information>
 #>
     [CmdletBinding()]
     param
@@ -51,17 +48,15 @@
         [string]$Tenant,
 
         [Parameter(Mandatory=$true)]
-        [string]$DatabaseName,
-        
-        [Parameter(Mandatory=$true)]
-        [string]$DatabaseServer
+        [DatabaseConnectionInformation]
+        $DatabaseConnectionInformation
     )
 
     begin
     {
         $Error.Clear()
 
-        Start-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Start-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -DatabaseConnectionInformation $DatabaseConnectionInformation
 
         $counter = 1
 
@@ -97,8 +92,7 @@
                     Write-PSFMessage -Level Debug -Message "($counter/$($items.Count)) Item Id='$($item.Id)'"
 
                     $parameters = @{}
-                    $parameters.DatabaseName         = $DatabaseName
-                    $parameters.DatabaseServer       = $DatabaseServer
+                    $parameters.DatabaseConnectionInformation = $DatabaseConnectionInformation
                     $parameters.FileViewedOrEdited   = $item.FieldValues["FileViewedOrEdited"]
                     $parameters.Initiator            = $item.FieldValues["Initiator"]
                     $parameters.IsGroupConnected     = $item.FieldValues["IsGroupConnected"]
@@ -113,7 +107,7 @@
                     $parameters.StorageUsed          = $item.FieldValues["StorageUsed"]
                     $parameters.TimeDeleted          = $item.FieldValues["TimeDeleted"]
                     $parameters.IsTeamsConnected     = $item.FieldValues["SiteFlags"] -eq 1
-                    $parameters.State                = -1 # "unknown"
+                    # $parameters.State                = -1 # "unknown"
 
                     if( -not [string]::IsNullOrWhiteSpace($item.FieldValues["State"]) )
                     {
@@ -147,19 +141,18 @@
                     Write-PSFMessage -Level Debug -Message "($counter/$($items.Count)) Item Id='$($item.Id)'"
 
                     $parameters = @{}
-                    $parameters.DatabaseName            = $DatabaseName
-                    $parameters.DatabaseServer          = $DatabaseServer
-                    $parameters.ConditionalAccessPolicy = $item.FieldValues["ConditionalAccessPolicy"]
-                    $parameters.CreatedBy               = $item.FieldValues["CreatedBy"]
-                    $parameters.DeletedBy               = $item.FieldValues["DeletedBy"]
-                    $parameters.SiteOwnerEmail          = $item.FieldValues["SiteOwnerEmail"]
-                    $parameters.SiteOwnerName           = $item.FieldValues["SiteOwnerName"]
-                    $parameters.StorageQuota            = $item.FieldValues["StorageQuota"]
-                    $parameters.SiteId                  = $item.FieldValues["SiteId"]
-                    $parameters.SiteUrl                 = $item.FieldValues["SiteUrl"]
-                    $parameters.TemplateName            = $item.FieldValues["TemplateName"]
-                    $parameters.TimeCreated             = $item.FieldValues["TimeCreated"]
-                    $parameters.Title                   = $item.FieldValues["Title"]
+                    $parameters.DatabaseConnectionInformation = $DatabaseConnectionInformation
+                    $parameters.ConditionalAccessPolicy       = $item.FieldValues["ConditionalAccessPolicy"]
+                    $parameters.CreatedBy                     = $item.FieldValues["CreatedBy"]
+                    $parameters.DeletedBy                     = $item.FieldValues["DeletedBy"]
+                    $parameters.SiteOwnerEmail                = $item.FieldValues["SiteOwnerEmail"]
+                    $parameters.SiteOwnerName                 = $item.FieldValues["SiteOwnerName"]
+                    $parameters.StorageQuota                  = $item.FieldValues["StorageQuota"]
+                    $parameters.SiteId                        = $item.FieldValues["SiteId"]
+                    $parameters.SiteUrl                       = $item.FieldValues["SiteUrl"]
+                    $parameters.TemplateName                  = $item.FieldValues["TemplateName"]
+                    $parameters.TimeCreated                   = $item.FieldValues["TimeCreated"]
+                    $parameters.Title                         = $item.FieldValues["Title"]
 
                     Update-SiteMetadata @parameters
 
@@ -170,7 +163,7 @@
     }
     end
     {
-        Stop-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -ErrorCount $Error.Count -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Stop-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -ErrorCount $Error.Count -DatabaseConnectionInformation $DatabaseConnectionInformation
     }
 }
 

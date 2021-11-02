@@ -1,4 +1,4 @@
-﻿Describe 'Validating File Syntax' {
+﻿Describe 'Validating File Syntax' -Tag "General" {
 
     BeforeAll {
 

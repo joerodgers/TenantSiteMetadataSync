@@ -3,7 +3,7 @@
     RootModule = 'TenantSiteMetadataSync.psm1'
 
     # Version number of this module.
-    ModuleVersion = '1.0.0.0'
+    ModuleVersion = '1.1.0.0'
 
     # ID used to uniquely identify this module
     GUID = '8c45bd42-02af-4f18-a8d8-0d5e891790df'
@@ -14,6 +14,9 @@
     # Minimum version of the Windows PowerShell engine required by this module
     PowerShellVersion = '5.1'
 
+    # import classes
+    ScriptsToProcess = ".\classes\DatabaseConnectionInformation.ps1"
+
     # Modules that must be imported into the global environment prior to importing this module
     RequiredModules = @{ModuleName="SqlServer";                             ModuleVersion ="21.1.18256" },
                       @{ModuleName="Microsoft.Graph.Groups";                ModuleVersion ="1.0.1"      },
@@ -21,8 +24,8 @@
                       @{ModuleName="PSFramework";                           ModuleVersion ="1.6.205"    }
                       
     # Functions to export from this module
-    FunctionsToExport = 'Import-DeletedSiteMetadataFromTenantAPI',
-                        'Import-M365GroupOwnershipData',
+    FunctionsToExport = 'Import-M365GroupOwnershipData',
+                        'Import-DeletedSiteMetadataFromTenantAPI',
                         'Import-MicrosoftGraphUsageAccountReportData',
                         'Import-SensitivityLabel',
                         'Import-SiteCreationSource',
@@ -34,7 +37,9 @@
                         'Stop-LogFile',
                         'Stop-SyncJobExecution',
                         'Sync-DatabaseSchema',
-                        'Sync-DeletionStatus'
+                        'Sync-DeletionStatus',
+                        'New-SqlServerDatabaseConnectionInformation'
 
     DefaultCommandPrefix = 'TSMS'
+    #DefaultCommandPrefix = ''
 }

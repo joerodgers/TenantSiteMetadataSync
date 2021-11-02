@@ -1,4 +1,4 @@
-﻿Describe "Validating not references to restricted commands" {
+﻿Describe "Validating not references to restricted commands" -Tag "General" {
 
     BeforeAll {
 

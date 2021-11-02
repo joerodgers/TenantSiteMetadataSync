@@ -18,7 +18,8 @@
     param
     (
         [Parameter(Mandatory=$true)]
-        [string]$DatabaseServer
+        [DatabaseConnectionInformation]
+        $DatabaseConnectionInformation
     )
 
     begin
@@ -27,11 +28,42 @@
     }
     process
     {
+        if( $DatabaseConnectionInformation -is [TrustedConnectionDatabaseConnectionInformation] )
+        {
+            $parameters = @{ 
+                ServerInstance = $DatabaseConnectionInformation.DatabaseServer
+                Database       = $DatabaseConnectionInformation.DatabaseName
+            }
+        }
+        elseif ( $DatabaseConnectionInformation -is [SqlAuthenticationDatabaseConnectionInformation] )
+        {
+            $parameters = @{ 
+                ServerInstance = $DatabaseConnectionInformation.DatabaseServer
+                Database       = $DatabaseConnectionInformation.DatabaseName
+                UserName       = $DatabaseConnectionInformation.SqlCredential.UserId
+                Password       = $DatabaseConnectionInformation.SqlCredential.Password | ConvertFrom-SecureString -AsPlainText
+            }
+        }
+        elseif ( $DatabaseConnectionInformation -is [ServicePrincipalDatabaseConnectionInformation] )
+        {
+            $accessToken = New-AzureSqlAccessToken `
+                                -ClientId     $DatabaseConnectionInformation.ClientId `
+                                -ClientSecret $DatabaseConnectionInformation.ClientSecret `
+                                -TenantId     $DatabaseConnectionInformation.TenantId
+
+            $parameters = @{ 
+                ServerInstance = $DatabaseConnectionInformation.DatabaseServer
+                Database       = $DatabaseConnectionInformation.DatabaseName
+                AccessToken    = $accessToken
+            }
+        }
+
         foreach( $path in $databases )
         {
             Write-Verbose "$(Get-Date) - $($PSCmdlet.MyInvocation.MyCommand) - Executing File: $($path.Fullname)"
 
-            Invoke-Sqlcmd -InputFile $path.FullName -ServerInstance $DatabaseServer
+            Invoke-Sqlcmd @parameters -InputFile $path.FullName
+
             if( -not $?) { return }
         }
     }

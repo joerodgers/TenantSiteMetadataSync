@@ -20,11 +20,8 @@
     .PARAMETER Tenant
     Name of the O365 Tenant
 
-    .PARAMETER DatabaseName
-    The SQL Server database name
-
-    .PARAMETER DatabaseServer
-    Name of the SQL Server database server, including the instance name (if applicable).
+    .PARAMETER DatabaseConnectionInformation
+    Database Connection Information
 
     .PARAMETER Template
     Optional template name to filter API results.  Valid values are 'APPCATALOG#0', 'BICenterSite#0', 'EDISC#0', 'EHS#1', 'PWA#0', 'SPSMSITEHOST#0', 'SRCHCEN#0', 'BLANKINTERNET#0', 'STS#-1', 'TEAMCHANNEL#0', 'RedirectSite#0', 'SITEPAGEPUBLISHING#0', 'STS#3', 'GROUP#0', 'STS#0'
@@ -45,16 +42,16 @@
     Switch to include OneDrive for Business sites in the import process.
 
     .EXAMPLE
-    PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+    PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseConnectionInformation <database connection information>
 
     .EXAMPLE
-    PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server> -Template 'TEAMCHANNEL#0'
+    PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseConnectionInformation <database connection information> -Template 'TEAMCHANNEL#0'
 
     .EXAMPLE
-    PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server> -DetailedImport
+    PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseConnectionInformation <database connection information> -DetailedImport
 
     .EXAMPLE
-    PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server> -Template 'TEAMCHANNEL#0' -DetailedImport
+    PS C:\> Import-SiteMetadataFromTenantAPI -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseConnectionInformation <database connection information> -Template 'TEAMCHANNEL#0' -DetailedImport
 #>
     [CmdletBinding()]
     param
@@ -69,10 +66,8 @@
         [string]$Tenant,
 
         [Parameter(Mandatory=$true)]
-        [string]$DatabaseName,
-        
-        [Parameter(Mandatory=$true)]
-        [string]$DatabaseServer,
+        [DatabaseConnectionInformation]
+        $DatabaseConnectionInformation,
 
         [Parameter(Mandatory=$false)]
         [ValidateSet( 'APPCATALOG#0', 'BICenterSite#0', 'EDISC#0', 'EHS#1', 'PWA#0', 'SPSMSITEHOST#0', 'SRCHCEN#0', 'BLANKINTERNET#0', 'STS#-1', 'TEAMCHANNEL#0', 'RedirectSite#0', 'SITEPAGEPUBLISHING#0', 'STS#3', 'GROUP#0', 'STS#0' )]
@@ -89,7 +84,7 @@
     {
         $Error.Clear()
 
-        Start-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Start-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -DatabaseConnectionInformation $DatabaseConnectionInformation
     }
     process
     {
@@ -125,8 +120,7 @@
                 Write-PSFMessage -Level Debug -Message "Processsing $($tenantSite.Url)"
 
                 $parameters = @{}
-                $parameters.DatabaseName   = $DatabaseName
-                $parameters.DatabaseServer = $DatabaseServer
+                $parameters.DatabaseConnectionInformation   = $DatabaseConnectionInformation
 
                 # these properties are returned by default
                 $parameters.DenyAddAndCustomizePages = $tenantSite.DenyAddAndCustomizePages.ToString()
@@ -136,7 +130,7 @@
                 $parameters.LockState                = $tenantSite.LockState.ToString()
                 $parameters.PWAEnabled               = ($null -ne $tenantSite.PWAEnabled -and $tenantSite.PWAEnabled.ToString() -eq "Enabled") 
                 $parameters.SiteUrl                  = $tenantSite.Url
-                $parameters.State                    = Get-SiteState | Where-Object -Property State -eq $tenantSite.Status | Select-Object -ExpandProperty Id
+                $parameters.State                    = (Get-SiteState -StateName $tenantSite.Status).Id
                 $parameters.StorageQuota             = $tenantsite.StorageQuota * 1MB         # CONVERT FROM MB to BYTES
                 $parameters.StorageUsed              = $tenantsite.StorageUsageCurrent * 1MB  # CONVERT FROM MB to BYTES
                 $parameters.TemplateName             = $tenantsite.Template
@@ -151,7 +145,7 @@
                 # process details is specified
                 if( $DetailedImport.IsPresent )
                 {
-                    if( $tenantSite.LockState.ToString() -eq "NoAccess")
+                    if( $tenantSite.LockState.ToString() -eq "NoAccess" )
                     {
                         Write-PSFMessage -Level Warning -Message "Skipping detailed request for site $($tenantSite.Url). Site lock status is '$($tenantSite.LockState.ToString())'"
                     }
@@ -168,8 +162,8 @@
                         # set the context to the new site
                         Set-PnPContext -Context $siteContext
     
-                        $site = Get-PnPSite -Includes Id, RelatedGroupId
-                        $web  = Get-PnPWeb  -Includes Created
+                        $site = Get-PnPSite -Includes Id, RelatedGroupId -Connection $connection
+                        $web  = Get-PnPWeb  -Includes Created -Connection $connection
                     
                         <# The following properties are returned by a direct request for an individual site
     
@@ -208,7 +202,6 @@
                         {
                             $parameters.RelatedGroupId = $site.RelatedGroupId
                         }
-    
                     }
                 }
 
@@ -235,6 +228,6 @@
     }
     end
     {
-        Stop-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -ErrorCount $Error.Count -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Stop-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -ErrorCount $Error.Count -DatabaseConnectionInformation $DatabaseConnectionInformation
     }
 }

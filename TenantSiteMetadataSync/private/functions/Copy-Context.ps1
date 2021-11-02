@@ -4,10 +4,12 @@
     param
     (
         [Parameter(Mandatory=$true)]
-        [object]$Context,
+        [object]
+        $Context,
 
         [Parameter(Mandatory=$true)]
-        [string]$Url
+        [string]
+        $Url
     )
     
     begin

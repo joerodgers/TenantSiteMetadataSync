@@ -16,14 +16,11 @@
     .PARAMETER Tenant
     Name of the O365 Tenant
 
-    .PARAMETER DatabaseName
-    The SQL Server database name
-
-    .PARAMETER DatabaseServer
-    Name of the SQL Server database server, including the instance name (if applicable).
+    .PARAMETER DatabaseConnectionInformation
+    Database Connection Information
 
     .EXAMPLE
-    PS C:\> Sync-DeletionStatus -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseName <database name> -DatabaseServer <database server>
+    PS C:\> Sync-DeletionStatus -ClientId <clientId> -Thumbprint <thumbprint> -Tenant <tenant> -DatabaseConnectionInformation <database connection information>
 #>
     [CmdletBinding()]
     param
@@ -38,18 +35,17 @@
         [string]$Tenant,
 
         [Parameter(Mandatory=$true)]
-        [string]$DatabaseName,
-        
-        [Parameter(Mandatory=$true)]
-        [string]$DatabaseServer
+        [DatabaseConnectionInformation]
+        $DatabaseConnectionInformation
     )
 
-    begin    {
+    begin    
+    {
         $tenantSites = $activeSites = $deletedSites = $null
 
         $Error.Clear()
 
-        Start-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Start-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -DatabaseConnectionInformation $DatabaseConnectionInformation 
     }
     process
     {
@@ -79,10 +75,9 @@
                 if( $tenantSites -notcontains $activeSite.SiteUrl )
                 {
                     Write-PSFMessage -Level Verbose -Message "Marking $($activeSite.SiteUrl) as deleted"
-                    Update-SiteMetadata -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -SiteId $activeSite.SiteId -SiteUrl $activeSite.SiteUrl -TimeDeleted ([System.Data.SqlTypes.SqlDateTime]::MinValue)
+                    Update-SiteMetadata  -DatabaseConnectionInformation $DatabaseConnectionInformation -SiteId $activeSite.SiteId -SiteUrl $activeSite.SiteUrl -TimeDeleted ([System.Data.SqlTypes.SqlDateTime]::MinValue)
                 }
             }
-
 
             # mark sites as not deleted if they are present in tenant list
             foreach( $deletedSite in $deletedSites )
@@ -90,13 +85,13 @@
                 if( $tenantSites -contains $deletedSite.SiteUrl )
                 {
                     Write-PSFMessage -Level Verbose -Message "Marking $($activeSite.SiteUrl) as not deleted"
-                    Invoke-NonQuery -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query "UPDATE SiteMetadata SET TimeDeleted = NULL WHERE @SiteId = @SiteId" -Parameters @{ SiteId = $deletedSite.SiteId }
+                    Invoke-NonQuery -DatabaseConnectionInformation $DatabaseConnectionInformation -Query "UPDATE SiteMetadata SET TimeDeleted = NULL WHERE @SiteId = @SiteId" -Parameters @{ SiteId = $deletedSite.SiteId }
                 }
             }
         }
     }
     end
     {
-        Stop-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -ErrorCount $Error.Count -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer
+        Stop-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -ErrorCount $Error.Count -DatabaseConnectionInformation $DatabaseConnectionInformation 
     }
 }
