@@ -211,7 +211,7 @@
                 }
                 catch
                 {
-                    Write-PSFMessage -Level Error -Message "Failed to update site metatadata for $($tenantSite.Url)" -Exception $_.Exception
+                    Stop-PSFFunction -Message "Failed to update site metatadata for $($tenantSite.Url)" -ErrorRecord $_
                 }
 
 

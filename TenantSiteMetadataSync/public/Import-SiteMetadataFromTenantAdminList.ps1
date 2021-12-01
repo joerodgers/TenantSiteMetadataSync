@@ -89,7 +89,7 @@
             {
                 foreach( $item in $items )
                 {
-                    Write-PSFMessage -Level Debug -Message "($counter/$($items.Count)) Item Id='$($item.Id)'"
+                    Write-PSFMessage -Level Debug -Message "($counter/$($items.Count)) Item Id='$($item.Id)'. List = 'AllSitesAggregatedSiteCollections'"
 
                     $parameters = @{}
                     $parameters.DatabaseConnectionInformation = $DatabaseConnectionInformation
@@ -138,13 +138,12 @@
             {
                 foreach( $item in $items )
                 {
-                    Write-PSFMessage -Level Debug -Message "($counter/$($items.Count)) Item Id='$($item.Id)'"
+                    Write-PSFMessage -Level Debug -Message "($counter/$($items.Count)) Item Id='$($item.Id)'. List = 'AllSitesAggregatedSiteCollections'"
 
                     $parameters = @{}
                     $parameters.DatabaseConnectionInformation = $DatabaseConnectionInformation
                     $parameters.ConditionalAccessPolicy       = $item.FieldValues["ConditionalAccessPolicy"]
-                    $parameters.CreatedBy                     = $item.FieldValues["CreatedBy"]
-                    $parameters.DeletedBy                     = $item.FieldValues["DeletedBy"]
+                    $parameters.CreatedBy                     = $item.FieldValues["CreatedBy"]                    
                     $parameters.SiteOwnerEmail                = $item.FieldValues["SiteOwnerEmail"]
                     $parameters.SiteOwnerName                 = $item.FieldValues["SiteOwnerName"]
                     $parameters.StorageQuota                  = $item.FieldValues["StorageQuota"]
@@ -153,6 +152,11 @@
                     $parameters.TemplateName                  = $item.FieldValues["TemplateName"]
                     $parameters.TimeCreated                   = $item.FieldValues["TimeCreated"]
                     $parameters.Title                         = $item.FieldValues["Title"]
+
+                    if( $item.FieldValues["DeletedBy"] )
+                    {
+                        $parameters.DeletedBy = $item.FieldValues["DeletedBy"]
+                    }
 
                     Update-SiteMetadata @parameters
 

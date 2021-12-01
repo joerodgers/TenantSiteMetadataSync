@@ -12,7 +12,7 @@
     Description = 'Module to sync tenant site metadata to a local SQL server database'
 
     # Minimum version of the Windows PowerShell engine required by this module
-    PowerShellVersion = '5.1'
+    PowerShellVersion = '7.1'
 
     # import classes
     ScriptsToProcess = ".\classes\DatabaseConnectionInformation.ps1"

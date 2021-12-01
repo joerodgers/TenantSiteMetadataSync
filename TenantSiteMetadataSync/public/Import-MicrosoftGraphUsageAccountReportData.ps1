@@ -127,7 +127,7 @@
 
                             if( $ReportType -eq 'M365Group' ) 
                             {
-                                Write-PSFMessage -Level Debug -Message "Processing row: $counter/$($rows.Count). GroupId='$($row.'Group Id')'"
+                                Write-PSFMessage -Level Verbose -Message "Processing row: $counter/$($rows.Count). GroupId='$($row.'Group Id')'"
 
                                 <#  Columns in v1.0 and beta report:
 
@@ -178,7 +178,7 @@
                             }
                             else
                             {
-                                Write-PSFMessage -Level Debug -Message "Processing row: $counter/$($rows.Count). SiteUrl='$($row.'Site URL')'"
+                                Write-PSFMessage -Level Verbose -Message "Processing row: $counter/$($rows.Count). SiteUrl='$($row.'Site URL')'"
 
                                 # these fields are present in reports and report versions
                                 $parameters.SiteUrl        = $row.'Site URL'

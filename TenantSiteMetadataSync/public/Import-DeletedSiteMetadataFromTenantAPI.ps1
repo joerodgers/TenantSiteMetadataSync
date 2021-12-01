@@ -49,7 +49,7 @@
     }
     process
     {
-        Write-PSFMessage -Level Verbose -Message "Connecting to SharePoint Online Tenant"
+        Write-PSFMessage -Level Verbose -Message "Connecting to https://$Tenant-admin.sharepoint.com"
 
         if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection:$True )
         {
@@ -63,15 +63,15 @@
 
             foreach( $tenantSite in $tenantSites )
             {
+                Write-PSFMessage -Level Verbose -Message "($counter/$($tenantSites.Count)) Processing Deleted Site: $($tenantSite.Url)"
+
                 try
                 {
-                    Write-PSFMessage -Level Debug -Message "($counter/$($tenantSites.Count)) Processing Url: $($tenantSite.Url)"
-
                     Update-SiteMetadata -DatabaseConnectionInformation $DatabaseConnectionInformation -SiteId $tenantSite.SiteId -SiteUrl $tenantSite.Url -TimeDeleted $tenantSite.DeletionTime
                 }
                 catch
                 {
-                    Write-PSFMessage -Level Error -Message "Error updating deleted site. SiteUrl='$($tenantSite.Url)'" -Exception $_.Exception
+                    Write-PSFMessage -Level Critical -Message "Error updating deleted site. SiteUrl='$($tenantSite.Url)'" -Exception $_.Exception
                 }
 
                 $counter++

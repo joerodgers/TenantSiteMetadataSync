@@ -63,11 +63,11 @@
 
             Write-PSFMessage -Level Verbose -Message "Querying database for all active sites"
 
-            $activeSites = Get-DataTable -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query "SELECT SiteId, SiteUrl FROM SitesActive"
+            $activeSites = Get-DataTable -DatabaseConnectionInformation $DatabaseConnectionInformation -Query "SELECT SiteId, SiteUrl FROM SitesActive"
         
             Write-PSFMessage -Level Verbose -Message "Querying database for all deleted sites"
 
-            $deletedSites = Get-DataTable -DatabaseName $DatabaseName -DatabaseServer $DatabaseServer -Query "SELECT SiteId, SiteUrl FROM SitesDeleted"
+            $deletedSites = Get-DataTable -DatabaseConnectionInformation $DatabaseConnectionInformation -Query "SELECT SiteId, SiteUrl FROM SitesDeleted"
 
             # mark sites as deleted if they are not in tenant list anymore and are not marked as deleted in the database
             foreach( $activeSite in $activeSites )

@@ -51,6 +51,8 @@
                 }
             }
 
+            Write-PSFMessage -Level Debug -Message "Executing Query: $Query"
+
             $null = $dataAdapter.Fill($dataSet)
 
             switch( $As )
@@ -74,7 +76,7 @@
                 {
                     if ($dataSet.Tables.Count -ne 0) 
                     {
-                        $dataSet.Tables[0].Rows | ConvertTo-PSCustomObject
+                        $dataSet.Tables[0] | ConvertTo-PSCustomObject
                     }
                 }
                 "SingleValue"

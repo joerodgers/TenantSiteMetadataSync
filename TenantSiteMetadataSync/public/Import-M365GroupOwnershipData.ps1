@@ -66,17 +66,17 @@
 
             $null = Connect-MgGraph -ClientId $ClientId -CertificateThumbprint $Thumbprint -TenantId "$Tenant.onmicrosoft.com"
 
-            Write-PSFMessage -Level Verbose -Message "Connected to Microsoft Graph"
-
             foreach( $group in $groups )
             {
                 Write-PSFMessage -Level Verbose -Message "$counter/$($groups.Count) - Processing Group: $($group.GroupId)"
                 
                 try
                 {
-                    Write-PSFMessage -Level Verbose -Message "Getting group owners from Microsoft Graph API"
+                    Write-PSFMessage -Level Verbose -Message "Getting group owners from Microsoft Graph API for group: $($group.GroupId)"
 
-                    $groupOwners = @(Get-MgGroupOwner -GroupId $group.GroupId -Top 500)
+                    $groupOwners = @(Get-MgGroupOwner -GroupId $group.GroupId -Top 500 )
+
+                    if( -not $? ){ continue }
 
                     Write-PSFMessage -Level Verbose -Message "Owner count: $($groupOwners.Count)"
 
@@ -91,6 +91,8 @@
                     
                         foreach( $groupOwner in $groupOwners )
                         {
+                            Write-PSFMessage -Level Verbose -Message "Adding Group Owner $($groupOwner.AdditionalProperties.userPrincipalName)"
+
                             $parameters.UserPrincipalName = $groupOwner.AdditionalProperties.userPrincipalName 
                             
                             try
@@ -99,7 +101,7 @@
                             }
                             catch
                             {
-                                Write-PSFMessage -Level Verbose -Message "Error updating group membership for Group='$($group.GroupId)'" -Exception $_
+                                Write-PSFMessage -Level Critical -Message "Error updating group owner information for group: '$($group.GroupId)'" -ErrorRecord $_
                             }
                         }
                     }
@@ -110,7 +112,7 @@
                 }
                 catch
                 {
-                    Write-PSFMessage -Level Error -Message "Error updating group membership" -Exception $_.Exception
+                    Write-PSFMessage -Level Critical -Message "Error updating group membership" -ErrorRecord $_
                 }
                 
                 $counter++

@@ -146,6 +146,8 @@
                 continue
             }
 
+            Write-PSFMessage -Level Debug -Message "Adding Parameter: $($PSBoundParameter.Key) = $($PSBoundParameter.Value)"
+
             if( $null -ne $PSBoundParameter.Value )
             {
                 $null = $sb.AppendFormat( " @{0} = @{0},", $PSBoundParameter.Key )
@@ -160,13 +162,13 @@
             {
                 $query = $sb.ToString().TrimEnd(",") # trim trailing comma
 
-                Write-PSFMessage -Level Debug -Message "Executing: '$query'"
+                Write-PSFMessage -Level Debug -Message "Executing SQL Query: '$query'"
 
                 Invoke-NonQuery -DatabaseConnectionInformation $DatabaseConnectionInformation -Query $query -Parameters $parameters
             }
             catch
             {
-                Write-PSFMessage -Level Error -Message "Error executing update query '$($query)'" -Exception $_.Exception
+                Stop-PSFFunction -Message "Error executing update query '$($query)'" -EnableException $false -ErrorRecord $_
             }
         }
         else 

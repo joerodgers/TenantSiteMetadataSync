@@ -44,26 +44,30 @@
         {
             $connection = New-SqlServerDatabaseConnection -DatabaseConnectionInformation $DatabaseConnectionInformation
 
-            $command = New-Object system.Data.SqlClient.SqlCommand($Query, $connection)     
+            $command = New-Object System.Data.SqlClient.SqlCommand($Query, $connection)     
             $command.CommandTimeout = $CommandTimeout
 
             foreach( $parameter in $Parameters.GetEnumerator() )
             {
                 if( $null -eq $parameter.Value )
                 {
+                    Write-PSFMessage -Level Debug -Message "Parameter: $($parameter.Key), Value=DBNULL"
                     $null = $command.Parameters.AddWithValue( "@$($parameter.Key)", [System.DBNull]::Value )
                 }
                 else 
                 {
+                    Write-PSFMessage -Level Debug -Message "Parameter: $($parameter.Key), Value='$parameter.Value'"
                     $null = $command.Parameters.AddWithValue( "@$($parameter.Key)", $parameter.Value )
                 }
             }
+
+            Write-PSFMessage -Level Debug -Message "Executing Query: $Query"
 
             $null = $command.ExecuteNonQuery()
         }
         catch
         {
-            throw $_.Exception
+            Stop-PSFFunction -Message "Failed to execute non-query." -EnableException $false -ErrorRecord $_
         }
         finally
         {

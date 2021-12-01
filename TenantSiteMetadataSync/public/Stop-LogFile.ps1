@@ -20,6 +20,8 @@
     }
     process
     {
+        Wait-PSFMessage -Timeout "30s" -Terminate # wait up to 30 seconds to termine the logging runspace
+
         Set-PSFLoggingProvider -Name 'logfile' -Enabled $false
     }
     end

@@ -1,5 +1,5 @@
 #requires -Modules @{ ModuleName="PnP.PowerShell";         ModuleVersion="1.7.0"   }
-#requires -Modules @{ ModuleName="TenantSiteMetadataSync"; ModuleVersion="1.0.0"   }
+#requires -Modules @{ ModuleName="TenantSiteMetadataSync"; ModuleVersion="1.1.0.0" }
 #requires -Modules @{ ModuleName="Microsoft.Graph.Groups"; ModuleVersion="1.0.1"   }
 #requires -Modules @{ ModuleName="PSFramework";            ModuleVersion="1.6.205" }
 
@@ -39,19 +39,19 @@ param
     [Parameter(Mandatory=$false)]
     [string]$TranscriptDirectoryPath = (Join-Path -Path $PSScriptRoot -ChildPath "Logs"),
 
-    [Parameter(Mandatory=$false,ParameterSetName='SqlAuthentication')]
+    [Parameter(Mandatory=$true,ParameterSetName='SqlAuthentication')]
     [string]$DatabaseUserName,
 
-    [Parameter(Mandatory=$false,ParameterSetName='SqlAuthentication')]
+    [Parameter(Mandatory=$true,ParameterSetName='SqlAuthentication')]
     [SecureString]$DatabaseUserPassword,
 
-    [Parameter(Mandatory=$false,ParameterSetName='AzureServicePrincipal')]
+    [Parameter(Mandatory=$true,ParameterSetName='AzureServicePrincipal')]
     [Guid]$AzureSqlServicePrincipalClientId,
 
-    [Parameter(Mandatory=$false,ParameterSetName='AzureServicePrincipal')]
+    [Parameter(Mandatory=$true,ParameterSetName='AzureServicePrincipal')]
     [SecureString]$AzureSqlServicePrincipalClientSecret,
 
-    [Parameter(Mandatory=$false,ParameterSetName='AzureServicePrincipal')]
+    [Parameter(Mandatory=$true,ParameterSetName='AzureServicePrincipal')]
     [Guid]$TenantId
 )
 
@@ -173,7 +173,7 @@ if( $ImportSharePointTenantListData.IsPresent )
             -DatabaseConnectionInformation $databaseConnectionInformation
 
         # import the guid/name mappings for site creation sources
-        Import-TSMSSiteCreationSources `
+        Import-TSMSSiteCreationSource `
             -ClientId       $ClientId `
             -Thumbprint     $Thumbprint `
             -Tenant         $Tenant `
@@ -197,6 +197,10 @@ if( $ImportSharePointTenantListData.IsPresent )
         Write-Host "$(Get-Date) - Completed $operation"
     
     }
+    catch
+    {
+        Write-PSFMessage -Level Critical -Message "Error executing ImportSharePointTenantListData" -ErrorRecord $_  
+    }
     finally
     {
         Stop-TSMSSyncJobExecution -Name $operation -DatabaseConnectionInformation $databaseConnectionInformation
@@ -204,7 +208,6 @@ if( $ImportSharePointTenantListData.IsPresent )
         Stop-TSMSLogFile
     }
 }
-
 
 # ImportSharePointTenantAPIData
 if( $ImportSharePointTenantAPIData.IsPresent )
@@ -263,7 +266,7 @@ if( $ImportDetailedSharePointTenantAPIData.IsPresent )
 
         $operation = "Operation - ImportDetailedSharePointTenantAPIData"
     
-        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportSharePointTenantAPIData" -MessageLevel ([PSFramework.Message.MessageLevel]::Verbose)
+        Start-TSMSLogFile -Path $transcriptDirectoryPath -Name "ImportDetailedSharePointTenantAPIData" -MessageLevel ([PSFramework.Message.MessageLevel]::Verbose)
     
         Start-TSMSSyncJobExecution -Name $operation -DatabaseConnectionInformation $databaseConnectionInformation
     
