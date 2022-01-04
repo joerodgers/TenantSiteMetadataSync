@@ -101,13 +101,17 @@
                     $parameters.NumOfFiles           = $item.FieldValues["NumOfFiles"]
                     $parameters.PagesVisited         = $item.FieldValues["PagesVisited"]
                     $parameters.PageViews            = $item.FieldValues["PageViews"]
-                    $parameters.SiteCreationSource   = $item.FieldValues["SiteCreationSource"]
                     $parameters.SiteId               = $item.FieldValues["SiteId"]
                     $parameters.SiteUrl              = $item.FieldValues["SiteUrl"]
                     $parameters.StorageUsed          = $item.FieldValues["StorageUsed"]
                     $parameters.TimeDeleted          = $item.FieldValues["TimeDeleted"]
                     $parameters.IsTeamsConnected     = $item.FieldValues["SiteFlags"] -eq 1
                     # $parameters.State                = -1 # "unknown"
+
+                    if( -not [string]::IsNullOrWhiteSpace($item.FieldValues["SiteCreationSource"]) )
+                    {
+                        $parameters.SiteCreationSource = $item.FieldValues["SiteCreationSource"]
+                    }
 
                     if( -not [string]::IsNullOrWhiteSpace($item.FieldValues["State"]) )
                     {
