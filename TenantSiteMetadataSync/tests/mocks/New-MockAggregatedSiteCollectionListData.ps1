@@ -30,7 +30,7 @@ function New-MockAggregatedSiteCollectionListData
                         NumOfFiles           = New-MockValue -TypeName Int32
                         PagesVisited         = New-MockValue -TypeName Int32
                         PageViews            = New-MockValue -TypeName Int32
-                        SiteCreationSource   = New-MockValue -TypeName Guid
+                        SiteCreationSource   = New-MockValue -TypeName Guid -IncludeNulls
                         SiteId               = New-MockValue -TypeName Guid
                         SiteUrl              = New-MockValue -TypeName String
                         StorageUsed          = New-MockValue -TypeName Int64
