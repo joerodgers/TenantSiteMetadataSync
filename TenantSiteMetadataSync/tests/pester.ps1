@@ -1,5 +1,8 @@
 ﻿Import-Module Pester
 
+Remove-Module -Name "TenantSiteMetadataSync" -Force -ErrorAction Ignore
+Import-Module -Name "$PSScriptRoot\..\TenantSiteMetadataSync.psd1" -Force
+
 $null = New-Item -Path "$PSScriptRoot\..\.." -Name TestResults -ItemType Directory -Force
 
 $failedTestCount = $totalTestCount = 0
@@ -12,7 +15,7 @@ $configuration.Run.PassThru       = $true
 $configuration.Output.Verbosity   = "Detailed"
 $configuration.Filter.Tag         = "General", "UnitTest"
 
-$generalTests  = Get-ChildItem "$PSScriptRoot\general"   -Filter "*.Tests.ps1" -Recurse -ErrorAction Ignore
+$generalTests = Get-ChildItem "$PSScriptRoot\general"   -Filter "*.Tests.ps1" -Recurse -ErrorAction Ignore
 
 foreach( $file in $generalTests )
 {

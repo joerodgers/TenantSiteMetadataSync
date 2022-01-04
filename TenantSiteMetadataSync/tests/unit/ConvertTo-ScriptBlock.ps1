@@ -9,7 +9,11 @@
 
     process
     {
-        [ScriptBlock]::Create( $String )
+        $scriptBlock = [ScriptBlock]::Create( $String )
+
+        Write-Verbose "Script Block: '$($scriptBlock.ToString())'"
+    
+        $scriptBlock
     }
 }
 

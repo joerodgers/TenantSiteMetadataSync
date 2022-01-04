@@ -37,7 +37,7 @@
                 -Verifiable        
         }
 
-        New-Database -DatabaseConnectionInformation $mockDatabaseConnectionInfo
+        New-TSMSDatabase -DatabaseConnectionInformation $mockDatabaseConnectionInfo
 
         Should -InvokeVerifiable
     }
@@ -70,7 +70,7 @@
         }
 
 
-        New-Database -DatabaseConnectionInformation $mockDatabaseConnectionInfo
+        New-TSMSDatabase -DatabaseConnectionInformation $mockDatabaseConnectionInfo
 
         Should -InvokeVerifiable
     }
@@ -116,16 +116,8 @@
                 -Verifiable        
         }
     
-        $UpdateSiteMetadataParameters = InModuleScope -ModuleName "TenantSiteMetadataSync" -ScriptBlock {
-
-            $command = Get-Command -Name "Update-SiteMetadata"
-            
-            $command.ParameterSets[0].Parameters # | Where-Object -Property Position -ge 0 | Select-Object Name, ParameterType, IsMandatory 
-        }
-
-        Write-Host "parameters: $UpdateSiteMetadataParameters"
-        
-        New-Database -DatabaseConnectionInformation $mockDatabaseConnectionInfo
+       
+        New-TSMSDatabase -DatabaseConnectionInformation $mockDatabaseConnectionInfo
 
         Should -InvokeVerifiable
     }

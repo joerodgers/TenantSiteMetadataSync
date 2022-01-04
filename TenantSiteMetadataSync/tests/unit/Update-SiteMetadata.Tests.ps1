@@ -27,7 +27,7 @@
             $testCases = New-MockSiteMetadata -Quantity 100
         }
 
-        It "should update the site <_.SiteUrl> based on the test case values" -ForEach $testCases {
+        It "should update the site <_.SiteUrl.Value> based on the test case values" -ForEach $testCases {
 
             $testCase = $_
 

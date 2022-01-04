@@ -54,7 +54,7 @@
                 -Verifiable        
         }
 
-        Sync-DatabaseSchema -DatabaseConnectionInformation $mockDatabaseConnectionInfo
+        Sync-TSMSDatabaseSchema -DatabaseConnectionInformation $mockDatabaseConnectionInfo
 
         Should -InvokeVerifiable
     }
@@ -103,7 +103,7 @@
                 -Verifiable        
         }
 
-        Sync-DatabaseSchema -DatabaseConnectionInformation  $mockDatabaseConnectionInfo
+        Sync-TSMSDatabaseSchema -DatabaseConnectionInformation  $mockDatabaseConnectionInfo
 
         Should -InvokeVerifiable
     }
@@ -163,7 +163,7 @@
                 -Verifiable        
         }
 
-        Sync-DatabaseSchema -DatabaseConnectionInformation  $mockDatabaseConnectionInfo
+        Sync-TSMSDatabaseSchema -DatabaseConnectionInformation  $mockDatabaseConnectionInfo
 
         Should -InvokeVerifiable
     }

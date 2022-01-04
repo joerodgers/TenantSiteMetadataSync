@@ -38,22 +38,22 @@ Describe "Testing Import-SiteMetadataFromTenantAPI cmdlet" -Tag "UnitTest" {
     }
 
 
-    It "should read the basic SPO site info from the API for <Quantity> sites with <_.Templates.Count> templates with DetailedImport being <DetailedImport>" -Foreach @(
-        @{ Quantity = 0; IncludeOneDriveSites = $false; Templates = @() }
-        @{ Quantity = 1; IncludeOneDriveSites = $false; Templates = @() }
-        @{ Quantity = 2; IncludeOneDriveSites = $false; Templates = @() }
+    It "should read the basic SPO site info from the API for <Quantity> sites with <_.Templates.Count> templates with DetailedImport being <DetailedImport> and IncludeOneDriveSites being <IncludeOneDriveSites>" -Foreach @(
+        @{ Quantity = 0; IncludeOneDriveSites = $false; DetailedImport = $false; Templates = @() }
+        @{ Quantity = 1; IncludeOneDriveSites = $false; DetailedImport = $false; Templates = @() }
+        @{ Quantity = 2; IncludeOneDriveSites = $false; DetailedImport = $false; Templates = @() }
 
-        @{ Quantity = 0; IncludeOneDriveSites = $false; Templates = @('APPCATALOG#0', 'BICenterSite#0', 'EDISC#0', 'EHS#1', 'PWA#0', 'SPSMSITEHOST#0', 'SRCHCEN#0', 'BLANKINTERNET#0', 'STS#-1', 'TEAMCHANNEL#0', 'RedirectSite#0', 'SITEPAGEPUBLISHING#0', 'STS#3', 'GROUP#0', 'STS#0') }
-        @{ Quantity = 1; IncludeOneDriveSites = $false; Templates = @('APPCATALOG#0', 'BICenterSite#0', 'EDISC#0', 'EHS#1', 'PWA#0', 'SPSMSITEHOST#0', 'SRCHCEN#0', 'BLANKINTERNET#0', 'STS#-1', 'TEAMCHANNEL#0', 'RedirectSite#0', 'SITEPAGEPUBLISHING#0', 'STS#3', 'GROUP#0', 'STS#0') }
-        @{ Quantity = 2; IncludeOneDriveSites = $false; Templates = @('APPCATALOG#0', 'BICenterSite#0', 'EDISC#0', 'EHS#1', 'PWA#0', 'SPSMSITEHOST#0', 'SRCHCEN#0', 'BLANKINTERNET#0', 'STS#-1', 'TEAMCHANNEL#0', 'RedirectSite#0', 'SITEPAGEPUBLISHING#0', 'STS#3', 'GROUP#0', 'STS#0') }
+        @{ Quantity = 0; IncludeOneDriveSites = $false; DetailedImport = $false; Templates = @('APPCATALOG#0', 'BICenterSite#0', 'EDISC#0', 'EHS#1', 'PWA#0', 'SPSMSITEHOST#0', 'SRCHCEN#0', 'BLANKINTERNET#0', 'STS#-1', 'TEAMCHANNEL#0', 'RedirectSite#0', 'SITEPAGEPUBLISHING#0', 'STS#3', 'GROUP#0', 'STS#0') }
+        @{ Quantity = 1; IncludeOneDriveSites = $false; DetailedImport = $false; Templates = @('APPCATALOG#0', 'BICenterSite#0', 'EDISC#0', 'EHS#1', 'PWA#0', 'SPSMSITEHOST#0', 'SRCHCEN#0', 'BLANKINTERNET#0', 'STS#-1', 'TEAMCHANNEL#0', 'RedirectSite#0', 'SITEPAGEPUBLISHING#0', 'STS#3', 'GROUP#0', 'STS#0') }
+        @{ Quantity = 2; IncludeOneDriveSites = $false; DetailedImport = $false; Templates = @('APPCATALOG#0', 'BICenterSite#0', 'EDISC#0', 'EHS#1', 'PWA#0', 'SPSMSITEHOST#0', 'SRCHCEN#0', 'BLANKINTERNET#0', 'STS#-1', 'TEAMCHANNEL#0', 'RedirectSite#0', 'SITEPAGEPUBLISHING#0', 'STS#3', 'GROUP#0', 'STS#0') }
 
-        @{ Quantity = 0; IncludeOneDriveSites = $true; Templates = @() }
-        @{ Quantity = 1; IncludeOneDriveSites = $true; Templates = @() }
-        @{ Quantity = 2; IncludeOneDriveSites = $true; Templates = @() }
+        @{ Quantity = 0; IncludeOneDriveSites = $true; DetailedImport = $false; Templates = @() }
+        @{ Quantity = 1; IncludeOneDriveSites = $true; DetailedImport = $false; Templates = @() }
+        @{ Quantity = 2; IncludeOneDriveSites = $true; DetailedImport = $false; Templates = @() }
 
-        @{ Quantity = 0; IncludeOneDriveSites = $true; Templates = @('APPCATALOG#0', 'BICenterSite#0', 'EDISC#0', 'EHS#1', 'PWA#0', 'SPSMSITEHOST#0', 'SRCHCEN#0', 'BLANKINTERNET#0', 'STS#-1', 'TEAMCHANNEL#0', 'RedirectSite#0', 'SITEPAGEPUBLISHING#0', 'STS#3', 'GROUP#0', 'STS#0') }
-        @{ Quantity = 1; IncludeOneDriveSites = $true; Templates = @('APPCATALOG#0', 'BICenterSite#0', 'EDISC#0', 'EHS#1', 'PWA#0', 'SPSMSITEHOST#0', 'SRCHCEN#0', 'BLANKINTERNET#0', 'STS#-1', 'TEAMCHANNEL#0', 'RedirectSite#0', 'SITEPAGEPUBLISHING#0', 'STS#3', 'GROUP#0', 'STS#0') }
-        @{ Quantity = 2; IncludeOneDriveSites = $true; Templates = @('APPCATALOG#0', 'BICenterSite#0', 'EDISC#0', 'EHS#1', 'PWA#0', 'SPSMSITEHOST#0', 'SRCHCEN#0', 'BLANKINTERNET#0', 'STS#-1', 'TEAMCHANNEL#0', 'RedirectSite#0', 'SITEPAGEPUBLISHING#0', 'STS#3', 'GROUP#0', 'STS#0') }
+        @{ Quantity = 0; IncludeOneDriveSites = $true; DetailedImport = $false; Templates = @('APPCATALOG#0', 'BICenterSite#0', 'EDISC#0', 'EHS#1', 'PWA#0', 'SPSMSITEHOST#0', 'SRCHCEN#0', 'BLANKINTERNET#0', 'STS#-1', 'TEAMCHANNEL#0', 'RedirectSite#0', 'SITEPAGEPUBLISHING#0', 'STS#3', 'GROUP#0', 'STS#0') }
+        @{ Quantity = 1; IncludeOneDriveSites = $true; DetailedImport = $false; Templates = @('APPCATALOG#0', 'BICenterSite#0', 'EDISC#0', 'EHS#1', 'PWA#0', 'SPSMSITEHOST#0', 'SRCHCEN#0', 'BLANKINTERNET#0', 'STS#-1', 'TEAMCHANNEL#0', 'RedirectSite#0', 'SITEPAGEPUBLISHING#0', 'STS#3', 'GROUP#0', 'STS#0') }
+        @{ Quantity = 2; IncludeOneDriveSites = $true; DetailedImport = $false; Templates = @('APPCATALOG#0', 'BICenterSite#0', 'EDISC#0', 'EHS#1', 'PWA#0', 'SPSMSITEHOST#0', 'SRCHCEN#0', 'BLANKINTERNET#0', 'STS#-1', 'TEAMCHANNEL#0', 'RedirectSite#0', 'SITEPAGEPUBLISHING#0', 'STS#3', 'GROUP#0', 'STS#0') }
         ) {
 
         $mockSites = New-MockTenantSiteData -Quantity $Quantity
@@ -127,7 +127,7 @@ Describe "Testing Import-SiteMetadataFromTenantAPI cmdlet" -Tag "UnitTest" {
 
         if( $Templates.Count -eq 0 )
         {
-            Import-SiteMetadataFromTenantAPI `
+            Import-TSMSSiteMetadataFromTenantAPI `
                 -IncludeOneDriveSites:$IncludeOneDriveSites `
                 -DetailedImport:$DetailedImport `
                 -ClientId   $mockTenantConnection.ClientId `
@@ -139,7 +139,7 @@ Describe "Testing Import-SiteMetadataFromTenantAPI cmdlet" -Tag "UnitTest" {
         {
             foreach( $temp in $Templates )
             {
-                Import-SiteMetadataFromTenantAPI `
+                Import-TSMSSiteMetadataFromTenantAPI `
                     -IncludeOneDriveSites:$IncludeOneDriveSites `
                     -DetailedImport:$DetailedImport `
                     -ClientId   $mockTenantConnection.ClientId `

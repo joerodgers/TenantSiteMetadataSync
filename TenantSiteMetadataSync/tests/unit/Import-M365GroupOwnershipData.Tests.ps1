@@ -62,7 +62,7 @@ Describe "Testing Import-M365GroupOwnershipData cmdlet" -Tag "UnitTest" {
         # build dynamic mocks
         foreach( $mockO365Group in $mockO365Groups )
         {
-            $parameterFilter = '$GroupId -eq "{0}" -and $Top -eq 500' -f $mockO365Group.GroupId.ToString() | ConvertTo-ScriptBlock
+            $parameterFilter = '$GroupId.ToString() -eq "{0}" -and $Top -eq 500' -f $mockO365Group.GroupId.ToString() | ConvertTo-ScriptBlock
 
             # create a mock with the unique filter
             Mock `
@@ -72,7 +72,7 @@ Describe "Testing Import-M365GroupOwnershipData cmdlet" -Tag "UnitTest" {
                 -MockWith { $mockO365GroupOwners } `
                 -Verifiable
 
-            $parameterFilter = '$Query -eq "EXEC proc_RemoveGroupOwnersByGroupId @GroupId = @GroupId" -and $Parameters.GroupId -eq "{0}"' -f $mockO365Group.GroupId | ConvertTo-ScriptBlock
+            $parameterFilter = '$Query -eq "EXEC proc_RemoveGroupOwnersByGroupId @GroupId = @GroupId" -and $Parameters.GroupId.ToString() -eq "{0}"' -f $mockO365Group.GroupId | ConvertTo-ScriptBlock
 
             # create a mock with the unique filter
             Mock `
@@ -83,8 +83,8 @@ Describe "Testing Import-M365GroupOwnershipData cmdlet" -Tag "UnitTest" {
 
             foreach( $mockO365GroupOwner in $mockO365GroupOwners )
             {
-                $parameterFilter = '$Query -eq "EXEC proc_AddGroupOwnerByGroupId @GroupId = @GroupId, @UserPrincipalName = @UserPrincipalName" -and $Parameters.GroupId -eq "{0}" -and $Parameters.UserPrincipalName -eq "{1}"' -f 
-                    $mockO365Group.GroupId, $mockO365GroupOwner.AdditionalProperties.userPrincipalName | ConvertTo-ScriptBlock
+                $parameterFilter = '$Query -eq "EXEC proc_AddGroupOwnerByGroupId @GroupId = @GroupId, @UserPrincipalName = @UserPrincipalName" -and $Parameters.GroupId.ToString() -eq "{0}" -and $Parameters.UserPrincipalName -eq "{1}"' -f 
+                    $mockO365Group.GroupId.ToString(), $mockO365GroupOwner.AdditionalProperties.userPrincipalName | ConvertTo-ScriptBlock
     
                 # create a mock with the unique filter
                 Mock `
@@ -95,7 +95,7 @@ Describe "Testing Import-M365GroupOwnershipData cmdlet" -Tag "UnitTest" {
             }
         }
 
-        Import-M365GroupOwnershipData `
+        Import-TSMSM365GroupOwnershipData `
             -ClientId   $mockTenantConnection.ClientId `
             -Tenant     $mockTenantConnection.TenantName `
             -Thumbprint $mockTenantConnection.Thumbprint `

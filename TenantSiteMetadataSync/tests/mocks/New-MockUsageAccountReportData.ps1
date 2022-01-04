@@ -58,11 +58,11 @@ function New-MockUsageAccountReportData
 
             if( $ApiVersion -eq "beta" )
             {
-                $mock | Add-Member -MemberType NoteProperty -Name 'Site Sensitivity Label Id'    -Value New-MockValue -TypeName DateTime -IncludeNulls -AsString
-                $mock | Add-Member -MemberType NoteProperty -Name 'Company Link Count'           -Value New-MockValue -TypeName Int32
-                $mock | Add-Member -MemberType NoteProperty -Name 'Anonymous Link Count'         -Value New-MockValue -TypeName Int32
-                $mock | Add-Member -MemberType NoteProperty -Name 'Secure Link For Guest Count'  -Value New-MockValue -TypeName Int32
-                $mock | Add-Member -MemberType NoteProperty -Name 'Secure Link For Member Count' -Value New-MockValue -TypeName Int32
+                $mock | Add-Member -MemberType NoteProperty -Name 'Site Sensitivity Label Id'    -Value (New-MockValue -TypeName Guid -IncludeNulls -AsString)
+                $mock | Add-Member -MemberType NoteProperty -Name 'Company Link Count'           -Value (New-MockValue -TypeName Int32)
+                $mock | Add-Member -MemberType NoteProperty -Name 'Anonymous Link Count'         -Value (New-MockValue -TypeName Int32)
+                $mock | Add-Member -MemberType NoteProperty -Name 'Secure Link For Guest Count'  -Value (New-MockValue -TypeName Int32)
+                $mock | Add-Member -MemberType NoteProperty -Name 'Secure Link For Member Count' -Value (New-MockValue -TypeName Int32)
             }
 
             $mocks += $mock

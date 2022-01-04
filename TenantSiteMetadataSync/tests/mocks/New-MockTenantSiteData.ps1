@@ -1,4 +1,5 @@
 ﻿. $PSScriptRoot\New-MockValue.ps1
+. $PSScriptRoot\New-MockSiteStates.ps1
 
 function New-MockTenantSiteData
 {
@@ -9,23 +10,8 @@ function New-MockTenantSiteData
         [int]$Quantity
     )
 
-    # keep in sync with Get-SiteState.ps1
-    $states = @(
-        [PSCustomObject] @{ Id = -1; State = "Unknown"   }
-        [PSCustomObject] @{ Id =  0; State = "Creating"  }
-        [PSCustomObject] @{ Id =  1; State = "Active"    }
-        [PSCustomObject] @{ Id =  2; State = "Updating"  }
-        [PSCustomObject] @{ Id =  3; State = "Renaming"  }
-        [PSCustomObject] @{ Id =  4; State = "Error"     }
-        [PSCustomObject] @{ Id =  5; State = "Deleted"   }
-        [PSCustomObject] @{ Id =  6; State = "Deleting"  }
-        [PSCustomObject] @{ Id =  7; State = "Recycling" }
-        [PSCustomObject] @{ Id =  8; State = "Recycled"  }
-        [PSCustomObject] @{ Id =  9; State = "Restoring" }
-        [PSCustomObject] @{ Id = 10; State = "Recreating"}
-        [PSCustomObject] @{ Id = 11; State = "New"       }
-    )
-    
+    $states = New-MockSiteState
+
     $mocks = @()
 
     for($x=0; $x -lt $Quantity; $x++)
@@ -40,7 +26,7 @@ function New-MockTenantSiteData
             LockState                = "Unlock", "NoAccess" | Get-Random
             PWAEnabled               = $null, "Enabled" | Get-Random 
             Url                      = New-MockValue -TypeName String
-            Status                   = $state.Name
+            Status                   = $state.State
             State                    = $state.Id
             StorageQuota             = [int64]((New-MockValue -TypeName Int64) / 1MB)
             StorageUsageCurrent      = [int64]((New-MockValue -TypeName Int64) / 1MB)

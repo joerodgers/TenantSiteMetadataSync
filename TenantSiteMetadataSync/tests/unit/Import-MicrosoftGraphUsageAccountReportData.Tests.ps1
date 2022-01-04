@@ -12,6 +12,7 @@ Describe "Testing Import-M365GroupOwnershipData cmdlet" -Tag "UnitTest" {
         . "$PSScriptRoot\..\mocks\New-MockO365GroupOwnerCollection.ps1"
         . "$PSScriptRoot\..\mocks\New-MockTenantConnectionInformation.ps1"
         . "$PSScriptRoot\..\mocks\New-MockUsageAccountReportData.ps1"
+        . "$PSScriptRoot\..\mocks\New-MockValue.ps1"
         . "$PSScriptRoot\ConvertTo-ScriptBlock.ps1"
 
         function Connect-PnPOnline { param( $Url, $ClientId, $Thumbprint, $Tenant, $ReturnConnection )  }
@@ -255,7 +256,7 @@ Describe "Testing Import-M365GroupOwnershipData cmdlet" -Tag "UnitTest" {
                     }   
                 }
 
-                $parameterfilter = $parameterfilter | ConvertTo-TpmOwnerAuth
+                $parameterfilter = $parameterfilter | ConvertTo-ScriptBlock
 
                 # create a mock with the unique filter
                 Mock `
@@ -283,7 +284,7 @@ Describe "Testing Import-M365GroupOwnershipData cmdlet" -Tag "UnitTest" {
             $parameters.Period = $Period            
         }
 
-        Import-MicrosoftGraphUsageAccountReportData @parameters
+        Import-TSMSMicrosoftGraphUsageAccountReportData @parameters
 
         Should -InvokeVerifiable
     }

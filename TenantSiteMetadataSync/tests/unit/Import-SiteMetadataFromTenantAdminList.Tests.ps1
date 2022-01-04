@@ -71,11 +71,19 @@ Describe "Testing Import-SiteMetadataFromTenantAdminLists cmdlet" -Tag "UnitTest
                 $parameterFilter += ' -and $NumOfFiles -eq {0}'                        -f $mockListItem.FieldValues.NumOfFiles
                 $parameterFilter += ' -and $PagesVisited -eq {0}'                      -f $mockListItem.FieldValues.PagesVisited
                 $parameterFilter += ' -and $PageViews -eq {0}'                         -f $mockListItem.FieldValues.PageViews
-                $parameterFilter += ' -and $SiteCreationSource -eq "{0}"'              -f $mockListItem.FieldValues.SiteCreationSource
-                $parameterFilter += ' -and $SiteId -eq "{0}"'                          -f $mockListItem.FieldValues.SiteId
+                $parameterFilter += ' -and $SiteId -eq [Guid]::Parse("{0}")'           -f $mockListItem.FieldValues.SiteId
                 $parameterFilter += ' -and $SiteUrl -eq "{0}"'                         -f $mockListItem.FieldValues.SiteUrl
                 $parameterFilter += ' -and $StorageUsed -eq {0}'                       -f $mockListItem.FieldValues.StorageUsed
                 $parameterFilter += ' -and $IsTeamsConnected -eq [bool]::Parse("{0}")' -f ($mockListItem.FieldValues.SiteFlags -eq 1)
+
+                if( -not [string]::IsNullOrWhiteSpace($mockListItem.FieldValues.SiteCreationSource) )
+                {
+                    $parameterFilter += ' -and $SiteCreationSource -eq [Guid]::Parse("{0}")' -f $mockListItem.FieldValues.SiteCreationSource
+                }
+                else
+                {
+                    $parameterFilter += ' -and $SiteCreationSource -eq $null'
+                }
 
                 if( -not [string]::IsNullOrWhiteSpace($mockListItem.FieldValues.State) )
                 {
@@ -83,7 +91,7 @@ Describe "Testing Import-SiteMetadataFromTenantAdminLists cmdlet" -Tag "UnitTest
                 }
                 else
                 {
-                    $parameterFilter += ' -and $State -eq -1'
+                    # $parameterFilter += ' -and $State -eq -1'
                 }
 
                 if( -not [string]::IsNullOrWhiteSpace($mockListItem.FieldValues.SensitivityLabel) )
@@ -101,7 +109,7 @@ Describe "Testing Import-SiteMetadataFromTenantAdminLists cmdlet" -Tag "UnitTest
                 }
                 else
                 {
-                    $parameterFilter += ' -and $GroupId -eq $null'
+                    # $parameterFilter += ' -and $GroupId -eq $null'
                 }
 
                 if( -not [string]::IsNullOrWhiteSpace($mockListItem.FieldValues.HubSiteId) )
@@ -110,22 +118,22 @@ Describe "Testing Import-SiteMetadataFromTenantAdminLists cmdlet" -Tag "UnitTest
                 }
                 else
                 {
-                    $parameterFilter += ' -and $HubSiteId -eq $null'
+                    # $parameterFilter += ' -and $HubSiteId -eq $null'
                 }
             }
             elseif( $AdminList -eq "AllSitesAggregatedSiteCollections" )
             {
-                $parameterFilter += '$ConditionalAccessPolicy -eq {0}' -f $mockListItem.FieldValues.ConditionalAccessPolicy
-                $parameterFilter += ' -and $CreatedBy -eq "{0}"'       -f $mockListItem.FieldValues.CreatedBy
-                $parameterFilter += ' -and $DeletedBy -eq "{0}"'       -f $mockListItem.FieldValues.DeletedBy
-                $parameterFilter += ' -and $SiteOwnerEmail -eq "{0}"'  -f $mockListItem.FieldValues.SiteOwnerEmail
-                $parameterFilter += ' -and $SiteOwnerName -eq "{0}"'   -f $mockListItem.FieldValues.SiteOwnerName
-                $parameterFilter += ' -and $StorageQuota -eq {0}'      -f $mockListItem.FieldValues.StorageQuota
-                $parameterFilter += ' -and $SiteId -eq "{0}"'          -f $mockListItem.FieldValues.SiteId
-                $parameterFilter += ' -and $SiteUrl -eq "{0}"'         -f $mockListItem.FieldValues.SiteUrl
-                $parameterFilter += ' -and $TemplateName -eq "{0}"'    -f $mockListItem.FieldValues.TemplateName
-                $parameterFilter += ' -and $TimeCreated.Ticks -eq {0}' -f $mockListItem.FieldValues.TimeCreated.Ticks
-                $parameterFilter += ' -and $Title -eq "{0}"'           -f $mockListItem.FieldValues.Title
+                $parameterFilter += '$ConditionalAccessPolicy -eq {0}'       -f $mockListItem.FieldValues.ConditionalAccessPolicy
+                $parameterFilter += ' -and $CreatedBy -eq "{0}"'             -f $mockListItem.FieldValues.CreatedBy
+                $parameterFilter += ' -and $DeletedBy -eq "{0}"'             -f $mockListItem.FieldValues.DeletedBy
+                $parameterFilter += ' -and $SiteOwnerEmail -eq "{0}"'        -f $mockListItem.FieldValues.SiteOwnerEmail
+                $parameterFilter += ' -and $SiteOwnerName -eq "{0}"'         -f $mockListItem.FieldValues.SiteOwnerName
+                $parameterFilter += ' -and $StorageQuota -eq {0}'            -f $mockListItem.FieldValues.StorageQuota
+                $parameterFilter += ' -and $SiteId -eq [Guid]::Parse("{0}")' -f $mockListItem.FieldValues.SiteId
+                $parameterFilter += ' -and $SiteUrl -eq "{0}"'               -f $mockListItem.FieldValues.SiteUrl
+                $parameterFilter += ' -and $TemplateName -eq "{0}"'          -f $mockListItem.FieldValues.TemplateName
+                $parameterFilter += ' -and $TimeCreated.Ticks -eq {0}'       -f $mockListItem.FieldValues.TimeCreated.Ticks
+                $parameterFilter += ' -and $Title -eq "{0}"'                 -f $mockListItem.FieldValues.Title
             }
 
             $parameterFilter = $parameterFilter | ConvertTo-ScriptBlock
@@ -137,7 +145,7 @@ Describe "Testing Import-SiteMetadataFromTenantAdminLists cmdlet" -Tag "UnitTest
                 -Verifiable
         }
         
-        Import-SiteMetadataFromTenantAdminList `
+        Import-TSMSSiteMetadataFromTenantAdminList `
             -AdminList  $AdminList `
             -ClientId   $mockTenantConnection.ClientId `
             -Thumbprint $mockTenantConnection.Thumbprint `

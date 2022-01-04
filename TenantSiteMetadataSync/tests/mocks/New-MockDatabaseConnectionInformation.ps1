@@ -31,6 +31,6 @@ function New-MockDatabaseConnectionInformation
         }
     }
 
-    return New-SqlServerDatabaseConnectionInformation @parameters
+    return New-TSMSSqlServerDatabaseConnectionInformation @parameters
 }
 

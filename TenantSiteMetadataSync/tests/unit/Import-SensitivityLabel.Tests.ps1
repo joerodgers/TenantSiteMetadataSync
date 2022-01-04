@@ -69,7 +69,7 @@ Describe "Testing Import-SensitivityLabel cmdlet" -Tag "UnitTest" {
                 -Verifiable
         }
 
-        Import-SensitivityLabel `
+        Import-TSMSSensitivityLabel `
             -ClientId       $mockTenantConnection.ClientId `
             -Thumbprint     $mockTenantConnection.Thumbprint `
             -Tenant         $mockTenantConnection.TenantName `

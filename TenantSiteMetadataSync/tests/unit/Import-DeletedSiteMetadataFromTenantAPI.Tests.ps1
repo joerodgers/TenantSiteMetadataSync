@@ -65,7 +65,7 @@ Describe "Testing Import-DeletedSiteMetadataFromTenantAPI cmdlet" -Tag "UnitTest
             -Verifiable
 
         # execute the function we are testing
-        Import-DeletedSiteMetadataFromTenantAPI `
+        Import-TSMSDeletedSiteMetadataFromTenantAPI `
                 -ClientId   $mockTenantConnection.ClientId `
                 -Thumbprint $mockTenantConnection.Thumbprint `
                 -Tenant     $mockTenantConnection.TenantName `

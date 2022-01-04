@@ -29,7 +29,7 @@
             $testCases = New-MockGroupMetadata -Quantity 100
         }
 
-        It "should update the group <GroupId> based on the test case values" -ForEach $testCases {
+        It "should update the group <GroupId.Value> based on the test case values" -ForEach $testCases {
 
             $testCase = $_
 
@@ -103,8 +103,8 @@
                     }
                 }
             }
-        
-            $parameterFilter = [ScriptBlock]::Create( $parameterFilter )
+
+            $parameterFilter = $parameterFilter | ConvertTo-ScriptBlock
 
             Mock `
                 -CommandName "Invoke-NonQuery" `

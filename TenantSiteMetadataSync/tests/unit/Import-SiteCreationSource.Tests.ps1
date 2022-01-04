@@ -62,7 +62,7 @@ Describe "Testing Import-SiteCreationSource cmdlet" -Tag "UnitTest" {
                 -Verifiable    
         }
 
-        Import-SiteCreationSource `
+        Import-TSMSSiteCreationSource `
             -ClientId       $mockTenantConnection.ClientId `
             -Thumbprint     $mockTenantConnection.Thumbprint `
             -Tenant         $mockTenantConnection.TenantName `
