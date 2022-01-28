@@ -79,3 +79,18 @@ BEGIN
     ALTER TABLE dbo.SiteMetadata DROP COLUMN LastWebActivityOn;
 END
 
+-- ensure the database collation is case insensitive
+USE master
+GO
+IF EXISTS (SELECT name FROM sys.databases WHERE name = N'TenantSiteMetadataSync')
+BEGIN
+
+   DECLARE @databaseCollation nvarchar(100)
+   SELECT  @databaseCollation = collation_name FROM sys.databases WHERE NAME = N'TenantSiteMetadataSync'
+   
+   IF ( @databaseCollation <> 'SQL_Latin1_General_CP1_CI_AS' )
+   BEGIN
+   PRINT 'ALTERTING'
+         ALTER DATABASE TenantSiteMetadataSync COLLATE SQL_Latin1_General_CP1_CI_AS;
+   END
+END

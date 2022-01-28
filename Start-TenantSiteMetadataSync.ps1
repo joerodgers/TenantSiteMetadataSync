@@ -1,5 +1,5 @@
 #requires -Modules @{ ModuleName="PnP.PowerShell";         ModuleVersion="1.7.0"   }
-#requires -Modules @{ ModuleName="TenantSiteMetadataSync"; ModuleVersion="1.1.0.0" }
+#requires -Modules @{ ModuleName="TenantSiteMetadataSync"; ModuleVersion="1.2.0.0" }
 #requires -Modules @{ ModuleName="Microsoft.Graph.Groups"; ModuleVersion="1.0.1"   }
 #requires -Modules @{ ModuleName="PSFramework";            ModuleVersion="1.6.205" }
 
@@ -20,6 +20,9 @@ param
 
     [Parameter(Mandatory=$false)]
     [switch]$ImportM365GroupOwnershipData,
+
+    [Parameter(Mandatory=$false)]
+    [switch]$ImportSecondaryAdminData,
 
     [Parameter(Mandatory=$true)]
     [string]$DatabaseServer,
@@ -54,6 +57,9 @@ param
     [Parameter(Mandatory=$true,ParameterSetName='AzureServicePrincipal')]
     [Guid]$TenantId
 )
+
+# ensure we default to TLS 1.2 for all cloud communications
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 
 if( $PSVersionTable.PSVersion.Major -ge 7 )
 {
@@ -98,6 +104,33 @@ $databaseConnectionInformation = New-TSMSSqlServerDatabaseConnectionInformation 
 
 # disable default 'filesystem' logging provider
 Set-PSFLoggingProvider -Name 'filesystem' -Enabled $false
+
+# $ImportSecondaryAdminData
+if( $ImportSecondaryAdminData.IsPresent )
+{
+    $Error.Clear()
+
+    $operation = "Operation - Import Secondary Admin Account Data"
+
+    Start-TSMSLogFile -Path $TranscriptDirectoryPath -Name "ImportSecondaryAdminData" -MessageLevel ([PSFramework.Message.MessageLevel]::Verbose)
+
+    Start-TSMSSyncJobExecution -Name $operation -DatabaseConnectionInformation $databaseConnectionInformation
+
+    Write-Host "$(Get-Date) - Starting Operation: ImportSecondaryAdminData"
+
+    # import secondary admin data
+    Import-TSMSSecondarySiteAdmin `
+        -ClientId       $ClientId `
+        -Thumbprint     $Thumbprint `
+        -Tenant         $Tenant `
+        -DatabaseConnectionInformation $databaseConnectionInformation
+
+    Write-Host "$(Get-Date) - Completed Operation: ImportSecondaryAdminData"
+
+    Stop-TSMSSyncJobExecution -Name $operation -DatabaseConnectionInformation $databaseConnectionInformation
+
+    Stop-TSMSLogFile
+}
 
 # ImportUsageAccountData
 if( $ImportUsageAccountData.IsPresent )

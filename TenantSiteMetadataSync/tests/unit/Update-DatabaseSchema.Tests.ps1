@@ -120,7 +120,7 @@
     ) {
         $mockDatabaseConnectionInfo = New-MockDatabaseConnectionInformation -DatabaseConnectionType "ServicePrincipal"
 
-        $parameterFilter = '$ClientId -eq "{0}"'       -f $mockDatabaseConnectionInfo.ClientId.ToString()
+        $parameterFilter = '$ClientId -eq "{0}"'        -f $mockDatabaseConnectionInfo.ClientId.ToString()
         $parameterFilter += ' -and $TenantId -eq "{0}"' -f $mockDatabaseConnectionInfo.TenantId.ToString()
         $parameterFilter += ' -and ($ClientSecret | ConvertFrom-SecureString -AsPlainText) -eq "{0}"' -f ($mockDatabaseConnectionInfo.ClientSecret | ConvertFrom-SecureString -AsPlainText)
 
@@ -149,17 +149,18 @@
 
         foreach( $file in $files )
         {
-    
             $filter = ''
             $filter = '$InputFile -eq "{0}"'             -f $file.FullName
             $filter += ' -and $Database -eq "{0}"'       -f $mockDatabaseConnectionInfo.DatabaseName
             $filter += ' -and $ServerInstance -eq "{0}"' -f $mockDatabaseConnectionInfo.DatabaseServer
             $filter += ' -and $AccessToken -eq "{0}"'    -f "mock_access_token"
-    
+
+            $filter = $filter | ConvertTo-ScriptBlock
+
             Mock `
                 -CommandName "Invoke-Sqlcmd" `
                 -ModuleName "TenantSiteMetadataSync" `
-                -ParameterFilter ([ScriptBlock]::Create( $filter )) `
+                -ParameterFilter $filter `
                 -Verifiable        
         }
 

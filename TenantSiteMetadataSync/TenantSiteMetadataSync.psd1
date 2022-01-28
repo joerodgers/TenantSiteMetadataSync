@@ -3,7 +3,7 @@
     RootModule = 'TenantSiteMetadataSync.psm1'
 
     # Version number of this module.
-    ModuleVersion = '1.1.0.0'
+    ModuleVersion = '1.2.0.0'
 
     # ID used to uniquely identify this module
     GUID = '8c45bd42-02af-4f18-a8d8-0d5e891790df'
@@ -38,7 +38,8 @@
                         'Stop-SyncJobExecution',
                         'Sync-DatabaseSchema',
                         'Sync-DeletionStatus',
-                        'New-SqlServerDatabaseConnectionInformation'
+                        'New-SqlServerDatabaseConnectionInformation',
+                        'Import-SecondarySiteAdmin'
 
     DefaultCommandPrefix = 'TSMS'
     #DefaultCommandPrefix = ''

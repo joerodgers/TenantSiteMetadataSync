@@ -46,6 +46,7 @@
             "SiteMetadata"
             "SiteState" 
             "SyncJob" 
+            "SecondarySiteAdministrator"
         )
 
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]

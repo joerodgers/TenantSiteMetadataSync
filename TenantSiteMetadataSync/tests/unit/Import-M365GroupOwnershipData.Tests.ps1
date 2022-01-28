@@ -47,7 +47,7 @@ Describe "Testing Import-M365GroupOwnershipData cmdlet" -Tag "UnitTest" {
         $mockO365GroupOwners = New-MockO365GroupOwnerCollection -Quantity $OwnerQuantity
 
         # Microsoft.Graph Mocks
-        $parameterFilter = '$ClientId -eq "{0}" -and $CertificateThumbprint -eq "{1}" -and $TenantId -eq "{2}"' -f $mockTenantConnection.ClientId, $mockTenantConnection.Thumbprint, $mockTenantConnection.TenantFQDN | ConvertTo-ScriptBlock
+        $parameterFilter = '$ClientId -eq "{0}" -and $CertificateThumbprint -eq "{1}" -and $TenantId -eq "{2}"' -f $mockTenantConnection.ClientId.ToString(), $mockTenantConnection.Thumbprint, $mockTenantConnection.TenantFQDN | ConvertTo-ScriptBlock
 
         Mock -CommandName "Disconnect-MgGraph" -Verifiable:$($GroupQuantity -gt 0) -ModuleName "TenantSiteMetadataSync"
         Mock -CommandName "Connect-MgGraph"    -Verifiable:$($GroupQuantity -gt 0) -ModuleName "TenantSiteMetadataSync" -ParameterFilter $parameterFilter
@@ -62,7 +62,7 @@ Describe "Testing Import-M365GroupOwnershipData cmdlet" -Tag "UnitTest" {
         # build dynamic mocks
         foreach( $mockO365Group in $mockO365Groups )
         {
-            $parameterFilter = '$GroupId.ToString() -eq "{0}" -and $Top -eq 500' -f $mockO365Group.GroupId.ToString() | ConvertTo-ScriptBlock
+            $parameterFilter = '$GroupId.ToString() -eq "{0}" -and $All -eq $true' -f $mockO365Group.GroupId.ToString() | ConvertTo-ScriptBlock
 
             # create a mock with the unique filter
             Mock `

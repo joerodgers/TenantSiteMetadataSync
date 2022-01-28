@@ -44,26 +44,29 @@
         {
             $connection = New-SqlServerDatabaseConnection -DatabaseConnectionInformation $DatabaseConnectionInformation
 
-            $command = New-Object System.Data.SqlClient.SqlCommand($Query, $connection)     
-            $command.CommandTimeout = $CommandTimeout
-
-            foreach( $parameter in $Parameters.GetEnumerator() )
+            if( $connection )
             {
-                if( $null -eq $parameter.Value )
+                $command = New-Object System.Data.SqlClient.SqlCommand($Query, $connection)     
+                $command.CommandTimeout = $CommandTimeout
+
+                foreach( $parameter in $Parameters.GetEnumerator() )
                 {
-                    Write-PSFMessage -Level Debug -Message "Parameter: $($parameter.Key), Value=DBNULL"
-                    $null = $command.Parameters.AddWithValue( "@$($parameter.Key)", [System.DBNull]::Value )
+                    if( $null -eq $parameter.Value )
+                    {
+                        Write-PSFMessage -Level Debug -Message "Parameter: $($parameter.Key), Value=DBNULL"
+                        $null = $command.Parameters.AddWithValue( "@$($parameter.Key)", [System.DBNull]::Value )
+                    }
+                    else 
+                    {
+                        Write-PSFMessage -Level Debug -Message "Parameter: $($parameter.Key), Value='$parameter.Value'"
+                        $null = $command.Parameters.AddWithValue( "@$($parameter.Key)", $parameter.Value )
+                    }
                 }
-                else 
-                {
-                    Write-PSFMessage -Level Debug -Message "Parameter: $($parameter.Key), Value='$parameter.Value'"
-                    $null = $command.Parameters.AddWithValue( "@$($parameter.Key)", $parameter.Value )
-                }
+
+                Write-PSFMessage -Level Debug -Message "Executing Query: $Query"
+
+                $null = $command.ExecuteNonQuery()
             }
-
-            Write-PSFMessage -Level Debug -Message "Executing Query: $Query"
-
-            $null = $command.ExecuteNonQuery()
         }
         catch
         {
