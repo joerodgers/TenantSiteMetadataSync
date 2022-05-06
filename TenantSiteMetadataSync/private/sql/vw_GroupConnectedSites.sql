@@ -9,4 +9,3 @@ AS
     FROM    
         dbo.TVF_GroupSites_Active()
 GO
-

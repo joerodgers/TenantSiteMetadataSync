@@ -1,17 +1,24 @@
 ﻿IF OBJECT_ID('dbo.GroupConnectedSitesAndOwner', 'V') IS NOT NULL
-   DROP VIEW dbo.GroupConnectedSitesAndOwner
+    DROP VIEW dbo.GroupConnectedSitesAndOwner
 GO
 
 CREATE VIEW dbo.GroupConnectedSitesAndOwner
 AS
-    SELECT
-         DISTINCT
-        GCS.[SiteUrl]
+    SELECT DISTINCT
+         GCS.[SiteUrl]
         ,GCS.TimeCreated
         ,GCS.IsTeamsConnected
         ,GM.*
-        ,STUFF((SELECT N', ' + UserPrincipalName FROM GroupOwner WHERE GroupId = O.GroupId FOR XML PATH(''),TYPE).value('text()[1]','nvarchar(max)'),1,2,N'') AS 'GroupOwners'
-    FROM 
+        ,STUFF(
+            (SELECT 
+                ';' + UserPrincipalName 
+             FROM
+                GroupOwner
+             WHERE
+                GroupId = O.GroupId 
+             FOR XML PATH('')), 1, 1, ''
+            ) AS 'GroupOwners'
+    FROM
         dbo.TVF_GroupSites_Active() GCS
         FULL OUTER JOIN
         GroupOwner O

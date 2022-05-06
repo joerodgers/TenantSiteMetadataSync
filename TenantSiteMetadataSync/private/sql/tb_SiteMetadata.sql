@@ -31,6 +31,7 @@ BEGIN
         [SiteCreationSource]         uniqueidentifier NULL,
         [SiteOwnerEmail]             nvarchar(255)    NULL,
         [SiteOwnerName]              nvarchar(255)    NULL,
+        [SiteOwnerUserPrincipalName] nvarchar(255)    NULL,
         [SiteUrl]                    nvarchar(450)    NOT NULL,
         [State]                      int              NULL,
         [StorageQuota]               bigint           NULL, 

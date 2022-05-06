@@ -167,6 +167,69 @@
                     $counter++
                 }
             }
+
+            # query for all SiteOwnerUserPrincipalName that are null
+            $sql1 = "SELECT DISTINCT 
+                        SiteOwnerEmail 
+                     FROM 
+                        SiteMetadata 
+                     WHERE 
+                            SiteOwnerUserPrincipalName IS NULL
+                        AND SiteOwnerEmail IS NOT NULL
+                        AND SiteOwnerEmail <> ''
+                        AND IsGroupConnected = 0
+                        AND SiteOwnerEmail NOT LIKE '%#ext#@%'"
+
+            # update SiteOwnerUserPrincipalName with any existing rows that has a matching SiteOwnerEmail value
+            $sql2 = "UPDATE
+                         SiteMetadata
+                     SET 
+                         SiteOwnerUserPrincipalName = (SELECT DISTINCT SiteOwnerUserPrincipalName WHERE SiteOwnerEmail = @SiteOwnerEmail)
+                     WHERE
+                         SiteOwnerEmail = @SiteOwnerEmail"
+
+            # update SiteOwnerUserPrincipalName with provided value
+            $sql3 = "UPDATE
+                         SiteMetadata
+                     SET 
+                         SiteOwnerUserPrincipalName = @SiteOwnerUserPrincipalName
+                     WHERE
+                         SiteOwnerEmail = @SiteOwnerEmail"
+
+            Write-PSFMessage -Level Verbose -Message "Updating SiteOwnerUserPrincipalName values"
+
+            if( $results = @(Get-DataTable -Query $sql1 -DatabaseConnectionInformation $DatabaseConnectionInformation -As 'PSObject') )
+            {
+                Write-PSFMessage -Level Verbose -Message "Found $($results.Count) site owners with a null SiteOwnerUserPrincipalName"
+
+                # update all rows in the table that already have the same email address
+                foreach( $result in $results )
+                {
+                    Invoke-NonQuery `
+                        -DatabaseConnectionInformation $DatabaseConnectionInformation `
+                        -Query $sql2 `
+                        -Parameters @{ SiteOwnerEmail = $result.SiteOwnerEmail }
+                }
+            }
+
+            if( $results = @(Get-DataTable -Query $sql1 -DatabaseConnectionInformation $DatabaseConnectionInformation -As 'PSObject') )
+            {
+                $null = Connect-MgGraph -ClientId $ClientId -CertificateThumbprint $Thumbprint -TenantId "$Tenant.onmicrosoft.com"
+
+                Write-PSFMessage -Level Verbose -Message "Found $($results.Count) remaining site owners with a null SiteOwnerUserPrincipalName"
+
+                # update all rows in the table that have a matching proxy address
+                foreach( $result in $results )
+                {
+                    if( $graphUser = Get-MgUser -Filter "proxyAddresses/any(x:x eq 'smtp:$($result.SiteOwnerEmail)')" -Property "UserPrincipalName" -Top 1 )
+                    {
+                        Invoke-NonQuery `
+                            -DatabaseConnectionInformation $DatabaseConnectionInformation `
+                            -Query $sql3 `
+                            -Parameters @{ SiteOwnerUserPrincipalName = $graphUser.UserPrincipalName; SiteOwnerEmail = $result.SiteOwnerEmail }
+                    }
+                }
+            }
         }
     }
     end

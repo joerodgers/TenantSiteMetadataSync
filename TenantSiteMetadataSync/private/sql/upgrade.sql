@@ -79,6 +79,12 @@ BEGIN
     ALTER TABLE dbo.SiteMetadata DROP COLUMN LastWebActivityOn;
 END
 
+-- add SiteMetadata.SiteOwnerUserPrincipalName column
+IF NOT EXISTS(SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'SiteMetadata' AND COLUMN_NAME = 'SiteOwnerUserPrincipalName' ) 
+BEGIN
+    ALTER TABLE dbo.SiteMetadata ADD SiteOwnerUserPrincipalName nvarchar(255) NULL;
+END
+
 -- ensure the database collation is case insensitive
 USE master
 GO
@@ -94,3 +100,4 @@ BEGIN
          ALTER DATABASE TenantSiteMetadataSync COLLATE SQL_Latin1_General_CP1_CI_AS;
    END
 END
+
