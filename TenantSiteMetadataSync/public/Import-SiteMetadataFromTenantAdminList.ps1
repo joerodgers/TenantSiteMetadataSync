@@ -95,7 +95,6 @@
                     $parameters.DatabaseConnectionInformation = $DatabaseConnectionInformation
                     $parameters.FileViewedOrEdited   = $item.FieldValues["FileViewedOrEdited"]
                     $parameters.Initiator            = $item.FieldValues["Initiator"]
-                    $parameters.IsGroupConnected     = $item.FieldValues["IsGroupConnected"]
                     $parameters.LastActivityOn       = $item.FieldValues["LastActivityOn"]
                     $parameters.LastItemModifiedDate = $item.FieldValues["LastItemModifiedDate"]
                     $parameters.NumOfFiles           = $item.FieldValues["NumOfFiles"]
@@ -107,6 +106,11 @@
                     $parameters.TimeDeleted          = $item.FieldValues["TimeDeleted"]
                     $parameters.IsTeamsConnected     = $item.FieldValues["SiteFlags"] -eq 1
                     # $parameters.State                = -1 # "unknown"
+
+                    if( -not [string]::IsNullOrWhiteSpace($item.FieldValues["IsGroupConnected"]) )
+                    {
+                        $parameters.IsGroupConnected = $item.FieldValues["IsGroupConnected"]
+                    }
 
                     if( -not [string]::IsNullOrWhiteSpace($item.FieldValues["SiteCreationSource"]) )
                     {
