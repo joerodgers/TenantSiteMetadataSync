@@ -91,7 +91,7 @@
                 {
                     Write-PSFMessage -Level Debug -Message "($counter/$($items.Count)) Item Id='$($item.Id)'. List = 'AllSitesAggregatedSiteCollections'"
 
-                    if( $item.FieldValues["SiteId"] )
+                    if( -not $item.FieldValues["SiteId"] )
                     {
                         Write-PSFMessage -Level Warning -Message "Skipping entry with NULL SiteId, SiteUrl: $($item.FieldValues["SiteUrl"])"
                         continue
@@ -154,7 +154,7 @@
                 {
                     Write-PSFMessage -Level Debug -Message "($counter/$($items.Count)) Item Id='$($item.Id)'. List = 'AllSitesAggregatedSiteCollections'"
 
-                    if( $item.FieldValues["SiteId"] )
+                    if( -not $item.FieldValues["SiteId"] )
                     {
                         Write-PSFMessage -Level Warning -Message "Skipping entry with NULL SiteId, SiteUrl: $($item.FieldValues["SiteUrl"])"
                         continue
