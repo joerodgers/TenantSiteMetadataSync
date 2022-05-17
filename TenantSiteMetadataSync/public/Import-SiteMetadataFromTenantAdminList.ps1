@@ -91,6 +91,12 @@
                 {
                     Write-PSFMessage -Level Debug -Message "($counter/$($items.Count)) Item Id='$($item.Id)'. List = 'AllSitesAggregatedSiteCollections'"
 
+                    if( $item.FieldValues["SiteId"] )
+                    {
+                        Write-PSFMessage -Level Warning -Message "Skipping entry with NULL SiteId, SiteUrl: $($item.FieldValues["SiteUrl"])"
+                        continue
+                    }
+
                     $parameters = @{}
                     $parameters.DatabaseConnectionInformation = $DatabaseConnectionInformation
                     $parameters.FileViewedOrEdited   = $item.FieldValues["FileViewedOrEdited"]
@@ -147,6 +153,12 @@
                 foreach( $item in $items )
                 {
                     Write-PSFMessage -Level Debug -Message "($counter/$($items.Count)) Item Id='$($item.Id)'. List = 'AllSitesAggregatedSiteCollections'"
+
+                    if( $item.FieldValues["SiteId"] )
+                    {
+                        Write-PSFMessage -Level Warning -Message "Skipping entry with NULL SiteId, SiteUrl: $($item.FieldValues["SiteUrl"])"
+                        continue
+                    }
 
                     $parameters = @{}
                     $parameters.DatabaseConnectionInformation = $DatabaseConnectionInformation
