@@ -55,7 +55,7 @@
         {
             Write-PSFMessage -Level Verbose -Message "Querying dbo.SitesActive"
 
-            if( $sites = Get-DataTable -Query "SELECT SiteUrl, SiteId FROM dbo.SitesActive (nolock) WHERE LockState = 'Unlock'" -DatabaseConnectionInformation $DatabaseConnectionInformation -As 'PSObject') 
+            if( $sites = Get-DataTable -Query "SELECT SiteUrl, SiteId FROM dbo.SitesActive (nolock) WHERE LockState IS NULL OR LockState = 'Unlock'" -DatabaseConnectionInformation $DatabaseConnectionInformation -As 'PSObject') 
             {
                 Write-PSFMessage -Level Debug -Message "Discovered $($sites.Count) active site collections"
 
@@ -69,7 +69,11 @@
                     {
                         $secondaryAdministratorsFieldsDataJSON = '{{ "secondaryAdministratorsFieldsData":  {{"siteId":  "{0}" }}}}' -f $site.SiteId
 
-                        $secondaryAdministrators = Invoke-PnPSPRestMethod -Method Post -Url "https://$tenant-admin.sharepoint.com/_api/SPO.Tenant/GetSiteSecondaryAdministrators" -Content $secondaryAdministratorsFieldsDataJSON | Select-Object -ExpandProperty value
+                        $secondaryAdministrators = Invoke-PnPSPRestMethod `
+                                                            -Method Post `
+                                                            -Url "https://$tenant-admin.sharepoint.com/_api/SPO.Tenant/GetSiteSecondaryAdministrators" `
+                                                            -Content $secondaryAdministratorsFieldsDataJSON `
+                                                            -ErrorAction Stop | Select-Object -ExpandProperty value
 
                         if( $secondaryAdministrators )
                         {
