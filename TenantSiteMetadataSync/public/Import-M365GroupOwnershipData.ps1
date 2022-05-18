@@ -76,7 +76,7 @@
                 {
                     Write-PSFMessage -Level Verbose -Message "Getting group owners from Microsoft Graph API for group: $($group.GroupId)"
 
-                    $groupOwners = @( Get-MgGroupOwner -GroupId $group.GroupId -All )
+                    $groupOwners = @( Get-MgGroupOwner -GroupId $group.GroupId -All -ErrorAction Stop )
 
                     # if( -not $? ){ continue }
 
