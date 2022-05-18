@@ -50,7 +50,7 @@
     {
         $Error.Clear()
 
-        $counter = 1
+        $counter = 0
 
         Start-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -DatabaseConnectionInformation $DatabaseConnectionInformation
     }
@@ -68,15 +68,17 @@
 
             foreach( $group in $groups )
             {
+                $counter++ 
+
                 Write-PSFMessage -Level Verbose -Message "$counter/$($groups.Count) - Processing Group: $($group.GroupId)"
                 
                 try
                 {
                     Write-PSFMessage -Level Verbose -Message "Getting group owners from Microsoft Graph API for group: $($group.GroupId)"
 
-                    $groupOwners = @(Get-MgGroupOwner -GroupId $group.GroupId -All )
+                    $groupOwners = @( Get-MgGroupOwner -GroupId $group.GroupId -All )
 
-                    if( -not $? ){ continue }
+                    # if( -not $? ){ continue }
 
                     Write-PSFMessage -Level Verbose -Message "Owner count: $($groupOwners.Count)"
 
@@ -114,8 +116,6 @@
                 {
                     Write-PSFMessage -Level Critical -Message "Error updating group membership" -ErrorRecord $_
                 }
-                
-                $counter++
             }
 
             Disconnect-MgGraph
@@ -130,6 +130,3 @@
         Stop-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -ErrorCount $Error.Count -DatabaseConnectionInformation $DatabaseConnectionInformation
     }
 }
-
-$cmd = Get-Command -Name "Import-M365GroupOwnershipData"
-$cmd

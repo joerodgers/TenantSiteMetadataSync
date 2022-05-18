@@ -229,9 +229,9 @@
         # query for all SiteOwnerUserPrincipalName that are null
         $sql1 = "SELECT DISTINCT 
                     SiteOwnerEmail 
-                    FROM 
+                 FROM 
                     SiteMetadata 
-                    WHERE 
+                 WHERE 
                     SiteOwnerEmail IS NOT NULL
                     AND SiteOwnerEmail <> ''
                     AND IsGroupConnected = 0
@@ -248,11 +248,11 @@
 
         # update SiteOwnerUserPrincipalName with provided value
         $sql3 = "UPDATE
-                        SiteMetadata
-                    SET 
-                        SiteOwnerUserPrincipalName = @SiteOwnerUserPrincipalName
-                    WHERE
-                        SiteOwnerEmail = @SiteOwnerEmail"
+                     SiteMetadata
+                 SET 
+                     SiteOwnerUserPrincipalName = @SiteOwnerUserPrincipalName
+                 WHERE
+                     SiteOwnerEmail = @SiteOwnerEmail"
 
         Write-PSFMessage -Level Verbose -Message "Updating SiteOwnerUserPrincipalName values"
 

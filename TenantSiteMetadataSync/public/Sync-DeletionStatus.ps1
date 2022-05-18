@@ -75,7 +75,7 @@
                 if( $tenantSites -notcontains $activeSite.SiteUrl )
                 {
                     Write-PSFMessage -Level Verbose -Message "Marking $($activeSite.SiteUrl) as deleted"
-                    Update-SiteMetadata  -DatabaseConnectionInformation $DatabaseConnectionInformation -SiteId $activeSite.SiteId -SiteUrl $activeSite.SiteUrl -TimeDeleted ([System.Data.SqlTypes.SqlDateTime]::MinValue)
+                    Update-SiteMetadata -DatabaseConnectionInformation $DatabaseConnectionInformation -SiteId $activeSite.SiteId -SiteUrl $activeSite.SiteUrl -TimeDeleted ([System.Data.SqlTypes.SqlDateTime]::MinValue)
                 }
             }
 
