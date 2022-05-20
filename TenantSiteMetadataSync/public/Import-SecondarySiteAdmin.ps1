@@ -53,9 +53,9 @@
 
         if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection:$True )
         {
-            Write-PSFMessage -Level Verbose -Message "Querying dbo.SitesActive"
+            Write-PSFMessage -Level Verbose -Message "Querying 'SELECT SiteUrl, SiteId FROM dbo.SitesActive (nolock) WHERE LockState IS NULL OR LockState = 'Unlock''"
 
-            if( $sites = Get-DataTable -Query "SELECT SiteUrl, SiteId FROM dbo.SitesActive (nolock) WHERE LockState IS NULL OR LockState = 'Unlock'" -DatabaseConnectionInformation $DatabaseConnectionInformation -As 'PSObject') 
+            if( $sites = Get-DataTable -Query "SELECT SiteUrl, SiteId FROM dbo.SitesActive (nolock) WHERE LockState IS NULL OR LockState = 'Unlock'" -DatabaseConnectionInformation $DatabaseConnectionInformation -As 'PSObject')
             {
                 Write-PSFMessage -Level Debug -Message "Discovered $($sites.Count) active site collections"
 
@@ -73,6 +73,7 @@
                                                             -Method Post `
                                                             -Url "https://$tenant-admin.sharepoint.com/_api/SPO.Tenant/GetSiteSecondaryAdministrators" `
                                                             -Content $secondaryAdministratorsFieldsDataJSON `
+                                                            -Connection $connection `
                                                             -ErrorAction Stop | Select-Object -ExpandProperty value
 
                         if( $secondaryAdministrators )

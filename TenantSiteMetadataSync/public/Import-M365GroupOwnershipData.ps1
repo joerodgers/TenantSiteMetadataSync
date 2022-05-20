@@ -62,9 +62,16 @@
         {
             Write-PSFMessage -Level Verbose -Message "Discovered $($groups.Count) groups connected sites"
 
-            Write-PSFMessage -Level Verbose -Message "Connecting to Microsoft Graph"
-
-            $null = Connect-MgGraph -ClientId $ClientId -CertificateThumbprint $Thumbprint -TenantId "$Tenant.onmicrosoft.com"
+            try
+            {
+                Write-PSFMessage -Level Verbose -Message "Connecting to Microsoft Graph"
+                Connect-MgGraph -ClientId $ClientId -CertificateThumbprint $Thumbprint -TenantId "$Tenant.onmicrosoft.com" -ErrorAction Stop
+            }
+            catch
+            {
+                Write-PSFMessage -Level Critical -Message "Failed to connect to Microsoft Graph." -Exception $_.Exception
+                return
+            }
 
             foreach( $group in $groups )
             {
@@ -78,8 +85,6 @@
 
                     $groupOwners = @( Get-MgGroupOwner -GroupId $group.GroupId -All -ErrorAction Stop )
 
-                    # if( -not $? ){ continue }
-
                     Write-PSFMessage -Level Verbose -Message "Owner count: $($groupOwners.Count)"
 
                     if( $groupOwners.Count -gt 0 )
@@ -91,10 +96,10 @@
                         $parameters = @{}
                         $parameters.GroupId = $group.GroupId
                     
+                        Write-PSFMessage -Level Verbose -Message "Adding Group Owners: $($groupOwners.AdditionalProperties.userPrincipalName -join ';')"
+
                         foreach( $groupOwner in $groupOwners )
                         {
-                            Write-PSFMessage -Level Verbose -Message "Adding Group Owner $($groupOwner.AdditionalProperties.userPrincipalName)"
-
                             $parameters.UserPrincipalName = $groupOwner.AdditionalProperties.userPrincipalName 
                             
                             try
@@ -117,6 +122,8 @@
                     Write-PSFMessage -Level Critical -Message "Error updating group membership" -ErrorRecord $_
                 }
             }
+
+            Write-PSFMessage -Level Verbose -Message "Import completed."
 
             Disconnect-MgGraph
         }
