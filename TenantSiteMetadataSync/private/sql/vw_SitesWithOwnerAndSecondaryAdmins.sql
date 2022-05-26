@@ -5,24 +5,38 @@ GO
 CREATE VIEW dbo.SitesWithOwnerAndSecondaryAdmins
 AS
     SELECT DISTINCT
-        SM.*
+        SA.*
         ,STUFF
         (
             (SELECT 
                 N';' + LoginName 
              FROM 
                 SecondarySiteAdministrator 
-             WHERE 
-                SiteId = SCA.SiteId 
+             WHERE
+                SiteId = SCA.SiteId AND IsUserPrincipal = 1
              FOR XML PATH('')
-            ), 1, 1, ''
+            ), 
+            1, 
+            1,
+            ''
         ) AS 'SiteCollectionAdminUserPrincpalNames'
-    FROM 
+        ,STUFF
+        (
+            (SELECT 
+                N';' + Replace(LoginName, 'c:0t.c|tenant|', '')
+             FROM 
+                SecondarySiteAdministrator 
+             WHERE 
+                SiteId = SCA.SiteId AND IsUserPrincipal = 0
+             FOR XML PATH('')
+            ), 
+            1,
+            1, 
+            ''
+        ) AS 'SiteCollectionAdminGroupIds'
+    FROM
         dbo.TVF_Sites_Active() SA
-        FULL OUTER JOIN
+        LEFT JOIN
         SecondarySiteAdministrator SCA
         ON SA.SiteId = SCA.SiteId
-        FULL OUTER JOIN
-        SiteMetadata SM
-        ON SM.SiteId = SA.SiteId
 GO

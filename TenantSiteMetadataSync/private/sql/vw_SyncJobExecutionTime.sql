@@ -4,13 +4,14 @@ GO
 
 CREATE VIEW dbo.SyncJobExecutionTime
 AS
-    SELECT
-        [Name],
-        [Started],
-        [Finished],
-        CASE WHEN ([Started] IS NOT NULL AND [Finished] IS NOT NULL) THEN DATEDIFF(MINUTE, [Started], [Finished]) ELSE NULL END AS TotalMinutes,
-        [LastFinished],
-        ErrorCount
-    FROM            
-        dbo.SyncJob
+    SELECT TOP 1000
+         [Name]
+        ,[Started]
+        ,[Finished]
+        ,CASE WHEN LastExecutionElapsedTime IS NOT NULL THEN CONVERT(varchar, [LastExecutionElapsedTime] / 86400 ) + ':' + CONVERT(varchar, DATEADD(ms, ( [LastExecutionElapsedTime] % 86400 ) * 1000, 0), 108) ELSE '' END AS 'LastExecutionElapsedTime'
+        ,[ErrorCount]
+    FROM 
+        [dbo].[SyncJob]
+    ORDER BY
+        [Name]
 GO

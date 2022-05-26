@@ -81,7 +81,6 @@
             "proc_AddOrUpdateSensitivityLabel"
             "proc_AddOrUpdateSiteCreationSource"
             "proc_AddOrUpdateSiteMetadata"
-            "proc_ColumnExistsInTable"
             "proc_RemoveGroupOwnersByGroupId"
             "proc_StartSyncJobExecution"
             "proc_StopSyncJobExecution"

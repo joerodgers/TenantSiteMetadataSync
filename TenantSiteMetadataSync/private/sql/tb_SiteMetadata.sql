@@ -18,7 +18,6 @@ BEGIN
         [IsTeamsConnected]           bit              NULL,
         [LastActivityOn]             date             NULL,
         [LastItemModifiedDate]       datetime2(7)     NULL,
-        [LastListActivityOn]         datetime2(7)     NULL,
         [LockState]                  nvarchar(50)     NULL,
         [MemberLinkCount]            int              NULL,
         [NumOfFiles]                 int              NULL, 

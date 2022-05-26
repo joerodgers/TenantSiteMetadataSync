@@ -50,6 +50,8 @@
     {
         $Error.Clear()
 
+        Write-PSFMessage -Message "START ERROR COUNT: $($Error.Count)"
+
         $counter = 0
 
         Start-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -DatabaseConnectionInformation $DatabaseConnectionInformation
@@ -65,7 +67,7 @@
             try
             {
                 Write-PSFMessage -Level Verbose -Message "Connecting to Microsoft Graph"
-                Connect-MgGraph -ClientId $ClientId -CertificateThumbprint $Thumbprint -TenantId "$Tenant.onmicrosoft.com" -ErrorAction Stop
+                $null = Connect-MgGraph -ClientId $ClientId -CertificateThumbprint $Thumbprint -TenantId "$Tenant.onmicrosoft.com" -ErrorAction Stop
             }
             catch
             {
@@ -119,7 +121,10 @@
                 }
                 catch
                 {
+                    Write-PSFMessage -Message "ERROR COUNT: $($Error[0])"
+                    Write-PSFMessage -Message "ERROR COUNT: $($Error.Count)"
                     Write-PSFMessage -Level Critical -Message "Error updating group membership" -ErrorRecord $_
+                    Write-PSFMessage -Message "ERROR COUNT: $($Error.Count)"
                 }
             }
 
@@ -134,6 +139,9 @@
     }
     end
     {
+        Write-PSFMessage -Message "FINAL ERROR COUNT: $($Error.Count)"
+
+
         Stop-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -ErrorCount $Error.Count -DatabaseConnectionInformation $DatabaseConnectionInformation
     }
 }

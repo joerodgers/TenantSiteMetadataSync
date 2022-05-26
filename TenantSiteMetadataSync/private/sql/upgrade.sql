@@ -85,6 +85,29 @@ BEGIN
     ALTER TABLE dbo.SiteMetadata ADD SiteOwnerUserPrincipalName nvarchar(255) NULL;
 END
 
+-- drop SiteMetadata.LastListActivityOn column
+IF EXISTS(SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'SiteMetadata' AND COLUMN_NAME = 'LastListActivityOn' ) 
+BEGIN
+    ALTER TABLE dbo.SiteMetadata DROP COLUMN LastListActivityOn;
+END
+
+-- add SyncJob.LastExecutionElapsedTime column
+IF NOT EXISTS(SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'SyncJob' AND COLUMN_NAME = 'LastExecutionElapsedTime' ) 
+BEGIN
+    
+    DROP TABLE dbo.SyncJob;
+
+    CREATE TABLE dbo.SyncJob(
+        [Name]                     nvarchar(100) NOT NULL,
+        [Started]                  datetime2(0),
+        [Finished]                 datetime2(0),
+        [LastExecutionElapsedTime] bigint,
+        [ErrorCount]               int,
+        CONSTRAINT PK_SyncJobName PRIMARY KEY (Name)
+    )
+
+END
+
 -- ensure the database collation is case insensitive
 USE master
 GO
@@ -100,4 +123,3 @@ BEGIN
          ALTER DATABASE TenantSiteMetadataSync COLLATE SQL_Latin1_General_CP1_CI_AS;
    END
 END
-

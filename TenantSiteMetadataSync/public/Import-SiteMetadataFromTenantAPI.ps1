@@ -188,11 +188,15 @@
     
                         # add detailed properties to the parameter set
                         $parameters.ConditionalAccessPolicy = $siteDetail.ConditionalAccessPolicy
-                        $parameters.SiteId                  = $site.Id
                         $parameters.SiteOwnerEmail          = $siteDetail.OwnerEmail
                         $parameters.SiteOwnerName           = $siteDetail.OwnerName
                         $parameters.TimeCreated             = $web.Created
                         
+                        if( $site.Id )
+                        {
+                            $parameters.SiteId = $site.Id
+                        }
+
                         if( $siteDetail.SensitivityLabel )
                         {
                             $parameters.SensitivityLabel = $siteDetail.SensitivityLabel

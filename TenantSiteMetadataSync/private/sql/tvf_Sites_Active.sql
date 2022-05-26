@@ -31,6 +31,7 @@ SELECT
     SM.SiteId, 
     SM.SiteOwnerEmail, 
     SM.SiteOwnerName, 
+    SM.SiteOwnerUserPrincipalName, 
     SM.SiteUrl, 
     SS.[State] AS 'SiteState', 
     SCS.Source AS 'SiteCreationSource',

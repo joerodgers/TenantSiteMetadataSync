@@ -41,8 +41,6 @@
 
     begin    
     {
-        $tenantSites = $activeSites = $deletedSites = $null
-
         $Error.Clear()
 
         Start-SyncJobExecution -Name $PSCmdlet.MyInvocation.InvocationName -DatabaseConnectionInformation $DatabaseConnectionInformation 
@@ -53,40 +51,37 @@
 
         if( $connection = Connect-PnPOnline -Url "https://$Tenant-admin.sharepoint.com" -ClientId $ClientId -Thumbprint $Thumbprint -Tenant "$Tenant.onmicrosoft.com" -ReturnConnection )
         {
-            Write-PSFMessage -Level Verbose -Message "Querying tenant for sites"
+            Write-PSFMessage -Level Verbose -Message "Querying tenant for all SharePoint and OneDrive sites"
 
-            $tenantSites = Get-PnPTenantSite -IncludeOneDriveSites -Connection $connection | Select-Object -ExpandProperty Url | ConvertTo-NormalizedUrl
+            $tenantSitesUrls  = Get-PnPTenantSite -IncludeOneDriveSites -Connection $connection | Select-Object -ExpandProperty Url | ConvertTo-NormalizedUrl
+            $tenantSitesUrls += Get-HiddenSiteUrl -Tenant $Tenant | ConvertTo-NormalizedUrl
 
-            $tenantSites += Get-HiddenSiteUrl -Tenant $Tenant | ConvertTo-NormalizedUrl
+            Write-PSFMessage -Level Verbose -Message "Querying database for all active and deleted sites"
 
-            Disconnect-PnPOnline -Connection $connection
+            $activeSiteUrls  = Get-DataTable -DatabaseConnectionInformation $DatabaseConnectionInformation -Query "SELECT SiteUrl FROM SitesActive"  -As "PSObject" | Select-Object -ExpandProperty SiteUrl | ConvertTo-NormalizedUrl
+            $deletedSiteUrls = Get-DataTable -DatabaseConnectionInformation $DatabaseConnectionInformation -Query "SELECT SiteUrl FROM SitesDeleted" -As "PSObject" | Select-Object -ExpandProperty SiteUrl | ConvertTo-NormalizedUrl
 
-            Write-PSFMessage -Level Verbose -Message "Querying database for all active sites"
+            # get all active sites that are not in the tenant site list
+            $siteUrls = @(Compare-Object -ReferenceObject $tenantSitesUrls -DifferenceObject $activeSiteUrls | Where-Object -Property "SideIndicator" -eq "=>" | Select-Object -ExpandProperty "InputObject")
 
-            $activeSites = Get-DataTable -DatabaseConnectionInformation $DatabaseConnectionInformation -Query "SELECT SiteId, SiteUrl FROM SitesActive"
-        
-            Write-PSFMessage -Level Verbose -Message "Querying database for all deleted sites"
+            Write-PSFMessage -Level Verbose -Message "Found $($siteUrls.Count) sites to mark as deleted"
 
-            $deletedSites = Get-DataTable -DatabaseConnectionInformation $DatabaseConnectionInformation -Query "SELECT SiteId, SiteUrl FROM SitesDeleted"
-
-            # mark sites as deleted if they are not in tenant list anymore and are not marked as deleted in the database
-            foreach( $activeSite in $activeSites )
+            # mark each active site found as deleted
+            foreach( $siteUrl in $siteUrls )
             {
-                if( $tenantSites -notcontains $activeSite.SiteUrl )
-                {
-                    Write-PSFMessage -Level Verbose -Message "Marking $($activeSite.SiteUrl) as deleted"
-                    Update-SiteMetadata -DatabaseConnectionInformation $DatabaseConnectionInformation -SiteId $activeSite.SiteId -SiteUrl $activeSite.SiteUrl -TimeDeleted ([System.Data.SqlTypes.SqlDateTime]::MinValue)
-                }
+                Write-PSFMessage -Level Verbose -Message "Marking $siteUrl as deleted"
+                Update-SiteMetadata -DatabaseConnectionInformation $DatabaseConnectionInformation -SiteUrl $siteUrl -TimeDeleted ([System.Data.SqlTypes.SqlDateTime]::MinValue)
             }
 
-            # mark sites as not deleted if they are present in tenant list
-            foreach( $deletedSite in $deletedSites )
+            # get all deleted sites that are in the tenant site list
+            $siteUrls = Compare-Object -ReferenceObject $tenantSitesUrls -DifferenceObject $deletedSiteUrls -IncludeEqual | Where-Object -Property "SideIndicator" -eq "==" | Select-Object -ExpandProperty "InputObject"
+
+            Write-PSFMessage -Level Verbose -Message "Found $($siteUrls.Count) sites to mark as not deleted"
+
+            foreach( $siteUrl in $siteUrls )
             {
-                if( $tenantSites -contains $deletedSite.SiteUrl )
-                {
-                    Write-PSFMessage -Level Verbose -Message "Marking $($activeSite.SiteUrl) as not deleted"
-                    Invoke-NonQuery -DatabaseConnectionInformation $DatabaseConnectionInformation -Query "UPDATE SiteMetadata SET TimeDeleted = NULL WHERE @SiteId = @SiteId" -Parameters @{ SiteId = $deletedSite.SiteId }
-                }
+                Write-PSFMessage -Level Verbose -Message "Marking $siteUrl as not deleted"
+                Invoke-NonQuery -DatabaseConnectionInformation $DatabaseConnectionInformation -Query "UPDATE SiteMetadata SET TimeDeleted = NULL, DeletedBy = NULL WHERE @SiteUrl = @SiteUrl AND TimeDeleted IS NOT NULL" -Parameters @{ SiteUrl = $siteUrl }
             }
         }
     }
