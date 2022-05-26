@@ -68,7 +68,7 @@
         else 
         {
             $listTitle = "DO_NOT_DELETE_SPLIST_TENANTADMIN_ALL_SITES_AGGREGATED_SITECOLLECTIONS"
-            $fields = "ConditionalAccessPolicy", "CreatedBy", "DeletedBy", "LastItemModifiedDate", "SiteOwnerEmail", "SiteOwnerName", "StorageQuota", "SiteId", "SiteUrl", "TemplateName", "TimeCreated", "Title"
+            $fields = "ConditionalAccessPolicy", "CreatedBy", "DeletedBy", "LastItemModifiedDate", "SiteOwnerEmail", "SiteOwnerName", "StorageQuota", "SiteId", "SiteUrl", "TemplateName", "TimeCreated", "TimeCreated", "Title"
         }
     }
     process
@@ -176,6 +176,16 @@
                     if( $item.FieldValues["DeletedBy"] )
                     {
                         $parameters.DeletedBy = $item.FieldValues["DeletedBy"]
+                    }
+
+                    if( $item.FieldValues["TimeDeleted"] )
+                    {
+                        $parameters.TimeDeleted = $item.FieldValues["TimeDeleted"]
+
+                        if( $item.FieldValues["DeletedBy"] )
+                        {
+                            $parameters.DeletedBy = $item.FieldValues["DeletedBy"]
+                        }
                     }
 
                     Update-SiteMetadata @parameters
