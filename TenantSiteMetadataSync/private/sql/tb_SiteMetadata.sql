@@ -1,7 +1,8 @@
 ﻿IF OBJECT_ID('dbo.SiteMetadata', 'U') IS NULL
 BEGIN
 
-    CREATE TABLE dbo.SiteMetadata(
+    CREATE TABLE dbo.SiteMetadata
+    (
         [SiteId]                     uniqueidentifier NOT NULL,
         [AnonymousLinkCount]         int              NULL,
         [CompanyLinkCount]           int              NULL,
@@ -58,4 +59,19 @@ END
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_SiteMetadata_GroupId')
 BEGIN
     CREATE INDEX [IX_SiteMetadata_GroupId] ON [dbo].[SiteMetadata]([GroupId]) ON [PRIMARY]
+END
+
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_SiteMetadata_TimeDeleted')
+BEGIN
+    CREATE INDEX [IX_SiteMetadata_TimeDeleted] ON [dbo].[SiteMetadata]([TimeDeleted]) ON [PRIMARY]
+END
+
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_SiteMetadata_IsGroupConnected')
+BEGIN
+    CREATE INDEX [IX_SiteMetadata_IsGroupConnected] ON [dbo].[SiteMetadata]([IsGroupConnected]) ON [PRIMARY]
+END
+
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_SiteMetadata_IsTeamsConnected')
+BEGIN
+    CREATE INDEX [IX_SiteMetadata_IsTeamsConnected] ON [dbo].[SiteMetadata]([IsTeamsConnected]) ON [PRIMARY]
 END
