@@ -36,6 +36,8 @@
             -DatabaseConnectionInformation $DatabaseConnectionInformation `
             -Query "EXEC proc_StartSyncJobExecution @Name = @Name" `
             -Parameters @{ Name = $Name }
+
+        $Global:Error.Clear()
     }
     end
     {

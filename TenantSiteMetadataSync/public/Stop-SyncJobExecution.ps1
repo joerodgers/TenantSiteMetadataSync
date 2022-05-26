@@ -27,11 +27,12 @@
         $DatabaseConnectionInformation,
 
         [Parameter(Mandatory=$false)]
-        [int]$ErrorCount = $Error.Count
+        [int]$ErrorCount = $Global:Error.Count
     )
     
     begin
     {
+        #
     }
     process
     {
