@@ -56,8 +56,10 @@
 
             Write-PSFMessage -Level Verbose -Message "Querying database for all active and deleted sites"
 
-            $activeSiteUrls  = Get-DataTable -DatabaseConnectionInformation $DatabaseConnectionInformation -Query "SELECT SiteUrl FROM SitesActive"  -As "PSObject" | Select-Object -ExpandProperty SiteUrl | ConvertTo-NormalizedUrl
-            $deletedSiteUrls = Get-DataTable -DatabaseConnectionInformation $DatabaseConnectionInformation -Query "SELECT SiteUrl FROM SitesDeleted" -As "PSObject" | Select-Object -ExpandProperty SiteUrl | ConvertTo-NormalizedUrl
+            $activeSiteUrls  = Get-DataTable -DatabaseConnectionInformation $DatabaseConnectionInformation -Query "SELECT SiteUrl FROM SitesBasicActive"  | Select-Object -ExpandProperty "SiteUrl"
+            $deletedSiteUrls = Get-DataTable -DatabaseConnectionInformation $DatabaseConnectionInformation -Query "SELECT SiteUrl FROM SitesBasicDeleted" | Select-Object -ExpandProperty "SiteUrl"
+
+            Write-PSFMessage -Level Verbose -Message "Comparing tenant site list to active site list"
 
             # get all active sites that are not in the tenant site list
             $siteUrls = @(Compare-Object -ReferenceObject $tenantSitesUrls -DifferenceObject $activeSiteUrls | Where-Object -Property "SideIndicator" -eq "=>" | Select-Object -ExpandProperty "InputObject")
@@ -71,8 +73,10 @@
                 Update-SiteMetadata -DatabaseConnectionInformation $DatabaseConnectionInformation -SiteUrl $siteUrl -TimeDeleted ([System.Data.SqlTypes.SqlDateTime]::MinValue)
             }
 
+            Write-PSFMessage -Level Verbose -Message "Comparing tenant site list to deleted site list"
+
             # get all deleted sites that are in the tenant site list
-            $siteUrls = Compare-Object -ReferenceObject $tenantSitesUrls -DifferenceObject $deletedSiteUrls -IncludeEqual | Where-Object -Property "SideIndicator" -eq "==" | Select-Object -ExpandProperty "InputObject"
+            $siteUrls = @(Compare-Object -ReferenceObject $tenantSitesUrls -DifferenceObject $deletedSiteUrls -IncludeEqual | Where-Object -Property "SideIndicator" -eq "==" | Select-Object -ExpandProperty "InputObject")
 
             Write-PSFMessage -Level Verbose -Message "Found $($siteUrls.Count) sites to mark as not deleted"
 
