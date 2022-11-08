@@ -3,5 +3,6 @@
 TestResults/*
 
 # ignore test logs
-
 Logs/*
+
+Test-Script.ps1

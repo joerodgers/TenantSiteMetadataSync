@@ -18,10 +18,10 @@
     ScriptsToProcess = ".\classes\DatabaseConnectionInformation.ps1"
 
     # Modules that must be imported into the global environment prior to importing this module
-    RequiredModules = @{ModuleName="SqlServer";                             ModuleVersion ="21.1.18256" },
-                      @{ModuleName="Microsoft.Graph.Groups";                ModuleVersion ="1.0.1"      },
-                      @{ModuleName="PnP.PowerShell";                        ModuleVersion ="1.7.0"      },
-                      @{ModuleName="PSFramework";                           ModuleVersion ="1.6.205"    }
+    RequiredModules = @{ModuleName="SqlServer";                             ModuleVersion  = "21.1.18256" },
+                      @{ModuleName="Microsoft.Graph.Groups";                ModuleVersion  = "1.0.1"      },
+                      @{ModuleName="PnP.PowerShell";                        MaximumVersion = "1.10.0"     },
+                      @{ModuleName="PSFramework";                           ModuleVersion  = "1.6.205"    }
                       
     # Functions to export from this module
     FunctionsToExport = 'Import-M365GroupOwnershipData',
